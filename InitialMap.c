@@ -115,24 +115,43 @@ int makeBarrier() {
     return 0;
 }
 
-int mapDrawer() {
-    for (int i = 0; i < mapHeight; ++i) {
-        for (int j = 0; j < mapWidth; ++j) {
-            switch (map[0][j][i]) {
+int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
+    BeginDrawing();
+
+    ClearBackground(RAYWHITE);
+
+    DrawTexture(mapTileSet, 0,0, WHITE);
+
+    for(int i=0; i<mapWidth; i++) {
+        for(int j=0; j<mapHeight; j++) {
+
+            //MapDrawer
+            switch (map[0][i][j]) {
                 case -1: // -1 is the code for kingdoms.
-                    printf("C ");
+                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BLACK);
                     break;
                 case -2: // -2 is the code for villages.
-                    printf("V ");
+                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
                     break;
-                case -3: // 0 is the code for barriers.
-                    printf("X ");
+                case -3: // -3 is the code for barriers.
+                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, GRAY);
                     break;
                 default: // It is used for roadways' numbers.
-                    printf("%d ", map[0][j][i]);
+                    DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
+
+                    // Writing roadways' numbers on the tile
+//                    char innerNum[2];
+//                    sprintf(innerNum, "%d", map[0][i][j]);
+//                    DrawText(innerNum, (i+.5)*TILE_SIZE+map0.x, (j+.5)*TILE_SIZE+map0.y, 20, BROWN);
+            }
+
+            // Hover Effect
+            if(coordination.x==i && coordination.y==j) {
+                DrawRectangle(i * TILE_SIZE + map0.x, j * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
             }
         }
-        printf("\n");
     }
+
+    EndDrawing();
     return 0;
 }
