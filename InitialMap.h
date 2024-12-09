@@ -11,6 +11,7 @@ extern int map[4][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth;
 
 // Functions' Prototypes
+//int generate_number();
 int initialMapMaker();
 int makeKingdom();
 int makeVillage();

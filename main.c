@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "raylib.h"
+#include <conio.h>
+#include <time.h>
 #include "InitialMap.h"
 
 // Program main entry point
@@ -11,6 +14,7 @@ int main() {
     makeBarrier();
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
+    srand(time(NULL));
 
     Vector2 mapCenter= {TILE_SIZE*15, TILE_SIZE*13};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
