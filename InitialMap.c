@@ -115,7 +115,7 @@ int makeBarrier() {
     return 0;
 }
 
-int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle,Texture2D Stone, Vector2 map0, Vector2 coordination) {
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
@@ -126,23 +126,25 @@ int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
         for(int j=0; j<mapHeight; j++) {
 
             //MapDrawer
+            DrawTexture(GroundTile,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
             switch (map[0][i][j]) {
                 case -1: // -1 is the code for kingdoms.
-                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BLACK);
+                    DrawTexture(Castle,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
                     break;
                 case -2: // -2 is the code for villages.
                     DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
                     break;
                 case -3: // -3 is the code for barriers.
-                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, GRAY);
+                //    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, GRAY);
+                    DrawTexture(Stone,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
                     break;
                 default: // It is used for roadways' numbers.
                     DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
 
                     // Writing roadways' numbers on the tile
-//                    char innerNum[2];
-//                    sprintf(innerNum, "%d", map[0][i][j]);
-//                    DrawText(innerNum, (i+.5)*TILE_SIZE+map0.x, (j+.5)*TILE_SIZE+map0.y, 20, BROWN);
+                    char innerNum[2];
+                    sprintf(innerNum, "%d", map[0][i][j]);
+                    DrawText(innerNum, (i+.45)*TILE_SIZE+map0.x, (j+.25)*TILE_SIZE+map0.y, 20, WHITE);
             }
 
             // Hover Effect
