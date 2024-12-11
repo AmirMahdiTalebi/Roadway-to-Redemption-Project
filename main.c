@@ -2,6 +2,8 @@
 #include "raylib.h"
 #include "InitialMap.h"
 
+
+
 // Program main entry point
 int main() {
 
@@ -19,6 +21,9 @@ int main() {
     Texture2D GroundTile = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\tilecrop (1).png");
     Texture2D Castle = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\castle.png");
     Texture2D Stone = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone2.png");
+    Texture2D House = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\house.png");
+
+    Font font= LoadFont("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\pixantiqua.png");
 
     SetTargetFPS(60);
 
@@ -29,7 +34,7 @@ int main() {
         Vector2 mousePosition = GetMousePosition();
         Vector2 coordination = {(int)((mousePosition.x - map0.x)/TILE_SIZE), (int)((mousePosition.y - map0.y)/TILE_SIZE)};
 
-        mapDrawer(mapTileSet, GroundTile, Castle, Stone, map0, coordination);
+        mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0, coordination);
     }
 
     UnloadTexture(mapTileSet);

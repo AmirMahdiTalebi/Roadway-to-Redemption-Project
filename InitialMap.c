@@ -115,7 +115,7 @@ int makeBarrier() {
     return 0;
 }
 
-int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle,Texture2D Stone, Vector2 map0, Vector2 coordination) {
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0, Vector2 coordination) {
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
@@ -127,29 +127,38 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle,Textu
 
             //MapDrawer
             DrawTexture(GroundTile,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
+            DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, (Color){150,75,0,100});
             switch (map[0][i][j]) {
+
                 case -1: // -1 is the code for kingdoms.
                     DrawTexture(Castle,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
                     break;
+
                 case -2: // -2 is the code for villages.
-                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
+                    DrawTexture(House,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
                     break;
+
                 case -3: // -3 is the code for barriers.
-                //    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, GRAY);
                     DrawTexture(Stone,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
                     break;
-                default: // It is used for roadways' numbers.
-                    DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
 
+                default: // It is used for roadways' numbers.
                     // Writing roadways' numbers on the tile
                     char innerNum[2];
                     sprintf(innerNum, "%d", map[0][i][j]);
-                    DrawText(innerNum, (i+.45)*TILE_SIZE+map0.x, (j+.25)*TILE_SIZE+map0.y, 20, WHITE);
+                    DrawTextEx(font, innerNum, (Vector2){(i+.4)*TILE_SIZE+map0.x,(j+.15)*TILE_SIZE+map0.y}, 30, 1, (Color){150,75,0,150});
             }
 
             // Hover Effect
             if(coordination.x==i && coordination.y==j) {
-                DrawRectangle(i * TILE_SIZE + map0.x, j * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+                DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+                //Village info
+                if(map[0][i][j]==-2) {
+                    DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.1) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
+                    char goldFood[30];
+                    sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
+                    DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
+                }
             }
         }
     }

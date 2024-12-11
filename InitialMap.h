@@ -15,6 +15,6 @@ int initialMapMaker();
 int makeKingdom();
 int makeVillage();
 int makeBarrier();
-int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D Stone,Vector2 map0, Vector2 coordination);
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0, Vector2 coordination);
 
 #endif // INITIAL_MAP_H
