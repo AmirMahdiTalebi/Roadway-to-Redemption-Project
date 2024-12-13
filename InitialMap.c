@@ -9,6 +9,7 @@
 int map[4][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
+int list[MAP_SIZE*MAP_SIZE][5];
 
 int generate_number() {
     float probs[4] = {.65, .25, .05, .05};
@@ -26,6 +27,111 @@ int generate_number() {
     }
 }
 
+int dijkstraPath(int source, int dest,Vector2 map0, int size) {
+    for (int i = 0; i < mapWidth; ++i) {
+        for (int j = 0; j < mapHeight; ++j) {
+            if (map[0][i][j] < 0) {
+                list[j*mapWidth+i][0] = -1;
+            }
+            else list[j*mapWidth+i][0] = map[0][i][j];
+        }
+    }
+
+    //Adding neighbors to the list
+    for (int i = 0; i < mapWidth*mapHeight; ++i) {
+        int k = 0;
+        int e = 0;
+        int verticeIndex = i + 1;
+        if ((verticeIndex - mapWidth) <= 0 || list[i - mapWidth][0] == -1) {
+            list[i][4-e] = -1;
+            e++;
+        }
+        else {
+            list[i][1+k] = i - mapWidth;
+            k++;
+        }
+        if ((verticeIndex + mapWidth) > (mapWidth * mapHeight) || list[i + mapWidth][0] == -1) {
+            list[i][4-e] = -1;
+            e++;
+        }
+        else {
+            list[i][1+k] = i + mapWidth;
+            k++;
+        }
+        if (verticeIndex % mapWidth == 1 || list[i-1][0] == -1) {
+            list[i][4-e] = -1;
+            e++;
+        }
+        else {
+            list[i][1+k] = i - 1;
+            k++;
+        }
+        if ((verticeIndex) % mapWidth == 0 || list[i+1][0] == -1) list[i][4-e] = -1;
+        else list[i][1+k] = i + 1;
+    }
+
+    //vars
+    int dist[size];
+    for (int i = 0; i < size; ++i) {
+        dist[i] = INT_MAX;
+    }
+    int path[size][size];
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            if (j == 0) path[i][j] = source;
+            else path[i][j] = -1;
+        }
+    }
+    int pathNumber[289]= {0};
+    int visited[289]= {0};
+    dist[source]=0;
+    pathNumber[source]=1;
+    int current=source, neighbor, minDistance;
+
+    //main algorithm loop
+    while(!visited[dest]) {
+
+        //update all neighbors
+        for(int i=1; list[current][i]>=0; i++) {
+            neighbor=list[current][i];
+            if(!visited[neighbor] && (dist[current] + list[neighbor][0]) < dist[neighbor] && list[neighbor][0] != -1) {
+                //update distance
+                dist[neighbor] = dist[current] + list[neighbor][0];
+                //update path
+                pathNumber[neighbor]= pathNumber[current]+1;
+                for(int j=0; j<pathNumber[current]; j++) {
+                    path[neighbor][j]=path[current][j];
+                }
+                path[neighbor][pathNumber[neighbor]-1]=neighbor;
+            }
+        }
+
+        //current is visited
+        visited[current] = 1;
+
+        //update current
+        minDistance=INT_MAX;
+        for(int i=0; i<size; i++) {
+            if(!visited[i] && dist[i]<minDistance && list[i][0] != -1) {
+                current=i;
+                minDistance=dist[i];
+            }
+        }
+    }
+
+    //output
+    for(int k=0; k < mapWidth*mapHeight; k++) {
+        printf("shortest path (%d) from %d to %d(%d) is " ,dist[k],source, k, list[k][0]);
+        for(int l=0; l<pathNumber[k]; l++)
+            printf("%d ", path[k][l]);
+        printf("\n");
+    }
+    for(int k=0; k<pathNumber[dest]; k++) {
+        DrawRectangle((path[dest][k]% mapWidth) * TILE_SIZE + map0.x, (path[dest][k]/mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+    }
+    return 0;
+}
+
 int initialMapMaker() {
     // Getting map's width and height
     printf("Enter the map height:");
@@ -41,9 +147,9 @@ int initialMapMaker() {
         scanf("%d", &mapWidth);
     }
     // Initializing map's values
-    for (int i = 0; i < mapHeight; ++i) {
-        for (int j = 0; j < mapWidth; ++j) {
-            map[0][j][i] = generate_number();
+    for (int i = 0; i < mapWidth; ++i) {
+        for (int j = 0; j < mapHeight; ++j) {
+            map[0][i][j] = generate_number();
         }
     }
     return 0;
@@ -168,6 +274,13 @@ int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
             // Hover Effect
             if(coordination.x==i && coordination.y==j) {
                 DrawRectangle(i * TILE_SIZE + map0.x, j * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+            }
+        }
+    }
+    for(int i=0; i<mapWidth; i++) {
+        for(int j=0; j<mapHeight; j++) {
+            if(coordination.x==i && coordination.y==j) {
+                dijkstraPath(0, j*mapWidth+i, map0, mapHeight*mapWidth);
             }
         }
     }
