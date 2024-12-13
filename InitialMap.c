@@ -1,10 +1,30 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "raylib.h"
+#include <conio.h>
+#include <time.h>
 #include "InitialMap.h"
 
 // Global Variables
 int map[4][MAP_SIZE][MAP_SIZE];
-int mapHeight, mapWidth;
+int mapHeight = 0;
+int mapWidth = 0;
+
+int generate_number() {
+    float probs[4] = {.65, .25, .05, .05};
+
+    float randValue = GetRandomValue(0, 100) / 100.0f;
+
+    if (randValue < probs[0]) {
+        return 1;
+    } else if (randValue < probs[0] + probs[1]) {
+        return 2;
+    } else if (randValue < probs[0] + probs[1] + probs[2]) {
+        return 3;
+    } else {
+        return 4;
+    }
+}
 
 int initialMapMaker() {
     // Getting map's width and height
@@ -23,7 +43,7 @@ int initialMapMaker() {
     // Initializing map's values
     for (int i = 0; i < mapHeight; ++i) {
         for (int j = 0; j < mapWidth; ++j) {
-            map[0][j][i] = 1;
+            map[0][j][i] = generate_number();
         }
     }
     return 0;
@@ -140,9 +160,9 @@ int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
                     DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
 
                     // Writing roadways' numbers on the tile
-//                    char innerNum[2];
-//                    sprintf(innerNum, "%d", map[0][i][j]);
-//                    DrawText(innerNum, (i+.5)*TILE_SIZE+map0.x, (j+.5)*TILE_SIZE+map0.y, 20, BROWN);
+                    char innerNum[2];
+                    sprintf(innerNum, "%d", map[0][i][j]);
+                    DrawText(innerNum, (i+.5)*TILE_SIZE+map0.x, (j+.5)*TILE_SIZE+map0.y, 20, BLACK);
             }
 
             // Hover Effect
