@@ -5,8 +5,6 @@
 #include <time.h>
 #include "InitialMap.h"
 
-
-
 // Program main entry point
 int main() {
 
@@ -20,6 +18,13 @@ int main() {
 
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
+    int kingdomVerticeNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
+    for(int i=0; i<villageNumber; i++) {
+        dijkstraPath(kingdomVerticeNumber, i, mapWidth*mapHeight);
+    }
+
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
+
 
     Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\initial map (1).png");
     Texture2D GroundTile = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\tilecrop (1).png");
@@ -31,10 +36,9 @@ int main() {
 
     SetTargetFPS(60);
 
-    // Main game loop
-    while (!WindowShouldClose())
-    {
-        //Hover effect vectors
+//     Main game loop
+    while (!WindowShouldClose()) {
+//        Hover effect vectors
         Vector2 mousePosition = GetMousePosition();
         Vector2 coordination = {(int)((mousePosition.x - map0.x)/TILE_SIZE), (int)((mousePosition.y - map0.y)/TILE_SIZE)};
 

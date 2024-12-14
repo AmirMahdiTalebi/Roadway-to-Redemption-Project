@@ -2,9 +2,140 @@
 #include "raylib.h"
 #include "InitialMap.h"
 
+typedef struct kingdom kingdom;
+typedef struct village village;
+
+//make village id and kingdom id more accessible and call dijkstra after getting all the x and y
+//maybe make a function that stores all the paths like intial mapmakers
+
 // Global Variables
 int map[4][MAP_SIZE][MAP_SIZE];
-int mapHeight, mapWidth;
+int mapHeight = 0;
+int mapWidth = 0;
+int list[MAP_SIZE*MAP_SIZE][5];
+
+int turn=0;
+int villageNumber;
+int kingdomNumber;
+
+village villages[30]={0};
+kingdom kingdoms[5]={0};
+
+
+int generate_number() {
+    float probs[4] = {.65, .25, .05, .05};
+
+    float randValue = GetRandomValue(0, 100) / 100.0f;
+
+    if (randValue < probs[0]) {
+        return 1;
+    } else if (randValue < probs[0] + probs[1]) {
+        return 2;
+    } else if (randValue < probs[0] + probs[1] + probs[2]) {
+        return 3;
+    } else {
+        return 4;
+    }
+}
+
+int dijkstraPath(int source,int id, int size) {
+    int dest = villages[id].y*mapWidth + villages[id].x;
+    for (int i = 0; i < mapWidth; ++i) {
+        for (int j = 0; j < mapHeight; ++j) {
+            if (map[0][i][j] < 0) {
+                list[j*mapWidth+i][0] = 2000;
+            }
+            else list[j*mapWidth+i][0] = map[0][i][j];
+        }
+    }
+    list[source][0]=list[dest][0]=0;
+
+    //Adding neighbors to the list
+    for (int i = 0; i < mapWidth*mapHeight; ++i) {
+        int k = 0;
+        int e = 0;
+        int verticeIndex = i + 1;
+        if ((verticeIndex - mapWidth) <= 0) {
+            list[i][4-e] = -1;
+            e++;
+        }
+        else {
+            list[i][1+k] = i - mapWidth;
+            k++;
+        }
+        if ((verticeIndex + mapWidth) > (mapWidth * mapHeight)) {
+            list[i][4-e] = -1;
+            e++;
+        }
+        else {
+            list[i][1+k] = i + mapWidth;
+            k++;
+        }
+        if (verticeIndex % mapWidth == 1) {
+            list[i][4-e] = -1;
+            e++;
+        }
+        else {
+            list[i][1+k] = i - 1;
+            k++;
+        }
+        if ((verticeIndex) % mapWidth == 0) list[i][4-e] = -1;
+        else list[i][1+k] = i + 1;
+    }
+
+    //vars
+    int dist[size];
+    for (int i = 0; i < size; ++i) {
+        dist[i] = 2000;
+    }
+    int path[size][size];
+    for (int i = 0; i < size; ++i) {
+        path[i][0] = source;
+    }
+    int pathNumber[289]= {0};
+    int visited[289]= {0};
+    dist[source]=0;
+    pathNumber[source]=1;
+    int current=source, neighbor, minDistance;
+
+    //main algorithm loop
+    while(!visited[dest]) {
+
+        //update all neighbors
+        for(int i=1; list[current][i]>=0 && i<5; i++) {
+            neighbor=list[current][i];
+            if(!visited[neighbor] && (dist[current] + list[neighbor][0]) < dist[neighbor] && list[neighbor][0] != -1) {
+                //update distance
+                dist[neighbor] = dist[current] + list[neighbor][0];
+                //update path
+                pathNumber[neighbor]= pathNumber[current]+1;
+                for(int j=0; j<pathNumber[current]; j++) {
+                    path[neighbor][j]=path[current][j];
+                }
+                path[neighbor][pathNumber[neighbor]-1]=neighbor;
+            }
+        }
+
+        //current is visited
+        visited[current] = 1;
+
+        //update current
+        minDistance=2000;
+        for(int i=0; i<size; i++) {
+            if(!visited[i] && dist[i]<minDistance && list[i][0] != -1) {
+                current=i;
+                minDistance=dist[i];
+            }
+        }
+    }
+
+    int k;
+    for(k=0; k<pathNumber[dest]; k++) {
+        villages[id].path[k]=path[dest][k];
+    }
+    villages[id].pathNumber = pathNumber[dest];
+    return 0;
+}
 
 int initialMapMaker() {
     // Getting map's width and height
@@ -21,9 +152,9 @@ int initialMapMaker() {
         scanf("%d", &mapWidth);
     }
     // Initializing map's values
-    for (int i = 0; i < mapHeight; ++i) {
-        for (int j = 0; j < mapWidth; ++j) {
-            map[0][j][i] = 1;
+    for (int i = 0; i < mapWidth; ++i) {
+        for (int j = 0; j < mapHeight; ++j) {
+            map[0][i][j] = generate_number();
         }
     }
     return 0;
@@ -33,6 +164,7 @@ int makeKingdom() {
     int n, x, y;
     printf("Enter the number of kingdoms:");
     scanf("%d", &n);
+    kingdomNumber=n;
     for (int i = 0; i < n; ++i) {
         printf("Enter x and y for the kingdom No.%d:\n", i + 1);
         scanf("%d %d", &x, &y);
@@ -49,6 +181,8 @@ int makeKingdom() {
         y--;
         map[0][x][y] = -1; // -1 is the code for kingdoms.
         map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
+        kingdoms[i].x = x;
+        kingdoms[i].y = y;
     }
     return 0;
 }
@@ -57,6 +191,7 @@ int makeVillage() {
     int n, x, y, goldX, foodX;
     printf("Enter the number of villages:");
     scanf("%d", &n);
+    villageNumber=n;
     for (int i = 0; i < n; ++i) {
         printf("Enter the info for the village No.%d:\n", i + 1);
         printf("x and y:");
@@ -69,11 +204,15 @@ int makeVillage() {
             printf("There is already something else there.\nx and y:");
             scanf("%d %d", &x, &y);
         }
+
         // x and y start from 1
         x--;
         y--;
         map[0][x][y] = -2; // -2 is the code for villages.
         map[1][x][y] = i; // I saved villages' IDs in z=1.
+        villages[i].x = x;
+        villages[i].y = y;
+
         printf("goldX:");
         scanf("%d", &goldX);
         while(goldX<0) {
@@ -81,6 +220,8 @@ int makeVillage() {
             scanf("%d", &goldX);
         }
         map[2][x][y] = goldX;
+        villages[i].goldX = goldX;
+
         printf("foodX:");
         scanf("%d", &foodX);
         while(foodX<0) {
@@ -88,6 +229,7 @@ int makeVillage() {
             scanf("%d", &foodX);
         }
         map[3][x][y] = foodX;
+        villages[i].foodX = foodX;
     }
     return 0;
 }
@@ -143,6 +285,8 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                     break;
 
                 default: // It is used for roadways' numbers.
+                    DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
+
                     // Writing roadways' numbers on the tile
                     char innerNum[2];
                     sprintf(innerNum, "%d", map[0][i][j]);
@@ -158,6 +302,16 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                     char goldFood[30];
                     sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
                     DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
+                }
+            }
+        }
+    }
+    for(int i=0; i<mapWidth; i++) {
+        for(int j=0; j<mapHeight; j++) {
+            if(coordination.x==i && coordination.y==j && map[0][i][j]==-2) {
+                int id= map[1][i][j];
+                for(int k=0; villages[id].pathNumber > k; k++) {
+                    DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
                 }
             }
         }
