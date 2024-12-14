@@ -115,67 +115,14 @@ int main() {
     makeVillage();
     makeBarrier();
 
-    //Creating dijkstra list
-//    for (int i = 0; i < mapWidth; ++i) {
-//        for (int j = 0; j < mapHeight; ++j) {
-//            if (map[0][i][j] < 0) {
-//                list[j*mapWidth+i][0] = -1;
-//            }
-//            else list[j*mapWidth+i][0] = map[0][i][j];
-//        }
-//    }
-//
-//    //Adding neighbors to the list
-//    for (int i = 0; i < mapWidth*mapHeight; ++i) {
-//        int k = 0;
-//        int e = 0;
-//        int verticeIndex = i + 1;
-//        if ((verticeIndex - mapWidth) <= 0 || list[i - mapWidth][0] == -1) {
-//            list[i][4-e] = -1;
-//            e++;
-//        }
-//        else {
-//            list[i][1+k] = i - mapWidth;
-//            k++;
-//        }
-//        if ((verticeIndex + mapWidth) > (mapWidth * mapHeight) || list[i + mapWidth][0] == -1) {
-//            list[i][4-e] = -1;
-//            e++;
-//        }
-//        else {
-//            list[i][1+k] = i + mapWidth;
-//            k++;
-//        }
-//        if (verticeIndex % mapWidth == 1 || list[i-1][0] == -1) {
-//            list[i][4-e] = -1;
-//            e++;
-//        }
-//        else {
-//            list[i][1+k] = i - 1;
-//            k++;
-//        }
-//        if ((verticeIndex) % mapWidth == 0 || list[i+1][0] == -1) list[i][4-e] = -1;
-//        else list[i][1+k] = i + 1;
-//    }
-//    for(int i=0; i<mapWidth*mapHeight; i++) {
-//                printf("%d ", i);
-//                for(int k=0; k<5; k++) {
-//                    printf("%d ", list[i][k]);
-//                }
-//                printf("\n");
-//        }
-
-
-//    int source1, dest1;
-//    source1 = 0;
-//    dest1 = 90;
-//    //dijkstra(source1, dest1);
-//    dijkstraPath(source1,dest1, mapWidth*mapHeight);
+    Vector2 mapCenter= {TILE_SIZE*15, TILE_SIZE*13};
+    Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
+    //dijkstraPath(kingdoms[turn].x+kingdoms[turn].y*mapWidth,x+y*mapWidth, mapWidth*mapHeight);
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
 
-    Vector2 mapCenter= {TILE_SIZE*15, TILE_SIZE*13};
-    Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
+    //Vector2 mapCenter= {TILE_SIZE*15, TILE_SIZE*13};
+    //Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
 //
     Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\Initial_Map.png");
 //

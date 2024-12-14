@@ -5,11 +5,25 @@
 #include <time.h>
 #include "InitialMap.h"
 
+typedef struct kingdom kingdom;
+typedef struct village village;
+
+//make village id and kingdom id more accessible and call dijkstra after getting all the x and y
+//maybe make a function that stores all the paths like intial mapmakers
+
 // Global Variables
 int map[4][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
 int list[MAP_SIZE*MAP_SIZE][5];
+int turn=0;
+
+
+village villages[30]={0};
+
+
+kingdom kingdoms[5]={0};
+
 
 int generate_number() {
     float probs[4] = {.65, .25, .05, .05};
@@ -27,7 +41,8 @@ int generate_number() {
     }
 }
 
-int dijkstraPath(int source, int dest,Vector2 map0, int size) {
+int dijkstraPath(int source, int dest, village village1, int size) {
+
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
             if (map[0][i][j] < 0) {
@@ -36,6 +51,7 @@ int dijkstraPath(int source, int dest,Vector2 map0, int size) {
             else list[j*mapWidth+i][0] = map[0][i][j];
         }
     }
+    list[source][0]=list[dest][0]=0;
 
     //Adding neighbors to the list
     for (int i = 0; i < mapWidth*mapHeight; ++i) {
@@ -119,16 +135,17 @@ int dijkstraPath(int source, int dest,Vector2 map0, int size) {
         }
     }
 
-    //output
-    for(int k=0; k < mapWidth*mapHeight; k++) {
-        printf("shortest path (%d) from %d to %d(%d) is " ,dist[k],source, k, list[k][0]);
-        for(int l=0; l<pathNumber[k]; l++)
-            printf("%d ", path[k][l]);
-        printf("\n");
-    }
-    for(int k=0; k<pathNumber[dest]; k++) {
-        DrawRectangle((path[dest][k]% mapWidth) * TILE_SIZE + map0.x, (path[dest][k]/mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
-    }
+    printf("shortest path (%d) from %d to %d(%d) is " ,dist[dest],source, dest, list[dest][0]);
+    for(int l=0; l<pathNumber[dest]; l++)
+        printf("%d ", path[dest][l]);
+    printf("\n");
+
+//    int id=map[1][x][y];
+//    int x=dest%mapWidth, y=dest/mapWidth, k;
+//    for(k=0; k<pathNumber[dest]; k++) {
+//        villagePath[map[1][x][y]][k]=path[dest][k];
+//    }
+//    villa[map[1][x][y]][k]=-1;
     return 0;
 }
 
@@ -175,6 +192,8 @@ int makeKingdom() {
         y--;
         map[0][x][y] = -1; // -1 is the code for kingdoms.
         map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
+        kingdoms[i].x = x;
+        kingdoms[i].y = y;
     }
     return 0;
 }
@@ -195,11 +214,15 @@ int makeVillage() {
             printf("There is already something else there.\nx and y:");
             scanf("%d %d", &x, &y);
         }
+
         // x and y start from 1
         x--;
         y--;
         map[0][x][y] = -2; // -2 is the code for villages.
         map[1][x][y] = i; // I saved villages' IDs in z=1.
+        villages[i].x = x;
+        villages[i].y = y;
+
         printf("goldX:");
         scanf("%d", &goldX);
         while(goldX<0) {
@@ -207,6 +230,8 @@ int makeVillage() {
             scanf("%d", &goldX);
         }
         map[2][x][y] = goldX;
+        villages[i].goldX = goldX;
+
         printf("foodX:");
         scanf("%d", &foodX);
         while(foodX<0) {
@@ -214,6 +239,7 @@ int makeVillage() {
             scanf("%d", &foodX);
         }
         map[3][x][y] = foodX;
+        villages[i].foodX = foodX;
     }
     return 0;
 }
@@ -279,8 +305,11 @@ int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
     }
     for(int i=0; i<mapWidth; i++) {
         for(int j=0; j<mapHeight; j++) {
-            if(coordination.x==i && coordination.y==j) {
-                dijkstraPath(0, j*mapWidth+i, map0, mapHeight*mapWidth);
+            if(coordination.x==i && coordination.y==j && map[0][i][j]==-2) {
+                int id= map[1][i][j];
+                for(int k=0; villages[id].pathNumber; k++) {
+                    DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+                }
             }
         }
     }
