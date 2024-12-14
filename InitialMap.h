@@ -1,10 +1,10 @@
 #ifndef INITIAL_MAP_H
 #define INITIAL_MAP_H
 
-#define SCREEN_HEIGHT 896
-#define SCREEN_WIDTH 960
+#define SCREEN_HEIGHT 900
+#define SCREEN_WIDTH 937
 #define MAP_SIZE 17
-#define TILE_SIZE 32
+#define TILE_SIZE 40
 
 // Global Variables
 extern int map[4][MAP_SIZE][MAP_SIZE];
@@ -16,6 +16,6 @@ int initialMapMaker();
 int makeKingdom();
 int makeVillage();
 int makeBarrier();
-int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination);
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0, Vector2 coordination);
 
 #endif // INITIAL_MAP_H

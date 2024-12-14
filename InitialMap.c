@@ -1,29 +1,10 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "raylib.h"
-#include <conio.h>
-#include <time.h>
 #include "InitialMap.h"
 
 // Global Variables
 int map[4][MAP_SIZE][MAP_SIZE];
 int mapHeight, mapWidth;
-
-int generate_number() {
-    float probs[4] = {.65, .25, .05, .05};
-
-    float randValue = GetRandomValue(0, 100) / 100.0f;
-
-    if (randValue < probs[0]) {
-        return 1;
-    } else if (randValue < probs[0] + probs[1]) {
-        return 2;
-    } else if (randValue < probs[0] + probs[1] + probs[2]) {
-        return 3;
-    } else {
-        return 4;
-    }
-}
 
 int initialMapMaker() {
     // Getting map's width and height
@@ -42,7 +23,7 @@ int initialMapMaker() {
     // Initializing map's values
     for (int i = 0; i < mapHeight; ++i) {
         for (int j = 0; j < mapWidth; ++j) {
-            map[0][j][i] = generate_number();
+            map[0][j][i] = 1;
         }
     }
     return 0;
@@ -134,7 +115,7 @@ int makeBarrier() {
     return 0;
 }
 
-int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0, Vector2 coordination) {
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
@@ -145,28 +126,39 @@ int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
         for(int j=0; j<mapHeight; j++) {
 
             //MapDrawer
+            DrawTexture(GroundTile,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
+            DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, (Color){150,75,0,100});
             switch (map[0][i][j]) {
-                case -1: // -1 is the code for kingdoms.
-                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BLACK);
-                    break;
-                case -2: // -2 is the code for villages.
-                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
-                    break;
-                case -3: // -3 is the code for barriers.
-                    DrawRectangle(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, GRAY);
-                    break;
-                default: // It is used for roadways' numbers.
-                    DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
 
+                case -1: // -1 is the code for kingdoms.
+                    DrawTexture(Castle,i*TILE_SIZE+map0.x, (j-0.5)*TILE_SIZE+map0.y, WHITE);
+                    break;
+
+                case -2: // -2 is the code for villages.
+                    DrawTexture(House,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
+                    break;
+
+                case -3: // -3 is the code for barriers.
+                    DrawTexture(Stone,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
+                    break;
+
+                default: // It is used for roadways' numbers.
                     // Writing roadways' numbers on the tile
                     char innerNum[2];
                     sprintf(innerNum, "%d", map[0][i][j]);
-                    DrawText(innerNum, (i+.5)*TILE_SIZE+map0.x, (j+.5)*TILE_SIZE+map0.y, 20, BLACK);
+                    DrawTextEx(font, innerNum, (Vector2){(i+.4)*TILE_SIZE+map0.x,(j+.15)*TILE_SIZE+map0.y}, 30, 1, (Color){150,75,0,150});
             }
 
             // Hover Effect
             if(coordination.x==i && coordination.y==j) {
-                DrawRectangle(i * TILE_SIZE + map0.x, j * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+                DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+                //Village info
+                if(map[0][i][j]==-2) {
+                    DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
+                    char goldFood[30];
+                    sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
+                    DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
+                }
             }
         }
     }
