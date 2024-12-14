@@ -131,7 +131,7 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
             switch (map[0][i][j]) {
 
                 case -1: // -1 is the code for kingdoms.
-                    DrawTexture(Castle,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
+                    DrawTexture(Castle,i*TILE_SIZE+map0.x, (j-0.5)*TILE_SIZE+map0.y, WHITE);
                     break;
 
                 case -2: // -2 is the code for villages.
@@ -154,7 +154,7 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                 DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
                 //Village info
                 if(map[0][i][j]==-2) {
-                    DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.1) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
+                    DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
                     char goldFood[30];
                     sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
                     DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
