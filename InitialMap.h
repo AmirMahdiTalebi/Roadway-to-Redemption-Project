@@ -18,7 +18,7 @@ struct village {
     int y;
     int goldX;
     int foodX;
-    int path[40];
+    int path[289];
     int pathNumber;
     int king;
 };
@@ -31,13 +31,16 @@ struct kingdom {
     int goldX;
 };
 
+extern village villages[30];
+extern kingdom kingdoms[5];
+
 
 // Functions' Prototypes
 int initialMapMaker();
 int makeKingdom();
 int makeVillage();
 int makeBarrier();
-int dijkstraPath(int source, int dest, village village1, int size);
+int dijkstraPath(int source, int id, int size);
 int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination);
 
 #endif // INITIAL_MAP_H

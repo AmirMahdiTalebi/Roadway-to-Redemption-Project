@@ -20,8 +20,6 @@ int turn=0;
 
 
 village villages[30]={0};
-
-
 kingdom kingdoms[5]={0};
 
 
@@ -41,12 +39,12 @@ int generate_number() {
     }
 }
 
-int dijkstraPath(int source, int dest, village village1, int size) {
-
+int dijkstraPath(int source,int id, int size) {
+    int dest = villages[id].y*mapWidth + villages[id].x;
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
             if (map[0][i][j] < 0) {
-                list[j*mapWidth+i][0] = -1;
+                list[j*mapWidth+i][0] = 2000;
             }
             else list[j*mapWidth+i][0] = map[0][i][j];
         }
@@ -58,7 +56,7 @@ int dijkstraPath(int source, int dest, village village1, int size) {
         int k = 0;
         int e = 0;
         int verticeIndex = i + 1;
-        if ((verticeIndex - mapWidth) <= 0 || list[i - mapWidth][0] == -1) {
+        if ((verticeIndex - mapWidth) <= 0) {
             list[i][4-e] = -1;
             e++;
         }
@@ -66,7 +64,7 @@ int dijkstraPath(int source, int dest, village village1, int size) {
             list[i][1+k] = i - mapWidth;
             k++;
         }
-        if ((verticeIndex + mapWidth) > (mapWidth * mapHeight) || list[i + mapWidth][0] == -1) {
+        if ((verticeIndex + mapWidth) > (mapWidth * mapHeight)) {
             list[i][4-e] = -1;
             e++;
         }
@@ -74,7 +72,7 @@ int dijkstraPath(int source, int dest, village village1, int size) {
             list[i][1+k] = i + mapWidth;
             k++;
         }
-        if (verticeIndex % mapWidth == 1 || list[i-1][0] == -1) {
+        if (verticeIndex % mapWidth == 1) {
             list[i][4-e] = -1;
             e++;
         }
@@ -82,21 +80,18 @@ int dijkstraPath(int source, int dest, village village1, int size) {
             list[i][1+k] = i - 1;
             k++;
         }
-        if ((verticeIndex) % mapWidth == 0 || list[i+1][0] == -1) list[i][4-e] = -1;
+        if ((verticeIndex) % mapWidth == 0) list[i][4-e] = -1;
         else list[i][1+k] = i + 1;
     }
 
     //vars
     int dist[size];
     for (int i = 0; i < size; ++i) {
-        dist[i] = INT_MAX;
+        dist[i] = 2000;
     }
     int path[size][size];
     for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            if (j == 0) path[i][j] = source;
-            else path[i][j] = -1;
-        }
+        path[i][0] = source;
     }
     int pathNumber[289]= {0};
     int visited[289]= {0};
@@ -126,7 +121,7 @@ int dijkstraPath(int source, int dest, village village1, int size) {
         visited[current] = 1;
 
         //update current
-        minDistance=INT_MAX;
+        minDistance=2000;
         for(int i=0; i<size; i++) {
             if(!visited[i] && dist[i]<minDistance && list[i][0] != -1) {
                 current=i;
@@ -135,17 +130,18 @@ int dijkstraPath(int source, int dest, village village1, int size) {
         }
     }
 
-    printf("shortest path (%d) from %d to %d(%d) is " ,dist[dest],source, dest, list[dest][0]);
-    for(int l=0; l<pathNumber[dest]; l++)
-        printf("%d ", path[dest][l]);
-    printf("\n");
+    for(int i=0; i<size; i++) {
+        printf("shortest path (%d) from %d to %d(%d) is ", dist[i], source, i, list[i][0]);
+        for (int l = 0; l < pathNumber[i]; l++)
+            printf("%d ", path[i][l]);
+        printf("\n");
+    }
 
-//    int id=map[1][x][y];
-//    int x=dest%mapWidth, y=dest/mapWidth, k;
-//    for(k=0; k<pathNumber[dest]; k++) {
-//        villagePath[map[1][x][y]][k]=path[dest][k];
-//    }
-//    villa[map[1][x][y]][k]=-1;
+    int k;
+    for(k=0; k<pathNumber[dest]; k++) {
+        villages[id].path[k]=path[dest][k];
+    }
+    villages[id].pathNumber = pathNumber[dest];
     return 0;
 }
 
@@ -166,7 +162,7 @@ int initialMapMaker() {
     // Initializing map's values
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
-            map[0][i][j] = generate_number();
+            map[0][i][j] = 1;
         }
     }
     return 0;
@@ -307,7 +303,7 @@ int mapDrawer(Texture2D mapTileSet, Vector2 map0, Vector2 coordination) {
         for(int j=0; j<mapHeight; j++) {
             if(coordination.x==i && coordination.y==j && map[0][i][j]==-2) {
                 int id= map[1][i][j];
-                for(int k=0; villages[id].pathNumber; k++) {
+                for(int k=0; villages[id].pathNumber > k; k++) {
                     DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
                 }
             }
