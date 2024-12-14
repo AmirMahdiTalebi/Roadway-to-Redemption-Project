@@ -1,8 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "raylib.h"
-#include <conio.h>
-#include <time.h>
 #include "InitialMap.h"
 
 // Program main entry point
@@ -14,7 +11,6 @@ int main() {
     makeBarrier();
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
-    srand(time(NULL));
 
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
@@ -22,8 +18,6 @@ int main() {
     for(int i=0; i<villageNumber; i++) {
         dijkstraPath(kingdomVerticeNumber, i, mapWidth*mapHeight);
     }
-
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
 
 
     Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\initial map (1).png");
@@ -43,6 +37,15 @@ int main() {
         Vector2 coordination = {(int)((mousePosition.x - map0.x)/TILE_SIZE), (int)((mousePosition.y - map0.y)/TILE_SIZE)};
 
         mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0, coordination);
+
+        if(IsKeyPressed(KEY_SPACE)) {
+            turn++;
+            if(turn>=kingdomNumber) turn=0;
+            kingdomVerticeNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
+            for(int i=0; i<villageNumber; i++) {
+                dijkstraPath(kingdomVerticeNumber, i, mapWidth*mapHeight);
+            }
+        }
     }
 
     UnloadTexture(mapTileSet);

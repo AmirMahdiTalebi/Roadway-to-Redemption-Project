@@ -5,9 +5,6 @@
 typedef struct kingdom kingdom;
 typedef struct village village;
 
-//make village id and kingdom id more accessible and call dijkstra after getting all the x and y
-//maybe make a function that stores all the paths like intial mapmakers
-
 // Global Variables
 int map[4][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
@@ -290,29 +287,28 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                     // Writing roadways' numbers on the tile
                     char innerNum[2];
                     sprintf(innerNum, "%d", map[0][i][j]);
-                    DrawTextEx(font, innerNum, (Vector2){(i+.4)*TILE_SIZE+map0.x,(j+.15)*TILE_SIZE+map0.y}, 30, 1, (Color){150,75,0,150});
+                    DrawTextEx(font, innerNum, (Vector2){(i+.4)*TILE_SIZE+map0.x,(j+.15)*TILE_SIZE+map0.y}, 30, 1, (Color){150,75,0,200});
             }
 
             // Hover Effect
             if(coordination.x==i && coordination.y==j) {
-                DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
-                //Village info
-                if(map[0][i][j]==-2) {
-                    DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
-                    char goldFood[30];
-                    sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
-                    DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
-                }
+                DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 90});
             }
         }
     }
     for(int i=0; i<mapWidth; i++) {
         for(int j=0; j<mapHeight; j++) {
             if(coordination.x==i && coordination.y==j && map[0][i][j]==-2) {
+                //show the shortest path
                 int id= map[1][i][j];
                 for(int k=0; villages[id].pathNumber > k; k++) {
-                    DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 100});
+                    DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 60});
                 }
+                //village info
+                DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
+                char goldFood[30];
+                sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
+                DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
             }
         }
     }
