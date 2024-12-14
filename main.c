@@ -17,7 +17,10 @@ int main() {
     Vector2 mapCenter= {TILE_SIZE*15, TILE_SIZE*13};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
     int kingdomVerticeNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
-    dijkstraPath(kingdomVerticeNumber, 0, mapWidth*mapHeight);
+    for(int i=0; i<villageNumber; i++) {
+        dijkstraPath(kingdomVerticeNumber, i, mapWidth*mapHeight);
+    }
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
 
 

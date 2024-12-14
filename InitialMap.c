@@ -16,8 +16,10 @@ int map[4][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
 int list[MAP_SIZE*MAP_SIZE][5];
-int turn=0;
 
+int turn=0;
+int villageNumber;
+int kingdomNumber;
 
 village villages[30]={0};
 kingdom kingdoms[5]={0};
@@ -103,7 +105,7 @@ int dijkstraPath(int source,int id, int size) {
     while(!visited[dest]) {
 
         //update all neighbors
-        for(int i=1; list[current][i]>=0; i++) {
+        for(int i=1; list[current][i]>=0 && i<5; i++) {
             neighbor=list[current][i];
             if(!visited[neighbor] && (dist[current] + list[neighbor][0]) < dist[neighbor] && list[neighbor][0] != -1) {
                 //update distance
@@ -128,13 +130,6 @@ int dijkstraPath(int source,int id, int size) {
                 minDistance=dist[i];
             }
         }
-    }
-
-    for(int i=0; i<size; i++) {
-        printf("shortest path (%d) from %d to %d(%d) is ", dist[i], source, i, list[i][0]);
-        for (int l = 0; l < pathNumber[i]; l++)
-            printf("%d ", path[i][l]);
-        printf("\n");
     }
 
     int k;
@@ -162,7 +157,7 @@ int initialMapMaker() {
     // Initializing map's values
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
-            map[0][i][j] = 1;
+            map[0][i][j] = generate_number();
         }
     }
     return 0;
@@ -172,6 +167,7 @@ int makeKingdom() {
     int n, x, y;
     printf("Enter the number of kingdoms:");
     scanf("%d", &n);
+    kingdomNumber=n;
     for (int i = 0; i < n; ++i) {
         printf("Enter x and y for the kingdom No.%d:\n", i + 1);
         scanf("%d %d", &x, &y);
@@ -198,6 +194,7 @@ int makeVillage() {
     int n, x, y, goldX, foodX;
     printf("Enter the number of villages:");
     scanf("%d", &n);
+    villageNumber=n;
     for (int i = 0; i < n; ++i) {
         printf("Enter the info for the village No.%d:\n", i + 1);
         printf("x and y:");

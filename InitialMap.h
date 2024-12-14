@@ -12,7 +12,11 @@ typedef struct village village;
 // Global Variables
 extern int map[4][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth;
+
 extern int turn;
+extern int villageNumber;
+extern int kingdomNumber;
+
 struct village {
     int x;
     int y;
