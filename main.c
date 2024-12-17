@@ -23,7 +23,7 @@ int main() {
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
 
-    Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*12};
+    Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
     int kingdomVerticeNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
     for(int i=0; i<villageNumber; i++) {
@@ -48,7 +48,12 @@ int main() {
         Vector2 mousePosition = GetMousePosition();
         Vector2 coordination = {(int)((mousePosition.x - map0.x)/TILE_SIZE), (int)((mousePosition.y - map0.y)/TILE_SIZE)};
 
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
         mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0, coordination);
+        scoreBoardDrawer(font);
 
         if (mode == 0) {
             strcpy(buttons[0].text, "Add food");
@@ -82,24 +87,90 @@ int main() {
             switch (action) {
                 case 0:
                     return 0;
+
                 case 1:
-                    kingdoms[turn].food++;
-                    break;
-                case 2:
-                    if (kingdoms[turn].food > 0) {
-                        kingdoms[turn].food--;
-                        kingdoms[turn].worker++;
+                    if (kingdoms[turn].gold >= 1) {
+                        kingdoms[turn].gold--;
+                        kingdoms[turn].food++;
+
+                        kingdoms[turn].food+=kingdoms[turn].foodX;
+                        kingdoms[turn].gold+=kingdoms[turn].goldX;
                     }
                     else {
-                        DrawText("You don't have enough food to hire worker!!!", 200, 95, 20, RED);
+                        DrawRectangle(90, 90, 700, 40, (Color){222, 131, 124, 100});
+                        DrawText("You don't have enough gold to buy food!!!", 100, 100, 30, RED);
+                        EndDrawing();
+                        WaitTime(2);
+                        turn--;
+                    }
+
+                    break;
+
+                case 2:
+                    if (kingdoms[turn].food >= 3) {
+                        kingdoms[turn].food-=3;
+                        kingdoms[turn].worker++;
+
+                        kingdoms[turn].food+=kingdoms[turn].foodX;
+                        kingdoms[turn].gold+=kingdoms[turn].goldX;
+                        turn--;
+                    }
+                    else {
+                        DrawRectangle(90, 90, 700, 40, (Color){222, 131, 124, 100});
+                        DrawText("You don't have enough food to hire workers!!!", 100,100, 30, RED);
+                        EndDrawing();
+                        WaitTime(2);
                         turn--;
                     }
                     break;
+
                 case 3:
+                    if (kingdoms[turn].gold >= 2) {
+                        kingdoms[turn].gold-=3;
+                        kingdoms[turn].soldier++;
+
+                        kingdoms[turn].food+=kingdoms[turn].foodX;
+                        kingdoms[turn].gold+=kingdoms[turn].goldX;
+                    }
+                    else {
+                        DrawRectangle(90, 90, 700, 40, (Color){222, 131, 124, 100});
+                        DrawText("You don't have enough gold to hire soldiers!!!", 100,100, 30, RED);
+                        EndDrawing();
+                        WaitTime(2);
+                        turn--;
+                    }
                     break;
+
                 case 4:
+//                    int sw=0;
+//                    Rectangle available;
+//                    while(sw==0) {
+//                        BeginDrawing();
+//                        for(int k=0; k<villageNumber; k++) {
+//                            if(villages[k].kingdom==turn) {
+//                                for(int p=1; list[villages[k].y*mapWidth+villages[k].x][p]; p++) {
+//                                    Vector2 neighbor= {list[villages[k].y*mapWidth+villages[k].x][p]%mapWidth,
+//                                                       list[villages[k].y*mapWidth+villages[k].x][p]/mapWidth};
+//                                    DrawRectangle(neighbor.x*TILE_SIZE+map0.x, neighbor.y*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE,
+//                                                  (Color){83, 212, 80, 100});
+//                                    available=(Rectangle){neighbor.x*TILE_SIZE+map0.x, neighbor.y*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE};
+//                                    if(CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+//                                        sw = 1;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        EndDrawing();
+//                    }
+
                     break;
+
+
                 case 5:
+
+                    kingdoms[turn].food+=kingdoms[turn].foodX;
+                    kingdoms[turn].gold+=kingdoms[turn].goldX;
+
                     break;
             }
             mode = 0;

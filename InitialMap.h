@@ -2,7 +2,7 @@
 #define INITIAL_MAP_H
 
 #define SCREEN_HEIGHT 900
-#define SCREEN_WIDTH 937
+#define SCREEN_WIDTH 1200
 #define MAP_SIZE 17
 #define TILE_SIZE 40
 
@@ -13,6 +13,8 @@ typedef struct village village;
 extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier;
 
+extern int list[MAP_SIZE*MAP_SIZE][5];
+
 struct kingdom {
     int x;
     int y;
@@ -22,6 +24,9 @@ struct kingdom {
     int goldX;
     int worker;
     int soldier;
+    Vector2 roads[289];
+    int roadNumber;
+    Color color;
 };
 
 struct village {
@@ -37,31 +42,6 @@ struct village {
 extern village villages[30];
 extern kingdom kingdoms[5];
 
-extern int turn;
-extern int villageNumber;
-extern int kingdomNumber;
-
-struct village {
-    int x;
-    int y;
-    int goldX;
-    int foodX;
-    int path[289];
-    int pathNumber;
-    int king;
-};
-
-
-struct kingdom {
-    int x;
-    int y;
-    int foodX;
-    int goldX;
-};
-
-extern village villages[30];
-extern kingdom kingdoms[5];
-
 
 // Functions' Prototypes
 //int generate_number();
@@ -71,8 +51,6 @@ int makeVillage();
 int makeBarrier();
 int dijkstraPath(int source, int id, int size);
 int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0, Vector2 coordination);
-int actionFunc(int action);
-int loadActionButtons();
-int unloadActionButtons();
+int scoreBoardDrawer();
 
 #endif // INITIAL_MAP_H
