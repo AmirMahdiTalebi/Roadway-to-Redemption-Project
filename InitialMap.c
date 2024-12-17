@@ -185,8 +185,9 @@ int makeKingdom() {
         map[0][x][y] = -1; // -1 is the code for kingdoms.
         map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
 
-        kingdoms[i].goldX = kingdoms[i].gold = 1;
-        kingdoms[i].food = kingdoms[i].soldier = kingdoms[i].worker = 0;
+        kingdoms[i].gold = 5;
+        kingdoms[i].food = kingdoms[i].foodX = kingdoms[i].soldier =  0;
+        kingdoms[i].goldX = kingdoms[i].worker = 1;
     }
     return 0;
 }
@@ -257,12 +258,9 @@ int makeBarrier() {
 }
 
 int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0, Vector2 coordination) {
-
     DrawTexture(mapTileSet, 0,0, WHITE);
-
     for(int i=0; i<mapWidth; i++) {
         for(int j=0; j<mapHeight; j++) {
-
             //MapDrawer
             DrawTexture(GroundTile,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
             DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, (Color){150,75,0,100});
@@ -315,17 +313,3 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
     }
     return 0;
 }
-
-int scoreBoardDrawer(Font font) {
-    DrawRectangleLines(937, 0, 263, 450, BROWN);
-    char gold[30], food[30], soldier[30], worker[30];
-    sprintf(gold, "%d Gold (+%d each round)\n", kingdoms[turn].gold, kingdoms[turn].goldX);
-    sprintf(food, "%d Food (+%d each round)\n", kingdoms[turn].food, kingdoms[turn].foodX);
-    sprintf(soldier, "%d Soldiers\n", kingdoms[turn].soldier);
-    sprintf(worker, "%d Workers\n", kingdoms[turn].worker);
-    DrawTextEx(font, gold, (Vector2){947, 100}, 30, 2, BLACK);
-    DrawTextEx(font, food, (Vector2){947, 200}, 30, 2, BLACK);
-    DrawTextEx(font, soldier, (Vector2){947, 300}, 30, 2, BLACK);
-    DrawTextEx(font, worker, (Vector2){947, 400}, 30, 1.5, BLACK);
-    return 0;
-};

@@ -50,10 +50,29 @@ int main() {
 
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
         mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0, coordination);
         scoreBoardDrawer(font);
+
+        for (int i = 0; i < kingdomNumber; ++i) {
+            char text[50];
+            sprintf(text, "Kingdom %d", i + 1);
+            DrawText(text, SCREEN_WIDTH-285, 15+(SCREEN_HEIGHT/kingdomNumber)*i, 30, WHITE);
+            sprintf(text, "Food = %d    FoodX = %d", kingdoms[i].food, kingdoms[i].foodX);
+            DrawText(text, SCREEN_WIDTH-285, 50+(SCREEN_HEIGHT/kingdomNumber)*i, 20, WHITE);
+            sprintf(text, "Gold = %d    GoldX = %d", kingdoms[i].gold, kingdoms[i].goldX);
+            DrawText(text, SCREEN_WIDTH-285, 75+(SCREEN_HEIGHT/kingdomNumber)*i, 20, WHITE);
+            sprintf(text, "Soldiers = %d", kingdoms[i].soldier);
+            DrawText(text, SCREEN_WIDTH-285, 100+(SCREEN_HEIGHT/kingdomNumber)*i, 20, WHITE);
+            sprintf(text, "Workers = %d", kingdoms[i].worker);
+            DrawText(text, SCREEN_WIDTH-285, 125+(SCREEN_HEIGHT/kingdomNumber)*i, 20, WHITE);
+            sprintf(text, "Villages = ");
+            DrawText(text, SCREEN_WIDTH-285, 150+(SCREEN_HEIGHT/kingdomNumber)*i, 20, WHITE);
+            DrawRectangle(SCREEN_WIDTH-300, (SCREEN_HEIGHT/kingdomNumber)*i-4, 300, 4, GREEN);
+        }
+
+
 
         if (mode == 0) {
             strcpy(buttons[0].text, "Add food");
