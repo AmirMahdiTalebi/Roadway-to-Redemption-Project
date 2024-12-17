@@ -2,7 +2,7 @@
 #define INITIAL_MAP_H
 
 #define SCREEN_HEIGHT 900
-#define SCREEN_WIDTH 937
+#define SCREEN_WIDTH 1237
 #define MAP_SIZE 17
 #define TILE_SIZE 40
 

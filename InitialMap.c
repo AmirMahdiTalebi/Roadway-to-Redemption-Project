@@ -185,8 +185,9 @@ int makeKingdom() {
         map[0][x][y] = -1; // -1 is the code for kingdoms.
         map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
 
-        kingdoms[i].gold = 1;
-        kingdoms[i].food = kingdoms[i].soldier = kingdoms[i].worker = 0;
+        kingdoms[i].gold = 5;
+        kingdoms[i].food = kingdoms[i].foodX = kingdoms[i].soldier =  0;
+        kingdoms[i].goldX = kingdoms[i].worker = 1;
     }
     return 0;
 }
