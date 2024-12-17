@@ -40,6 +40,8 @@ int main() {
 
     SetTargetFPS(60);
 
+    float buttonsPosY = -100;
+
 //     Main game loop
     while (!WindowShouldClose()) {
 //        Hover effect vectors
@@ -53,7 +55,6 @@ int main() {
         mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0, coordination);
 
         if (mode == 0) {
-
             strcpy(buttons[0].text, "Add food");
             strcpy(buttons[1].text, "Add worker");
             strcpy(buttons[2].text, "Add soldier");
@@ -61,7 +62,8 @@ int main() {
             strcpy(buttons[4].text, "Do nothing");
             for (int i = 0; i < 5; ++i) {
                 buttons[i].rect.x = 30 + 175*i;
-                buttons[i].rect.y = 20;
+                if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 30;
+                buttons[i].rect.y = buttonsPosY;
                 buttons[i].rect.width = 150;
                 buttons[i].rect.height = 65;
                 buttons[i].color = WHITE;
@@ -80,6 +82,7 @@ int main() {
         }
 
         if (mode == 1) {
+            buttonsPosY = -100;
             switch (action) {
                 case 0:
                     return 0;
@@ -91,10 +94,12 @@ int main() {
                         kingdoms[turn].food--;
                         kingdoms[turn].worker++;
                     }
-                    else DrawText("You don't have enough food to hire worker!!!", 200, 95, 20, RED);
+                    else {
+                        DrawText("You don't have enough food to hire worker!!!", 200, 95, 20, RED);
+                        turn--;
+                    }
                     break;
                 case 3:
-                    map[0][15][15] = -1;
                     break;
                 case 4:
                     break;
@@ -113,8 +118,7 @@ int main() {
         EndDrawing();
 
         if (IsKeyPressed(KEY_SPACE)) {
-            if (mode == 0) mode = 1;
-            else if (mode == 1) mode = 0;
+            mode = 0;
         }
     }
 
