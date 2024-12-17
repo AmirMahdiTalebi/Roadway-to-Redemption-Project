@@ -6,18 +6,14 @@ typedef struct kingdom kingdom;
 typedef struct village village;
 
 // Global Variables
-int map[4][MAP_SIZE][MAP_SIZE];
+int map[2][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
+int turn = 0, kingdomNumber, villageNumber, neededSoldier;
 int list[MAP_SIZE*MAP_SIZE][5];
 
-int turn=0;
-int villageNumber;
-int kingdomNumber;
-
-village villages[30]={0};
-kingdom kingdoms[5]={0};
-
+village villages[30] = {0};
+kingdom kingdoms[5] = {0};
 
 int generate_number() {
     float probs[4] = {.65, .25, .05, .05};
@@ -142,12 +138,21 @@ int initialMapMaker() {
         printf("Map height is invalid.\nEnter the map height:");
         scanf("%d", &mapHeight);
     }
+
     printf("Enter the map width:");
     scanf("%d", &mapWidth);
     while(mapWidth<3 || mapWidth>MAP_SIZE) {
         printf("Map width is invalid.\nEnter the map width:");
         scanf("%d", &mapWidth);
     }
+
+    printf("Enter the number of soldiers that player needs to win:");
+    scanf("%d", &neededSoldier);
+    while(neededSoldier<0) {
+        printf("Number is invalid.\nEnter the number of soldiers that player needs to win:");
+        scanf("%d", &neededSoldier);
+    }
+
     // Initializing map's values
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
@@ -158,11 +163,10 @@ int initialMapMaker() {
 }
 
 int makeKingdom() {
-    int n, x, y;
+    int x, y;
     printf("Enter the number of kingdoms:");
-    scanf("%d", &n);
-    kingdomNumber=n;
-    for (int i = 0; i < n; ++i) {
+    scanf("%d", &kingdomNumber);
+    for (int i = 0; i < kingdomNumber; ++i) {
         printf("Enter x and y for the kingdom No.%d:\n", i + 1);
         scanf("%d %d", &x, &y);
         while(x<=0 || x>mapWidth || y<=0 || y>mapHeight) {
@@ -176,20 +180,22 @@ int makeKingdom() {
         //x and y start from 1
         x--;
         y--;
-        map[0][x][y] = -1; // -1 is the code for kingdoms.
-        map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
         kingdoms[i].x = x;
         kingdoms[i].y = y;
+        map[0][x][y] = -1; // -1 is the code for kingdoms.
+        map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
+
+        kingdoms[i].gold = 1;
+        kingdoms[i].food = kingdoms[i].soldier = kingdoms[i].worker = 0;
     }
     return 0;
 }
 
 int makeVillage() {
-    int n, x, y, goldX, foodX;
+    int x, y;
     printf("Enter the number of villages:");
-    scanf("%d", &n);
-    villageNumber=n;
-    for (int i = 0; i < n; ++i) {
+    scanf("%d", &villageNumber);
+    for (int i = 0; i < villageNumber; ++i) {
         printf("Enter the info for the village No.%d:\n", i + 1);
         printf("x and y:");
         scanf("%d %d", &x, &y);
@@ -211,22 +217,18 @@ int makeVillage() {
         villages[i].y = y;
 
         printf("goldX:");
-        scanf("%d", &goldX);
-        while(goldX<0) {
+        scanf("%d", &villages[i].goldX);
+        while(villages[i].goldX<0) {
             printf("Number is invalid.\ngoldX:");
-            scanf("%d", &goldX);
+            scanf("%d", &villages[i].goldX);
         }
-        map[2][x][y] = goldX;
-        villages[i].goldX = goldX;
 
         printf("foodX:");
-        scanf("%d", &foodX);
-        while(foodX<0) {
+        scanf("%d", &villages[i].foodX);
+        while(villages[i].foodX<0) {
             printf("Number is invalid.\nfoodX:");
-            scanf("%d", &foodX);
+            scanf("%d", &villages[i].foodX);
         }
-        map[3][x][y] = foodX;
-        villages[i].foodX = foodX;
     }
     return 0;
 }
@@ -296,6 +298,8 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
             }
         }
     }
+
+    //Villages' Information
     for(int i=0; i<mapWidth; i++) {
         for(int j=0; j<mapHeight; j++) {
             if(coordination.x==i && coordination.y==j && map[0][i][j]==-2) {
@@ -307,12 +311,22 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                 //village info
                 DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
                 char goldFood[30];
-                sprintf(goldFood, "%d gold\n%d food",map[2][i][j],map[3][i][j]);
+                sprintf(goldFood, "%d gold\n%d food", villages[id].goldX, villages[id].foodX);
                 DrawTextEx(font,goldFood,(Vector2){(i-1.3)*TILE_SIZE+map0.x,(j-0.1)*TILE_SIZE+map0.y}, 20,1,(Color){35, 97, 34, 200});
             }
         }
     }
+    return 0;
+}
 
-    EndDrawing();
+int loadActionButtons() {
+    return 0;
+}
+
+int unloadActionButtons() {
+    return 0;
+}
+
+int actionFunc(int action) {
     return 0;
 }
