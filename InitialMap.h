@@ -12,6 +12,15 @@ typedef struct village village;
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier;
+extern int list[MAP_SIZE*MAP_SIZE][5];
+extern int mode;
+
+extern Vector2 mousePosition;
+extern Vector2 coordination;
+
+extern Color transparentWhite;
+extern Color transparentGreen;
+extern Color transparentRed;
 
 struct kingdom {
     int x;
@@ -22,6 +31,9 @@ struct kingdom {
     int goldX;
     int worker;
     int soldier;
+    Color color;
+    Vector2 roads[289];
+    int roadNumber;
 };
 
 struct village {
@@ -44,9 +56,7 @@ int makeKingdom();
 int makeVillage();
 int makeBarrier();
 int dijkstraPath(int source, int id, int size);
-int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0, Vector2 coordination);
-int actionFunc(int action);
-int loadActionButtons();
-int unloadActionButtons();
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
+int checkNeighbors(int x, int y, Vector2 map0);
 
 #endif // INITIAL_MAP_H

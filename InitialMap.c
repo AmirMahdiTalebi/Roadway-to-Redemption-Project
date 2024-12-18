@@ -9,8 +9,15 @@ typedef struct village village;
 int map[2][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
-int turn = 0, kingdomNumber, villageNumber, neededSoldier;
+int turn = 1, kingdomNumber, villageNumber, neededSoldier;
 int list[MAP_SIZE*MAP_SIZE][5];
+int mode = 0;
+
+Vector2 mousePosition;
+Vector2 coordination;
+
+Color transparentWhite = (Color){255, 255, 255, 60};
+Color transparentGreen = (Color){37, 204, 81, 90};
 
 village villages[30] = {0};
 kingdom kingdoms[5] = {0};
@@ -180,14 +187,14 @@ int makeKingdom() {
         //x and y start from 1
         x--;
         y--;
-        kingdoms[i].x = x;
-        kingdoms[i].y = y;
+        kingdoms[i+1].x = x;
+        kingdoms[i+1].y = y;
         map[0][x][y] = -1; // -1 is the code for kingdoms.
-        map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
+        map[1][x][y] = i+1; // I saved Kingdoms' IDs in z=1.
 
-        kingdoms[i].gold = 5;
-        kingdoms[i].food = kingdoms[i].foodX = kingdoms[i].soldier =  0;
-        kingdoms[i].goldX = kingdoms[i].worker = 1;
+        kingdoms[i+1].gold = 5;
+        kingdoms[i+1].food = kingdoms[i+1].foodX = kingdoms[i+1].soldier =  0;
+        kingdoms[i+1].goldX = kingdoms[i+1].worker = 1;
     }
     return 0;
 }
@@ -257,7 +264,7 @@ int makeBarrier() {
     return 0;
 }
 
-int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0, Vector2 coordination) {
+int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0) {
     DrawTexture(mapTileSet, 0,0, WHITE);
     for(int i=0; i<mapWidth; i++) {
         for(int j=0; j<mapHeight; j++) {
@@ -267,11 +274,11 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
             switch (map[0][i][j]) {
 
                 case -1: // -1 is the code for kingdoms.
-                    DrawTexture(Castle,i*TILE_SIZE+map0.x, (j-0.5)*TILE_SIZE+map0.y, WHITE);
+                    DrawTexture(Castle,i*TILE_SIZE+map0.x, (j-0.5)*TILE_SIZE+map0.y, kingdoms[map[1][i][j]].color);
                     break;
 
                 case -2: // -2 is the code for villages.
-                    DrawTexture(House,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, WHITE);
+                    DrawTexture(House,i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, kingdoms[villages[map[1][i][j]].kingdom].color);
                     break;
 
                 case -3: // -3 is the code for barriers.
@@ -281,15 +288,22 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                 default: // It is used for roadways' numbers.
                     DrawRectangleLines(i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y, TILE_SIZE,TILE_SIZE, BROWN);
 
-                    // Writing roadways' numbers on the tile
-                    char innerNum[2];
-                    sprintf(innerNum, "%d", map[0][i][j]);
-                    DrawTextEx(font, innerNum, (Vector2){(i+.4)*TILE_SIZE+map0.x,(j+.15)*TILE_SIZE+map0.y}, 30, 1, (Color){150,75,0,200});
+                    if(map[1][i][j]>0) {
+                        DrawTexture(GroundTile, i*TILE_SIZE+map0.x, j*TILE_SIZE+map0.y,kingdoms[map[1][i][j]].color);
+                    }
+                    else {
+                        // Writing roadways' numbers on the tile
+                        char innerNum[2];
+                        sprintf(innerNum, "%d", map[0][i][j]);
+                        DrawTextEx(font, innerNum,
+                                   (Vector2) {(i + .4) * TILE_SIZE + map0.x, (j + .15) * TILE_SIZE + map0.y}, 30, 1,
+                                   (Color) {150, 75, 0, 200});
+                    }
             }
 
             // Hover Effect
             if(coordination.x==i && coordination.y==j) {
-                DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 90});
+                DrawRectangle(i*TILE_SIZE + map0.x, j*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentWhite);
             }
         }
     }
@@ -301,7 +315,7 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                 //show the shortest path
                 int id= map[1][i][j];
                 for(int k=0; villages[id].pathNumber > k; k++) {
-                    DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, (Color){255, 255, 255, 60});
+                    DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentWhite);
                 }
                 //village info
                 DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j-0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,(1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
@@ -313,3 +327,60 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
     }
     return 0;
 }
+
+int checkNeighbors(int x, int y, Vector2 map0) {
+    Rectangle available;
+    if(map[1][x-1][y]==0 && x!=0 && map[0][x-1][y]>0) {
+        DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        available= (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
+        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            map[1][x-1][y]=turn;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x-1;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y;
+            kingdoms[turn].roadNumber++;
+            mode=0;
+            turn++;
+        }
+    }
+    if(map[1][x+1][y]==0 && x!=mapWidth-1 && map[0][x+1][y]>0) {
+        DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
+        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            map[1][kingdoms[turn].x+1][kingdoms[turn].y]=turn;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x+1;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y;
+            kingdoms[turn].roadNumber++;
+            mode=0;
+            turn++;
+        }
+    }
+    if(map[1][x][y-1]==0 && y!=0 && map[0][x][y-1]>0) {
+        DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        available= (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
+        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            map[1][x][y-1]=turn;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y-1;
+            kingdoms[turn].roadNumber++;
+            mode=0;
+            turn++;
+        }
+    }
+    if(map[1][x][y+1]==0 && y!=mapHeight-1 && map[0][x][y+1]>0) {
+        DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        available= (Rectangle){x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
+        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            map[1][x][y+1]=turn;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x;
+            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y+1;
+            kingdoms[turn].roadNumber++;
+            mode=0;
+            turn++;
+        }
+    }
+    return 0;
+};
