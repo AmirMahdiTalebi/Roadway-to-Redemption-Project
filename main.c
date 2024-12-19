@@ -39,7 +39,7 @@ int main() {
     Font font= LoadFont("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\pixantiqua.png");
 
     kingdoms[0].color = WHITE;
-    kingdoms[1].color = (Color){133, 132, 227, 255};
+    kingdoms[1].color = (Color){59, 114, 209, 255};
     kingdoms[2].color = (Color){227, 125, 130, 255};
     kingdoms[3].color = (Color){131, 235, 148, 255};
     kingdoms[4].color = (Color){189, 125, 219, 255};
@@ -80,6 +80,11 @@ int main() {
 
 
         if (mode == 0) {
+
+            kingdomVerticeNumber = kingdoms[turn].y * mapWidth + kingdoms[turn].x;
+            for (int i = 0; i < villageNumber; i++) {
+                dijkstraPath(kingdomVerticeNumber, i, mapWidth * mapHeight);
+            }
 
             if (turn > kingdomNumber) {
                 turn = 1;
@@ -170,25 +175,21 @@ int main() {
                     }
                     mode = 0;
                     turn++;
-
-                    kingdomVerticeNumber = kingdoms[turn].y * mapWidth + kingdoms[turn].x;
-                    for (int i = 0; i < villageNumber; i++) {
-                        dijkstraPath(kingdomVerticeNumber, i, mapWidth * mapHeight);
-                    }
             }
 
         if (mode==2) {
-            checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
+            int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
-            for(int i=0; i<kingdoms[turn].roadNumber; i++) {
-                checkNeighbors(kingdoms[turn].roads[i].x, kingdoms[turn].roads[i].y, map0);
+            for(int i=0; i<kingdoms[turn].roadNumber && check==0 ; i++) {
+                check = checkNeighbors(kingdoms[turn].roads[i].x, kingdoms[turn].roads[i].y, map0);
             }
 
-            for(int i=0; i<villageNumber; i++) {
+            for(int i=0; i<villageNumber && check==0; i++) {
                 if(villages[i].kingdom==turn) {
-                    checkNeighbors(villages[i].x, villages[i].y, map0);
+                    check = checkNeighbors(villages[i].x, villages[i].y, map0);
                 }
             }
+
         }
 
             EndDrawing();

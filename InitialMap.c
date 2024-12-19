@@ -330,57 +330,99 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
 
 int checkNeighbors(int x, int y, Vector2 map0) {
     Rectangle available;
-    if(map[1][x-1][y]==0 && x!=0 && map[0][x-1][y]>0) {
+    if(x!=0 && ((map[0][x-1][y]>0 && map[1][x-1][y]==0) || (map[0][x-1][y]==-2 && villages[map[1][x-1][y]].kingdom==0))) {
         DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            map[1][x-1][y]=turn;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x-1;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y;
-            kingdoms[turn].roadNumber++;
+
+            if(map[0][x-1][y] == -2) {
+                villages[map[1][x-1][y]].kingdom = turn;
+                kingdoms[turn].goldX += villages[map[1][x-1][y]].goldX;
+                kingdoms[turn].foodX += villages[map[1][x-1][y]].foodX;
+                printf("%d", map[1][x-1][y]);
+            }
+
+            else {
+                map[1][x-1][y]=turn;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x-1;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y;
+                kingdoms[turn].roadNumber++;
+            }
+
             mode=0;
             turn++;
+            return 1;
         }
     }
-    if(map[1][x+1][y]==0 && x!=mapWidth-1 && map[0][x+1][y]>0) {
+    if(x!=(mapWidth-1) && ((map[0][x+1][y]>0 && map[1][x+1][y]==0) || (map[0][x+1][y]==-2 && villages[map[1][x+1][y]].kingdom==0))) {
         DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            map[1][kingdoms[turn].x+1][kingdoms[turn].y]=turn;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x+1;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y;
-            kingdoms[turn].roadNumber++;
+
+            if(map[0][x+1][y] == -2) {
+                villages[map[1][x+1][y]].kingdom = turn;
+                kingdoms[turn].goldX += villages[map[1][x+1][y]].goldX;
+                kingdoms[turn].foodX += villages[map[1][x+1][y]].foodX;
+            }
+            else {
+                map[1][x+1][y]=turn;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x+1;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y;
+                kingdoms[turn].roadNumber++;
+            }
+
             mode=0;
             turn++;
+            return 1;
         }
     }
-    if(map[1][x][y-1]==0 && y!=0 && map[0][x][y-1]>0) {
+    if(y!=0 && ((map[0][x][y-1]>0 && map[1][x][y-1]==0) || (map[0][x][y-1]==-2 && villages[map[1][x][y-1]].kingdom==0))) {
         DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            map[1][x][y-1]=turn;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y-1;
-            kingdoms[turn].roadNumber++;
+
+            if(map[0][x][y-1] == -2) {
+                villages[map[1][x][y-1]].kingdom = turn;
+                kingdoms[turn].goldX += villages[map[1][x][y-1]].goldX;
+                kingdoms[turn].foodX += villages[map[1][x][y-1]].foodX;
+            }
+            else {
+                map[1][x][y-1]=turn;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y-1;
+                kingdoms[turn].roadNumber++;
+            }
+
             mode=0;
             turn++;
+            return 1;
         }
     }
-    if(map[1][x][y+1]==0 && y!=mapHeight-1 && map[0][x][y+1]>0) {
+    if(y!=(mapHeight-1) && ((map[0][x][y+1]>0 && map[1][x][y+1]==0) || (map[0][x][y+1]==-2 && villages[map[1][x][y+1]].kingdom==0))) {
         DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            map[1][x][y+1]=turn;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].x = kingdoms[turn].x;
-            kingdoms[turn].roads[kingdoms[turn].roadNumber].y = kingdoms[turn].y+1;
-            kingdoms[turn].roadNumber++;
+
+            if(map[0][x][y+1] == -2) {
+                villages[map[1][x][y+1]].kingdom = turn;
+                kingdoms[turn].goldX += villages[map[1][x][y+1]].goldX;
+                kingdoms[turn].foodX += villages[map[1][x][y+1]].foodX;
+            }
+            else {
+                map[1][x][y+1]=turn;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x;
+                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y+1;
+                kingdoms[turn].roadNumber++;
+            }
+
             mode=0;
             turn++;
+            return 1;
         }
     }
     return 0;
-};
+}
