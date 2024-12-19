@@ -31,10 +31,9 @@ struct kingdom {
     int goldX;
     int worker;
     int soldier;
-    Color color;
-    Vector2 roads[289];
-    int roadNumber;
+    int roads[MAP_SIZE][MAP_SIZE];
     int villageNumber;
+    Color color;
 };
 
 struct village {

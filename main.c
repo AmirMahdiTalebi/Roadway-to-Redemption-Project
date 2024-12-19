@@ -26,9 +26,9 @@ int main() {
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
 
-    int kingdomVerticeNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
+    int kingdomVertexNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
     for(int i=0; i<villageNumber; i++) {
-        dijkstraPath(kingdomVerticeNumber, i, mapWidth*mapHeight);
+        dijkstraPath(kingdomVertexNumber, i, mapWidth*mapHeight);
     }
 
     Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\initial map (1).png");
@@ -51,7 +51,7 @@ int main() {
 
 //     Main game loop
     while (!WindowShouldClose()) {
-//        Hover effect vectors
+        //Hover effect vectors
         mousePosition = GetMousePosition();
         coordination = (Vector2){(int) ((mousePosition.x - map0.x) / TILE_SIZE), (int) ((mousePosition.y - map0.y) / TILE_SIZE)};
 
@@ -81,9 +81,9 @@ int main() {
 
         if (mode == 0) {
 
-            kingdomVerticeNumber = kingdoms[turn].y * mapWidth + kingdoms[turn].x;
+            kingdomVertexNumber = kingdoms[turn].y * mapWidth + kingdoms[turn].x;
             for (int i = 0; i < villageNumber; i++) {
-                dijkstraPath(kingdomVerticeNumber, i, mapWidth * mapHeight);
+                dijkstraPath(kingdomVertexNumber, i, mapWidth * mapHeight);
             }
 
             if (turn > kingdomNumber) {
@@ -108,13 +108,10 @@ int main() {
                 buttons[i].color = WHITE;
                 if (CheckCollisionPointRec(mousePosition, buttons[i].rect)) {
                     buttons[i].color = (Color) {255, 255, 255, 220};
-                    SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
                     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
                         mode = 1;
                         action = i + 1;
                     }
-                } else {
-                    SetMouseCursor(MOUSE_CURSOR_DEFAULT); // Revert to default cursor
                 }
                 DrawRectangle(buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.width, buttons[i].rect.height,
                               buttons[i].color);
@@ -188,8 +185,10 @@ int main() {
         if (mode == 2) {
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
-            for(int i=0; i<kingdoms[turn].roadNumber && check==0 ; i++) {
-                check = checkNeighbors(kingdoms[turn].roads[i].x, kingdoms[turn].roads[i].y, map0);
+            for (int mapX = 0; mapX < mapWidth; ++mapX) {
+                for (int mapY = 0; mapY < mapHeight; ++mapY) {
+                    if (kingdoms[turn].roads[mapX][mapY] == 0) check = checkNeighbors(mapX, mapY, map0);
+                }
             }
 
             for(int i=0; i<villageNumber && check==0; i++) {
