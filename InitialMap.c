@@ -193,7 +193,7 @@ int makeKingdom() {
         map[1][x][y] = i+1; // I saved Kingdoms' IDs in z=1.
 
         kingdoms[i+1].gold = 5;
-        kingdoms[i+1].food = kingdoms[i+1].foodX = kingdoms[i+1].soldier =  0;
+        kingdoms[i+1].food = kingdoms[i+1].foodX = kingdoms[i+1].soldier = kingdoms[i+1].villageNumber = 0;
         kingdoms[i+1].goldX = kingdoms[i+1].worker = 1;
     }
     return 0;
@@ -334,94 +334,114 @@ int checkNeighbors(int x, int y, Vector2 map0) {
         DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
-        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(mousePosition, available)) {
+            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                if(map[0][x-1][y] == -2) {
+                    villages[map[1][x-1][y]].kingdom = turn;
+                    kingdoms[turn].villageNumber++;
+                    kingdoms[turn].goldX += villages[map[1][x-1][y]].goldX;
+                    kingdoms[turn].foodX += villages[map[1][x-1][y]].foodX;
+                }
 
-            if(map[0][x-1][y] == -2) {
-                villages[map[1][x-1][y]].kingdom = turn;
-                kingdoms[turn].goldX += villages[map[1][x-1][y]].goldX;
-                kingdoms[turn].foodX += villages[map[1][x-1][y]].foodX;
-                printf("%d", map[1][x-1][y]);
+                else {
+                    map[1][x-1][y]=turn;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x-1;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y;
+                    kingdoms[turn].roadNumber++;
+                }
+
+                mode=0;
+                turn++;
+                return 1;
             }
-
-            else {
-                map[1][x-1][y]=turn;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x-1;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y;
-                kingdoms[turn].roadNumber++;
-            }
-
-            mode=0;
-            turn++;
-            return 1;
+        } else {
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // Revert to default cursor
         }
     }
     if(x!=(mapWidth-1) && ((map[0][x+1][y]>0 && map[1][x+1][y]==0) || (map[0][x+1][y]==-2 && villages[map[1][x+1][y]].kingdom==0))) {
         DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
-        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(mousePosition, available)) {
+            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                if(map[0][x+1][y] == -2) {
+                    villages[map[1][x+1][y]].kingdom = turn;
+                    kingdoms[turn].villageNumber++;
+                    kingdoms[turn].goldX += villages[map[1][x+1][y]].goldX;
+                    kingdoms[turn].foodX += villages[map[1][x+1][y]].foodX;
+                }
+                else {
+                    map[1][x+1][y]=turn;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x+1;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y;
+                    kingdoms[turn].roadNumber++;
+                }
 
-            if(map[0][x+1][y] == -2) {
-                villages[map[1][x+1][y]].kingdom = turn;
-                kingdoms[turn].goldX += villages[map[1][x+1][y]].goldX;
-                kingdoms[turn].foodX += villages[map[1][x+1][y]].foodX;
+                mode=0;
+                turn++;
+                return 1;
             }
-            else {
-                map[1][x+1][y]=turn;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x+1;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y;
-                kingdoms[turn].roadNumber++;
-            }
-
-            mode=0;
-            turn++;
-            return 1;
+        } else {
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // Revert to default cursor
         }
     }
     if(y!=0 && ((map[0][x][y-1]>0 && map[1][x][y-1]==0) || (map[0][x][y-1]==-2 && villages[map[1][x][y-1]].kingdom==0))) {
         DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
-        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(mousePosition, available)) {
+            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                if(map[0][x][y-1] == -2) {
+                    villages[map[1][x][y-1]].kingdom = turn;
+                    kingdoms[turn].villageNumber++;
+                    kingdoms[turn].goldX += villages[map[1][x][y-1]].goldX;
+                    kingdoms[turn].foodX += villages[map[1][x][y-1]].foodX;
+                }
+                else {
+                    map[1][x][y-1]=turn;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y-1;
+                    kingdoms[turn].roadNumber++;
+                }
 
-            if(map[0][x][y-1] == -2) {
-                villages[map[1][x][y-1]].kingdom = turn;
-                kingdoms[turn].goldX += villages[map[1][x][y-1]].goldX;
-                kingdoms[turn].foodX += villages[map[1][x][y-1]].foodX;
+                mode=0;
+                turn++;
+                return 1;
             }
-            else {
-                map[1][x][y-1]=turn;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y-1;
-                kingdoms[turn].roadNumber++;
-            }
-
-            mode=0;
-            turn++;
-            return 1;
+        } else {
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // Revert to default cursor
         }
     }
     if(y!=(mapHeight-1) && ((map[0][x][y+1]>0 && map[1][x][y+1]==0) || (map[0][x][y+1]==-2 && villages[map[1][x][y+1]].kingdom==0))) {
         DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         available= (Rectangle){x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
-        if (CheckCollisionPointRec(mousePosition, available) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(mousePosition, available)) {
+            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                if(map[0][x][y+1] == -2) {
+                    villages[map[1][x][y+1]].kingdom = turn;
+                    kingdoms[turn].villageNumber++;
+                    kingdoms[turn].goldX += villages[map[1][x][y+1]].goldX;
+                    kingdoms[turn].foodX += villages[map[1][x][y+1]].foodX;
+                }
 
-            if(map[0][x][y+1] == -2) {
-                villages[map[1][x][y+1]].kingdom = turn;
-                kingdoms[turn].goldX += villages[map[1][x][y+1]].goldX;
-                kingdoms[turn].foodX += villages[map[1][x][y+1]].foodX;
-            }
-            else {
-                map[1][x][y+1]=turn;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x;
-                kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y+1;
-                kingdoms[turn].roadNumber++;
-            }
+                else {
+                    map[1][x][y+1]=turn;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].x = x;
+                    kingdoms[turn].roads[kingdoms[turn].roadNumber].y = y+1;
+                    kingdoms[turn].roadNumber++;
+                }
 
-            mode=0;
-            turn++;
-            return 1;
+                mode=0;
+                turn++;
+                return 1;
+            }
+        } else {
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // Revert to default cursor
         }
     }
     return 0;

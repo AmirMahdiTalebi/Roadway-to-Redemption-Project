@@ -11,6 +11,7 @@ struct button {
 typedef struct button button;
 button buttons[5];
 
+int winner;
 
 // Program main entry point
 int main() {
@@ -52,8 +53,7 @@ int main() {
     while (!WindowShouldClose()) {
 //        Hover effect vectors
         mousePosition = GetMousePosition();
-        coordination = (Vector2){(int) ((mousePosition.x - map0.x) / TILE_SIZE),
-                                (int) ((mousePosition.y - map0.y) / TILE_SIZE)};
+        coordination = (Vector2){(int) ((mousePosition.x - map0.x) / TILE_SIZE), (int) ((mousePosition.y - map0.y) / TILE_SIZE)};
 
         BeginDrawing();
 
@@ -73,7 +73,7 @@ int main() {
             DrawText(text, SCREEN_WIDTH - 285, 100 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
             sprintf(text, "Workers = %d", kingdoms[i+1].worker);
             DrawText(text, SCREEN_WIDTH - 285, 125 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
-            sprintf(text, "Villages = ");
+            sprintf(text, "Villages = %d", kingdoms[i+1].villageNumber);
             DrawText(text, SCREEN_WIDTH - 285, 150 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
             DrawRectangle(SCREEN_WIDTH - 300, (SCREEN_HEIGHT / kingdomNumber) * i - 4, 300, 4, GREEN);
         }
@@ -108,10 +108,13 @@ int main() {
                 buttons[i].color = WHITE;
                 if (CheckCollisionPointRec(mousePosition, buttons[i].rect)) {
                     buttons[i].color = (Color) {255, 255, 255, 220};
+                    SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
                     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
                         mode = 1;
                         action = i + 1;
                     }
+                } else {
+                    SetMouseCursor(MOUSE_CURSOR_DEFAULT); // Revert to default cursor
                 }
                 DrawRectangle(buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.width, buttons[i].rect.height,
                               buttons[i].color);
@@ -123,9 +126,6 @@ int main() {
         if (mode == 1) {
             buttonsPosY = -100;
             switch (action) {
-                case 0:
-                    return 0;
-
                 case 1:
                     if (kingdoms[turn].gold >= 1) {
                         kingdoms[turn].gold--;
@@ -155,7 +155,7 @@ int main() {
                     break;
 
                 case 3:
-                    if (kingdoms[turn].gold >= 2) {
+                    if (kingdoms[turn].gold >= 3) {
                         kingdoms[turn].gold -= 3;
                         kingdoms[turn].soldier++;
                     } else {
@@ -172,12 +172,20 @@ int main() {
                     continue;
                 case 5:
                     break;
-                    }
-                    mode = 0;
-                    turn++;
             }
 
-        if (mode==2) {
+            int areAllVillagesConquered = 0, areSoldiersEnough = 0;
+            if (kingdoms[turn].villageNumber == villageNumber) areAllVillagesConquered = 1;
+            if (kingdoms[turn].soldier >= neededSoldier) areSoldiersEnough = 1;
+            if (areAllVillagesConquered && areSoldiersEnough) {
+                winner = turn;
+                mode = 3;
+            }
+            else mode = 0;
+            turn++;
+        }
+
+        if (mode == 2) {
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
             for(int i=0; i<kingdoms[turn].roadNumber && check==0 ; i++) {
@@ -192,11 +200,14 @@ int main() {
 
         }
 
-            EndDrawing();
+        if (mode == 3) {
+            DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
+            char text[20];
+            sprintf(text, "WINNER IS KINGDOM %d", winner);
+            DrawText(text, 200, 200, 40, BLACK);
+        }
 
-            if (IsKeyPressed(KEY_SPACE)) {
-                mode = 0;
-            }
+            EndDrawing();
         }
 
         UnloadTexture(mapTileSet);

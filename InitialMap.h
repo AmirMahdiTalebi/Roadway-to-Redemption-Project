@@ -34,6 +34,7 @@ struct kingdom {
     Color color;
     Vector2 roads[289];
     int roadNumber;
+    int villageNumber;
 };
 
 struct village {
