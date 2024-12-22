@@ -81,9 +81,37 @@ int main() {
 
         if (mode == 0) {
 
-            kingdomVertexNumber = kingdoms[turn].y * mapWidth + kingdoms[turn].x;
-            for (int i = 0; i < villageNumber; i++) {
-                dijkstraPath(kingdomVertexNumber, i, mapWidth * mapHeight);
+            for (int i = 0; i < villageNumber; ++i) {
+                int BestPath = kingdoms[turn].y * mapWidth + kingdoms[turn].x, path, distance
+                , BestDistance =dijkstraPath(kingdomVertexNumber, i, mapWidth * mapHeight);
+                for (int j = 0; j < kingdoms[turn].roadNumber; ++j) {
+                    path = kingdoms[turn].road[j].y * mapWidth + kingdoms[turn].road[j].x;
+                    distance = dijkstraPath(path, i , mapWidth * mapHeight);
+                    if (dijkstraPath(path, i , mapWidth * mapHeight) < BestDistance) {
+                        BestPath = path;
+                        BestDistance = distance;
+                    }
+                }
+                for (int j=0; j<villageNumber; ++j) {
+                    if (villages[j].kingdom == turn) {
+                        path = villages[j].y * mapWidth + villages[j].x;
+                        distance = dijkstraPath(path, i , mapWidth * mapHeight);
+                        if (dijkstraPath(path, i , mapWidth * mapHeight) < BestDistance) {
+                            BestPath = path;
+                            BestDistance = distance;
+                        }
+                    }
+                }
+
+                dijkstraPath(BestPath, i , mapWidth * mapHeight);
+
+                int areAllVillagesConquered = 0, areSoldiersEnough = 0;
+                if (kingdoms[turn].villageNumber == villageNumber) areAllVillagesConquered = 1;
+                if (kingdoms[turn].soldier >= neededSoldier) areSoldiersEnough = 1;
+                if (areAllVillagesConquered && areSoldiersEnough) {
+                    winner = turn;
+                    mode = 3;
+                }
             }
 
             if (turn > kingdomNumber) {
@@ -170,25 +198,15 @@ int main() {
                 case 5:
                     break;
             }
-
-            int areAllVillagesConquered = 0, areSoldiersEnough = 0;
-            if (kingdoms[turn].villageNumber == villageNumber) areAllVillagesConquered = 1;
-            if (kingdoms[turn].soldier >= neededSoldier) areSoldiersEnough = 1;
-            if (areAllVillagesConquered && areSoldiersEnough) {
-                winner = turn;
-                mode = 3;
-            }
-            else mode = 0;
+            mode = 0;
             turn++;
         }
 
         if (mode == 2) {
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
-            for (int mapX = 0; mapX < mapWidth; ++mapX) {
-                for (int mapY = 0; mapY < mapHeight; ++mapY) {
-                    if (kingdoms[turn].roads[mapX][mapY] == 0) check = checkNeighbors(mapX, mapY, map0);
-                }
+            for (int i = 0; i <kingdoms[turn].roadNumber && check==0; ++i) {
+                check = checkNeighbors(kingdoms[turn].road[i].x, kingdoms[turn].road[i].y, map0);
             }
 
             for(int i=0; i<villageNumber && check==0; i++) {

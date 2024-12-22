@@ -134,7 +134,7 @@ int dijkstraPath(int source,int id, int size) {
         villages[id].path[k]=path[dest][k];
     }
     villages[id].pathNumber = pathNumber[dest];
-    return 0;
+    return dist[dest];
 }
 
 int initialMapMaker() {
@@ -191,13 +191,12 @@ int makeKingdom() {
         kingdoms[i].y = y;
         map[0][x][y] = -1; // -1 is the code for kingdoms.
         map[1][x][y] = i; // I saved Kingdoms' IDs in z=1.
-
         kingdoms[i].gold = 5;
         kingdoms[i].food = kingdoms[i].foodX = kingdoms[i].soldier = kingdoms[i].villageNumber = 0;
         kingdoms[i].goldX = kingdoms[i].worker = 1;
         for (int mapX = 0; mapX < mapWidth; ++mapX) {
             for (int mapY = 0; mapY < mapHeight; ++mapY) {
-                kingdoms[i].roads[mapX][mapY] = map[0][mapX][mapY];
+                kingdoms[i].roadLeftover[mapX][mapY] = map[0][mapX][mapY];
             }
         }
     }
@@ -299,7 +298,7 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
                     else {
                         // Writing roadways' numbers on the tile
                         char innerNum[2];
-                        sprintf(innerNum, "%d", kingdoms[turn].roads[i][j]);
+                        sprintf(innerNum, "%d", kingdoms[turn].roadLeftover[i][j]);
                         DrawTextEx(font, innerNum,
                                    (Vector2) {(i + .4) * TILE_SIZE + map0.x, (j + .15) * TILE_SIZE + map0.y}, 30, 1,
                                    (Color) {150, 75, 0, 200});
@@ -348,10 +347,13 @@ int checkNeighbors(int x, int y, Vector2 map0) {
                     kingdoms[turn].foodX += villages[map[1][x-1][y]].foodX;
                 }
                 else {
-                    kingdoms[turn].roads[x-1][y] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roads[x-1][y] <= 0) {
-                        kingdoms[turn].roads[x-1][y] = 0;
+                    kingdoms[turn].roadLeftover[x - 1][y] -= kingdoms[turn].worker;
+                    if (kingdoms[turn].roadLeftover[x - 1][y] <= 0) {
+                        kingdoms[turn].roadLeftover[x - 1][y] = 0;
                         map[1][x-1][y] = turn;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x - 1;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y;
+                        kingdoms[turn].roadNumber++;
                     }
                 }
 
@@ -374,10 +376,13 @@ int checkNeighbors(int x, int y, Vector2 map0) {
                     kingdoms[turn].foodX += villages[map[1][x+1][y]].foodX;
                 }
                 else {
-                    kingdoms[turn].roads[x+1][y] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roads[x+1][y] <= 0) {
-                        kingdoms[turn].roads[x+1][y] = 0;
+                    kingdoms[turn].roadLeftover[x + 1][y] -= kingdoms[turn].worker;
+                    if (kingdoms[turn].roadLeftover[x + 1][y] <= 0) {
+                        kingdoms[turn].roadLeftover[x + 1][y] = 0;
                         map[1][x+1][y] = turn;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x + 1;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y;
+                        kingdoms[turn].roadNumber++;
                     }
                 }
 
@@ -400,10 +405,13 @@ int checkNeighbors(int x, int y, Vector2 map0) {
                     kingdoms[turn].foodX += villages[map[1][x][y-1]].foodX;
                 }
                 else {
-                    kingdoms[turn].roads[x][y-1] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roads[x][y-1] <= 0) {
-                        kingdoms[turn].roads[x][y-1] = 0;
+                    kingdoms[turn].roadLeftover[x][y - 1] -= kingdoms[turn].worker;
+                    if (kingdoms[turn].roadLeftover[x][y - 1] <= 0) {
+                        kingdoms[turn].roadLeftover[x][y - 1] = 0;
                         map[1][x][y-1] = turn;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y - 1;
+                        kingdoms[turn].roadNumber++;
                     }
                 }
 
@@ -426,10 +434,13 @@ int checkNeighbors(int x, int y, Vector2 map0) {
                     kingdoms[turn].foodX += villages[map[1][x][y+1]].foodX;
                 }
                 else {
-                    kingdoms[turn].roads[x][y+1] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roads[x][y+1] <= 0) {
-                        kingdoms[turn].roads[x][y+1] = 0;
+                    kingdoms[turn].roadLeftover[x][y + 1] -= kingdoms[turn].worker;
+                    if (kingdoms[turn].roadLeftover[x][y + 1] <= 0) {
+                        kingdoms[turn].roadLeftover[x][y + 1] = 0;
                         map[1][x][y+1] = turn;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x;
+                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y + 1;
+                        kingdoms[turn].roadNumber++;
                     }
                 }
 

@@ -31,7 +31,9 @@ struct kingdom {
     int goldX;
     int worker;
     int soldier;
-    int roads[MAP_SIZE][MAP_SIZE];
+    int roadLeftover[MAP_SIZE][MAP_SIZE];
+    Vector2 road[MAP_SIZE*MAP_SIZE];
+    int roadNumber;
     int villageNumber;
     Color color;
 };
