@@ -9,7 +9,7 @@ typedef struct village village;
 int map[2][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
-int turn = 1, kingdomNumber, villageNumber, neededSoldier;
+int turn = 1, kingdomNumber, villageNumber, neededSoldier, opponent;
 int list[MAP_SIZE*MAP_SIZE][5];
 int mode = 0;
 
@@ -18,6 +18,7 @@ Vector2 coordination;
 
 Color transparentWhite = (Color){255, 255, 255, 60};
 Color transparentGreen = (Color){37, 204, 81, 90};
+Color transparentRed = (Color){255, 0,0,60};
 
 village villages[30] = {0};
 kingdom kingdoms[5] = {0};
@@ -170,6 +171,7 @@ int initialMapMaker() {
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
             map[0][i][j] = generate_number();
+            map[1][i][j] = 0;
         }
     }
     return 0;
@@ -341,22 +343,26 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
 int checkNeighbors(int x, int y, Vector2 map0) {
     Rectangle available;
     if(x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] == 0) || (map[0][x-1][y] == -2 && villages[map[1][x-1][y]].kingdom == 0))) {
-        DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int checker = checkForWar(x-1 ,y ,map0);
+        if (checker) {
+            DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
+        } else {
+            DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        }
         available = (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if(map[0][x-1][y] == -2) {
-                    villages[map[1][x-1][y]].kingdom = turn;
+                if (map[0][x - 1][y] == -2) {
+                    villages[map[1][x - 1][y]].kingdom = turn;
                     kingdoms[turn].villageNumber++;
-                    kingdoms[turn].goldX += villages[map[1][x-1][y]].goldX;
-                    kingdoms[turn].foodX += villages[map[1][x-1][y]].foodX;
-                }
-                else {
+                    kingdoms[turn].goldX += villages[map[1][x - 1][y]].goldX;
+                    kingdoms[turn].foodX += villages[map[1][x - 1][y]].foodX;
+                } else {
                     kingdoms[turn].roadLeftover[x - 1][y] -= kingdoms[turn].worker;
                     if (kingdoms[turn].roadLeftover[x - 1][y] <= 0) {
                         kingdoms[turn].roadLeftover[x - 1][y] = 0;
-                        map[1][x-1][y] = turn;
+                        map[1][x - 1][y] = turn;
                         kingdoms[turn].road[kingdoms[turn].roadNumber].x = x - 1;
                         kingdoms[turn].road[kingdoms[turn].roadNumber].y = y;
                         kingdoms[turn].roadNumber++;
@@ -370,7 +376,12 @@ int checkNeighbors(int x, int y, Vector2 map0) {
         }
     }
     if(x!=(mapWidth-1) && ((map[0][x+1][y]>0 && map[1][x+1][y]==0) || (map[0][x+1][y]==-2 && villages[map[1][x+1][y]].kingdom==0))) {
-        DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int checker = checkForWar(x+1 ,y ,map0);
+        if (checker) {
+            DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
+        } else {
+            DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        }
         available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
@@ -399,8 +410,13 @@ int checkNeighbors(int x, int y, Vector2 map0) {
         }
     }
     if(y!=0 && ((map[0][x][y-1]>0 && map[1][x][y-1]==0) || (map[0][x][y-1]==-2 && villages[map[1][x][y-1]].kingdom==0))) {
-        DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
-        available= (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+        int checker = checkForWar(x ,y-1 ,map0);
+        if (checker) {
+            DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
+        } else {
+            DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        }
+        available = (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -428,7 +444,12 @@ int checkNeighbors(int x, int y, Vector2 map0) {
         }
     }
     if(y!=(mapHeight-1) && ((map[0][x][y+1]>0 && map[1][x][y+1]==0) || (map[0][x][y+1]==-2 && villages[map[1][x][y+1]].kingdom==0))) {
-        DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int checker = checkForWar(x ,y+1 ,map0);
+        if (checker) {
+            DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
+        } else {
+            DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        }
         available= (Rectangle){x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
@@ -455,6 +476,37 @@ int checkNeighbors(int x, int y, Vector2 map0) {
                 return 1;
             }
         }
+    }
+    return 0;
+}
+
+int checkForWar(int x, int y, Vector2 map0) {
+    if (x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] != 0 && map[1][x-1][y] != turn) ||
+                   (map[0][x-1][y] == -1 && map[1][x-1][y] != turn) ||
+                   (map[0][x-1][y] == -2 && villages[map[1][x-1][y]].kingdom != 0 && villages[map[1][x-1][y]].kingdom != turn))) {
+        opponent = map[1][x-1][y];
+        return 1;
+    }
+
+    if (y != 0 && ((map[0][x][y-1] > 0 && map[1][x][y-1] != 0 && map[1][x][y-1] != turn) ||
+                   (map[0][x][y-1] == -1 && map[1][x][y-1] != turn) ||
+                   (map[0][x][y-1] == -2 && villages[map[1][x][y-1]].kingdom != 0 && villages[map[1][x][y-1]].kingdom != turn))) {
+        opponent = map[1][x][y-1];
+        return 1;
+    }
+
+    if (y != (mapHeight-1) && ((map[0][x][y+1] > 0 && map[1][x][y+1] != 0 && map[1][x][y+1] != turn) ||
+                   (map[0][x][y+1] == -1 && map[1][x][y+1] != turn) ||
+                   (map[0][x][y+1] == -2 && villages[map[1][x][y+1]].kingdom != 0 && villages[map[1][x][y+1]].kingdom != turn))) {
+        opponent = map[1][x][y+1];
+        return 1;
+    }
+
+    if (x != (mapWidth-1) && ((map[0][x+1][y] > 0 && map[1][x+1][y] != 0 && map[1][x+1][y] != turn) ||
+                   (map[0][x+1][y] == -1 && map[1][x+1][y] != turn) ||
+                   (map[0][x+1][y] == -2 && villages[map[1][x+1][y]].kingdom != 0 && villages[map[1][x+1][y]].kingdom != turn))) {
+        opponent = map[1][x+1][y];
+        return 1;
     }
     return 0;
 }

@@ -11,7 +11,7 @@ typedef struct village village;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
-extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier;
+extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
 
@@ -60,5 +60,6 @@ int makeBarrier();
 int dijkstraPath(int source, int id, int size);
 int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
 int checkNeighbors(int x, int y, Vector2 map0);
+int checkForWar(int x, int y, Vector2 map0);
 
 #endif // INITIAL_MAP_H
