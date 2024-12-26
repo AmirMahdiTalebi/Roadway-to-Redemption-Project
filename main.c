@@ -11,8 +11,6 @@ struct button {
 typedef struct button button;
 button buttons[5];
 
-int winner;
-
 // Program main entry point
 int main() {
     int action = 0;
@@ -61,7 +59,7 @@ int main() {
 
         mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0);
 
-        for (int i = 0; i < kingdomNumber; ++i) {
+        for (int i = 0; i < kingdomNumber; ++i) { //show kingdoms' info
             char text[50];
             Color textColor;
             if(i+1!=turn)
@@ -84,7 +82,7 @@ int main() {
         }
 
 
-        if (mode == 0) {
+        if (mode == 0) { //start of the turn
 
             if (turn > kingdomNumber) {
                 turn = 1;
@@ -94,6 +92,7 @@ int main() {
                 }
             }
 
+            //choose the shortest path
             for (int i = 0; i < villageNumber; ++i) {
                 int BestPath = kingdoms[turn].y * mapWidth + kingdoms[turn].x, path, distance
                 , BestDistance =dijkstraPath(kingdomVertexNumber, i, mapWidth * mapHeight);
@@ -117,14 +116,6 @@ int main() {
                 }
 
                 dijkstraPath(BestPath, i , mapWidth * mapHeight);
-
-                int areAllVillagesConquered = 0, areSoldiersEnough = 0;
-                if (kingdoms[turn].villageNumber == villageNumber) areAllVillagesConquered = 1;
-                if (kingdoms[turn].soldier >= neededSoldier) areSoldiersEnough = 1;
-                if (areAllVillagesConquered && areSoldiersEnough) {
-                    winner = turn;
-                    mode = 3;
-                }
             }
 
             strcpy(buttons[0].text, "Add food");
@@ -153,7 +144,7 @@ int main() {
 
         }
 
-        if (mode == 1) {
+        if (mode == 1) { //actions
             buttonsPosY = -100;
             switch (action) {
                 case 1:
@@ -207,7 +198,7 @@ int main() {
             turn++;
         }
 
-        if (mode == 2) {
+        if (mode == 2) { //making roads
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
             for (int i = 0; i <kingdoms[turn].roadNumber && check==0; ++i) {
@@ -222,7 +213,7 @@ int main() {
 
         }
 
-        if (mode == 3) {
+        if (mode == 3) { //the end of the game
             DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
             char text[20];
             sprintf(text, "WINNER IS KINGDOM %d", winner);

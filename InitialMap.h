@@ -11,7 +11,7 @@ typedef struct village village;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
-extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent;
+extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent, winner;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
 
