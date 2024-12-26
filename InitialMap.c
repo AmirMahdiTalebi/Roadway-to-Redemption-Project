@@ -43,9 +43,15 @@ int dijkstraPath(int source,int id, int size) {
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
             if (map[0][i][j] < 0) {
+                //anything that can't become a road
                 list[j*mapWidth+i][0] = 2000;
             }
-            else list[j*mapWidth+i][0] = map[0][i][j];
+            else {
+                if (map[1][i][j]!=turn && map[1][i][j]>0)
+                    list[j*mapWidth + i][0]=2000;
+                else
+                    list[j * mapWidth + i][0] = (kingdoms[turn].roadLeftover[i][j] + kingdoms[turn].worker - 1) / kingdoms[turn].worker;
+            }
         }
     }
     list[source][0] = list[dest][0] = 0;
@@ -120,7 +126,7 @@ int dijkstraPath(int source,int id, int size) {
         visited[current] = 1;
 
         //update current
-        minDistance=2000;
+        minDistance=4000;
         for(int i=0; i<size; i++) {
             if(!visited[i] && dist[i]<minDistance && list[i][0] != -1) {
                 current=i;
@@ -130,8 +136,8 @@ int dijkstraPath(int source,int id, int size) {
     }
 
     int k;
-    for(k=0; k<pathNumber[dest]; k++) {
-        villages[id].path[k]=path[dest][k];
+    for (k = 0; k < pathNumber[dest]; k++) {
+        villages[id].path[k] = path[dest][k];
     }
     villages[id].pathNumber = pathNumber[dest];
     return dist[dest];
@@ -318,7 +324,7 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
             if(coordination.x==i && coordination.y==j && map[0][i][j]==-2) {
                 //show the shortest path
                 int id= map[1][i][j];
-                for(int k=0; villages[id].pathNumber > k; k++) {
+                for(int k=1; k < villages[id].pathNumber; k++) {
                     DrawRectangle((villages[id].path[k] % mapWidth) * TILE_SIZE + map0.x, (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentWhite);
                 }
                 //village info

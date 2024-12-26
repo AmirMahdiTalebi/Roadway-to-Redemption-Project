@@ -40,8 +40,8 @@ int main() {
     Font font= LoadFont("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\pixantiqua.png");
 
     kingdoms[0].color = WHITE;
-    kingdoms[1].color = (Color){59, 114, 209, 255};
-    kingdoms[2].color = (Color){227, 125, 130, 255};
+    kingdoms[1].color = (Color){103, 135, 194, 255};
+    kingdoms[2].color = (Color){230, 37, 82, 255};
     kingdoms[3].color = (Color){131, 235, 148, 255};
     kingdoms[4].color = (Color){189, 125, 219, 255};
 
@@ -63,23 +63,36 @@ int main() {
 
         for (int i = 0; i < kingdomNumber; ++i) {
             char text[50];
+            Color textColor;
+            if(i+1!=turn)
+                textColor=transparentWhite;
+            else
+                textColor=kingdoms[i+1].color;
             sprintf(text, "Kingdom %d", i + 1);
-            DrawText(text, SCREEN_WIDTH - 285, 15 + (SCREEN_HEIGHT / kingdomNumber) * i, 30, kingdoms[i+1].color);
+            DrawText(text, SCREEN_WIDTH - 285, 15 + (SCREEN_HEIGHT / kingdomNumber) * i, 30, textColor);
             sprintf(text, "Food = %d    FoodX = %d", kingdoms[i+1].food, kingdoms[i+1].foodX);
-            DrawText(text, SCREEN_WIDTH - 285, 50 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
+            DrawText(text, SCREEN_WIDTH - 285, 50 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
             sprintf(text, "Gold = %d    GoldX = %d", kingdoms[i+1].gold, kingdoms[i+1].goldX);
-            DrawText(text, SCREEN_WIDTH - 285, 75 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
+            DrawText(text, SCREEN_WIDTH - 285, 75 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
             sprintf(text, "Soldiers = %d", kingdoms[i+1].soldier);
-            DrawText(text, SCREEN_WIDTH - 285, 100 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
+            DrawText(text, SCREEN_WIDTH - 285, 100 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
             sprintf(text, "Workers = %d", kingdoms[i+1].worker);
-            DrawText(text, SCREEN_WIDTH - 285, 125 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
+            DrawText(text, SCREEN_WIDTH - 285, 125 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
             sprintf(text, "Villages = %d", kingdoms[i+1].villageNumber);
-            DrawText(text, SCREEN_WIDTH - 285, 150 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, kingdoms[i+1].color);
+            DrawText(text, SCREEN_WIDTH - 285, 150 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
             DrawRectangle(SCREEN_WIDTH - 300, (SCREEN_HEIGHT / kingdomNumber) * i - 4, 300, 4, GREEN);
         }
 
 
         if (mode == 0) {
+
+            if (turn > kingdomNumber) {
+                turn = 1;
+                for (int i = 1; i <= kingdomNumber; i++) {
+                    kingdoms[i].food += kingdoms[i].foodX;
+                    kingdoms[i].gold += kingdoms[i].goldX;
+                }
+            }
 
             for (int i = 0; i < villageNumber; ++i) {
                 int BestPath = kingdoms[turn].y * mapWidth + kingdoms[turn].x, path, distance
@@ -111,14 +124,6 @@ int main() {
                 if (areAllVillagesConquered && areSoldiersEnough) {
                     winner = turn;
                     mode = 3;
-                }
-            }
-
-            if (turn > kingdomNumber) {
-                turn = 1;
-                for (int i = 1; i <= kingdomNumber; i++) {
-                    kingdoms[i].food += kingdoms[i].foodX;
-                    kingdoms[i].gold += kingdoms[i].goldX;
                 }
             }
 
@@ -229,6 +234,10 @@ int main() {
 
         UnloadTexture(mapTileSet);
         UnloadTexture(GroundTile);
+        UnloadTexture(Stone);
+        UnloadTexture(House);
+        UnloadTexture(Castle);
+        UnloadFont(font);
         // De-Initialization
         CloseWindow();
 
