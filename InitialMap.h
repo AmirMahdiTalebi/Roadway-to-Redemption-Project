@@ -36,6 +36,7 @@ struct kingdom {
     int roadNumber;
     int villageNumber;
     Color color;
+    int dead;
 };
 
 struct village {
@@ -61,5 +62,6 @@ int dijkstraPath(int source, int id, int size);
 int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
 int checkNeighbors(int x, int y, Vector2 map0);
 int checkForWar(int x, int y, Vector2 map0);
+int DeleteKingdom(int id);
 
 #endif // INITIAL_MAP_H

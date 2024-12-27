@@ -62,7 +62,9 @@ int main() {
         for (int i = 0; i < kingdomNumber; ++i) { //show kingdoms' info
             char text[50];
             Color textColor;
-            if(i+1!=turn)
+            if(kingdoms[i+1].dead)
+                textColor=(Color){30,30,30,255};
+            else if(i+1!=turn)
                 textColor=transparentWhite;
             else
                 textColor=kingdoms[i+1].color;
@@ -86,7 +88,24 @@ int main() {
 
             if (turn > kingdomNumber) {
                 turn = 1;
+                if(kingdoms[turn].dead)
+                    turn++;
                 for (int i = 1; i <= kingdomNumber; i++) {
+                    if (kingdoms[i].dead)
+                        continue;
+                    kingdoms[i].food += kingdoms[i].foodX;
+                    kingdoms[i].gold += kingdoms[i].goldX;
+                }
+            }
+            if (kingdoms[turn].dead)
+                turn++;
+            if (turn > kingdomNumber) {
+                turn = 1;
+                if (kingdoms[turn].dead)
+                    turn++;
+                for (int i = 1; i <= kingdomNumber; i++) {
+                    if (kingdoms[i].dead)
+                        continue;
                     kingdoms[i].food += kingdoms[i].foodX;
                     kingdoms[i].gold += kingdoms[i].goldX;
                 }
