@@ -8,6 +8,7 @@
 
 typedef struct kingdom kingdom;
 typedef struct village village;
+typedef struct button button;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
@@ -21,6 +22,9 @@ extern Vector2 coordination;
 extern Color transparentWhite;
 extern Color transparentGreen;
 extern Color transparentRed;
+
+extern float buttonsPosY;
+extern int action;
 
 struct kingdom {
     int x;
@@ -49,19 +53,28 @@ struct village {
     int kingdom;
 };
 
+struct button {
+    Rectangle rect;
+    char text[30];
+    Color color;
+};
+
+extern button buttons[5];
 extern village villages[30];
 extern kingdom kingdoms[5];
 
 // Functions' Prototypes
 //int generate_number();
-int initialMapMaker();
-int makeKingdom();
-int makeVillage();
-int makeBarrier();
+void initialMapMaker();
+void makeKingdom();
+void makeVillage();
+void makeBarrier();
 int dijkstraPath(int source, int id, int size);
-int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
+void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
 int checkNeighbors(int x, int y, Vector2 map0);
 int checkForWar(int x, int y, Vector2 map0);
-int DeleteKingdom(int id);
+void DeleteKingdom(int id);
+void mode0();
+void mode1();
 
 #endif // INITIAL_MAP_H

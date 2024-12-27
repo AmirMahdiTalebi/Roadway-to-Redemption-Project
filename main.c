@@ -3,17 +3,9 @@
 #include "raylib.h"
 #include "InitialMap.h"
 
-struct button {
-    Rectangle rect;
-    char text[30];
-    Color color;
-};
-typedef struct button button;
-button buttons[5];
-
 // Program main entry point
 int main() {
-    int action = 0;
+    action = 0;
     initialMapMaker();
     makeKingdom();
     makeVillage();
@@ -24,10 +16,7 @@ int main() {
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
 
-    int kingdomVertexNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
-    for(int i=0; i<villageNumber; i++) {
-        dijkstraPath(kingdomVertexNumber, i, mapWidth*mapHeight);
-    }
+    buttonsPosY = -100;
 
     Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\initial map (1).png");
     Texture2D GroundTile = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\tilecrop (1).png");
@@ -45,9 +34,7 @@ int main() {
 
     SetTargetFPS(60);
 
-    float buttonsPosY = -100;
-
-//     Main game loop
+    //Main game loop
     while (!WindowShouldClose()) {
         //Hover effect vectors
         mousePosition = GetMousePosition();
@@ -84,138 +71,11 @@ int main() {
         }
 
 
-        if (mode == 0) { //start of the turn
+        if (mode == 0) //start of the turn
+            mode0();
 
-            if (turn > kingdomNumber) {
-                turn = 1;
-                if(kingdoms[turn].dead)
-                    turn++;
-                for (int i = 1; i <= kingdomNumber; i++) {
-                    if (kingdoms[i].dead)
-                        continue;
-                    kingdoms[i].food += kingdoms[i].foodX;
-                    kingdoms[i].gold += kingdoms[i].goldX;
-                }
-            }
-            if (kingdoms[turn].dead)
-                turn++;
-            if (turn > kingdomNumber) {
-                turn = 1;
-                if (kingdoms[turn].dead)
-                    turn++;
-                for (int i = 1; i <= kingdomNumber; i++) {
-                    if (kingdoms[i].dead)
-                        continue;
-                    kingdoms[i].food += kingdoms[i].foodX;
-                    kingdoms[i].gold += kingdoms[i].goldX;
-                }
-            }
-
-            //choose the shortest path
-            for (int i = 0; i < villageNumber; ++i) {
-                int BestPath = kingdoms[turn].y * mapWidth + kingdoms[turn].x, path, distance
-                , BestDistance =dijkstraPath(kingdomVertexNumber, i, mapWidth * mapHeight);
-                for (int j = 0; j < kingdoms[turn].roadNumber; ++j) {
-                    path = kingdoms[turn].road[j].y * mapWidth + kingdoms[turn].road[j].x;
-                    distance = dijkstraPath(path, i , mapWidth * mapHeight);
-                    if (dijkstraPath(path, i , mapWidth * mapHeight) < BestDistance) {
-                        BestPath = path;
-                        BestDistance = distance;
-                    }
-                }
-                for (int j=0; j<villageNumber; ++j) {
-                    if (villages[j].kingdom == turn) {
-                        path = villages[j].y * mapWidth + villages[j].x;
-                        distance = dijkstraPath(path, i , mapWidth * mapHeight);
-                        if (dijkstraPath(path, i , mapWidth * mapHeight) < BestDistance) {
-                            BestPath = path;
-                            BestDistance = distance;
-                        }
-                    }
-                }
-
-                dijkstraPath(BestPath, i , mapWidth * mapHeight);
-            }
-
-            strcpy(buttons[0].text, "Add food");
-            strcpy(buttons[1].text, "Add worker");
-            strcpy(buttons[2].text, "Add soldier");
-            strcpy(buttons[3].text, "Make road");
-            strcpy(buttons[4].text, "Do nothing");
-            for (int i = 0; i < 5; ++i) {
-                buttons[i].rect.x = 30 + 175 * i;
-                if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 30;
-                buttons[i].rect.y = buttonsPosY;
-                buttons[i].rect.width = 150;
-                buttons[i].rect.height = 65;
-                buttons[i].color = WHITE;
-                if (CheckCollisionPointRec(mousePosition, buttons[i].rect)) {
-                    buttons[i].color = (Color) {255, 255, 255, 220};
-                    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-                        mode = 1;
-                        action = i + 1;
-                    }
-                }
-                DrawRectangle(buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.width, buttons[i].rect.height,
-                              buttons[i].color);
-                DrawText(buttons[i].text, buttons[i].rect.x + 25, buttons[i].rect.y + 25, 20, BLACK);
-            }
-
-        }
-
-        if (mode == 1) { //actions
-            buttonsPosY = -100;
-            switch (action) {
-                case 1:
-                    if (kingdoms[turn].gold >= 1) {
-                        kingdoms[turn].gold--;
-                        kingdoms[turn].food++;
-
-                    } else {
-                        DrawRectangle(90, 90, 710, 40, (Color) {222, 131, 124, 100});
-                        DrawText("You don't have enough gold to buy food!!!", 100, 100, 30, RED);
-                        EndDrawing();
-                        WaitTime(2);
-                        turn--;
-                    }
-
-                    break;
-
-                case 2:
-                    if (kingdoms[turn].food >= 3) {
-                        kingdoms[turn].food -= 3;
-                        kingdoms[turn].worker++;
-                    } else {
-                        DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
-                        DrawText("You don't have enough food to hire workers!!!", 100, 100, 30, RED);
-                        EndDrawing();
-                        WaitTime(2);
-                        turn--;
-                    }
-                    break;
-
-                case 3:
-                    if (kingdoms[turn].gold >= 3) {
-                        kingdoms[turn].gold -= 3;
-                        kingdoms[turn].soldier++;
-                    } else {
-                        DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
-                        DrawText("You don't have enough gold to hire soldiers!!!", 100, 100, 30, RED);
-                        EndDrawing();
-                        WaitTime(2);
-                        turn--;
-                    }
-                    break;
-
-                case 4:
-                    mode=2;
-                    continue;
-                case 5:
-                    break;
-            }
-            mode = 0;
-            turn++;
-        }
+        if (mode == 1)  //actions
+            mode1();
 
         if (mode == 2) { //making roads
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);

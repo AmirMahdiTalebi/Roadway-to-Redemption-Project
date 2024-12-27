@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "InitialMap.h"
+#include <string.h>
 
 typedef struct kingdom kingdom;
 typedef struct village village;
@@ -21,6 +22,10 @@ Color transparentWhite = (Color){255, 255, 255, 60};
 Color transparentGreen = (Color){37, 204, 81, 90};
 Color transparentRed = (Color){255, 0,0,60};
 
+float buttonsPosY;
+int action;
+
+button buttons[5];
 village villages[30] = {0};
 kingdom kingdoms[5] = {0};
 
@@ -145,7 +150,7 @@ int dijkstraPath(int source,int id, int size) {
     return dist[dest];
 }
 
-int initialMapMaker() {
+void initialMapMaker() {
     // Getting map's width and height
     printf("Enter the map height:");
     scanf("%d", &mapHeight);
@@ -168,10 +173,9 @@ int initialMapMaker() {
             map[1][i][j] = 0;
         }
     }
-    return 0;
 }
 
-int makeKingdom() {
+void makeKingdom() {
     int x, y;
     printf("Enter the number of kingdoms:");
     scanf("%d", &kingdomNumber);
@@ -202,10 +206,9 @@ int makeKingdom() {
             }
         }
     }
-    return 0;
 }
 
-int makeVillage() {
+void makeVillage() {
     int x, y;
     printf("Enter the number of villages:");
     scanf("%d", &villageNumber);
@@ -244,10 +247,9 @@ int makeVillage() {
             scanf("%d", &villages[i].foodX);
         }
     }
-    return 0;
 }
 
-int makeBarrier() {
+void makeBarrier() {
     int n, x, y;
     printf("Enter the number of barriers:");
     scanf("%d", &n);
@@ -267,10 +269,9 @@ int makeBarrier() {
         y--;
         map[0][x][y] = -3; // -3 is the code for barriers.
     }
-    return 0;
 }
 
-int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0) {
+void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0) {
     DrawTexture(mapTileSet, 0,0, WHITE);
     for(int i=0; i<mapWidth; i++) {
         for(int j=0; j<mapHeight; j++) {
@@ -331,11 +332,11 @@ int mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Text
             }
         }
     }
-    return 0;
 }
 
 int checkNeighbors(int x, int y, Vector2 map0) {
     Rectangle available;
+    int MakeRoad=0, roadX, roadY;
     if(x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] == 0) || (map[0][x-1][y] == -2 && villages[map[1][x-1][y]].kingdom == 0))) {
         int checker = checkForWar(x-1 ,y ,map0);
         if (checker) {
@@ -347,53 +348,9 @@ int checkNeighbors(int x, int y, Vector2 map0) {
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    kingdoms[turn].roadLeftover[x - 1][y] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roadLeftover[x - 1][y] <= 0) {
-                        kingdoms[turn].roadLeftover[x - 1][y] = 0;
-                        map[1][x - 1][y] = turn;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x - 1;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y;
-                        kingdoms[turn].roadNumber++;
-                        if (map[0][x - 1 + 1][y] == -2 || map[0][x - 1 - 1][y] == -2 ||
-                            map[0][x - 1][y - 1] == -2 || map[0][x - 1][y + 1] == -2) {
-                            int VID = (map[0][x - 1 + 1][y] == -2) * map[1][x - 1 + 1][y]
-                                      + (map[0][x - 1 - 1][y] == -2) * map[1][x - 1 - 1][y]
-                                      + (map[0][x - 1][y - 1] == -2) * map[1][x - 1][y - 1]
-                                      + (map[0][x - 1][y + 1] == -2) * map[1][x - 1][y + 1];
-                            villages[VID].kingdom = turn;
-                            kingdoms[turn].villageNumber++;
-                            kingdoms[turn].goldX += villages[VID].goldX;
-                            kingdoms[turn].foodX += villages[VID].foodX;
-                        }
-
-
-                        if (checker) { //war
-                            if (map[0][x - 1 + 1][y] == -1 || map[0][x - 1 - 1][y] == -1 ||
-                                map[0][x - 1][y - 1] == -1 || map[0][x - 1][y + 1] == -1) //all-out war
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    DeleteKingdom(opponent);
-                                    return 1;
-                                }
-                                else {
-                                    DeleteKingdom(turn);
-                                    return 1;
-                                }
-                            else {
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    kingdoms[turn].soldier -= kingdoms[opponent].soldier;
-                                    kingdoms[opponent].soldier = 0;
-                                }
-                                else {
-                                    kingdoms[opponent].soldier -= kingdoms[turn].soldier;
-                                    kingdoms[turn].soldier = 0;
-                                }
-                            }
-                        }
-                    }
-
-                mode = 0;
-                turn++;
-                return 1;
+                MakeRoad = 1;
+                roadX = x - 1;
+                roadY = y;
             }
         }
     }
@@ -408,51 +365,9 @@ int checkNeighbors(int x, int y, Vector2 map0) {
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    kingdoms[turn].roadLeftover[x + 1][y] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roadLeftover[x + 1][y] <= 0) {
-                        kingdoms[turn].roadLeftover[x + 1][y] = 0;
-                        map[1][x+1][y] = turn;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x + 1;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y;
-                        kingdoms[turn].roadNumber++;
-                        if(map[0][x + 1 + 1][y] == -2 || map[0][x + 1 - 1][y] == -2 ||
-                           map[0][x + 1][y - 1] == -2 || map[0][x + 1][y + 1] == -2) {
-                            int VID = (map[0][x + 1 + 1][y] == -2) * map[1][x + 1 + 1][y]
-                                      + (map[0][x + 1 - 1][y] == -2) * map[1][x + 1 - 1][y]
-                                      + (map[0][x + 1][y - 1] == -2) * map[1][x + 1][y - 1]
-                                      + (map[0][x + 1][y + 1] == -2) * map[1][x + 1][y + 1];
-                            villages[VID].kingdom = turn;
-                            kingdoms[turn].villageNumber++;
-                            kingdoms[turn].goldX += villages[VID].goldX;
-                            kingdoms[turn].foodX += villages[VID].foodX;
-                        }
-                        if (checker) { //war
-                            if (map[0][x + 1 + 1][y] == -1 || map[0][x + 1 - 1][y] == -1 ||
-                                map[0][x + 1][y - 1] == -1 || map[0][x + 1][y + 1] == -1) //all-out war
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    DeleteKingdom(opponent);
-                                    return 1;
-                                }
-                                else {
-                                    DeleteKingdom(turn);
-                                    return 1;
-                                }
-                            else {
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    kingdoms[turn].soldier -= kingdoms[opponent].soldier;
-                                    kingdoms[opponent].soldier = 0;
-                                }
-                                else {
-                                    kingdoms[opponent].soldier -= kingdoms[turn].soldier;
-                                    kingdoms[turn].soldier = 0;
-                                }
-                            }
-                        }
-                    }
-
-                mode=0;
-                turn++;
-                return 1;
+                   MakeRoad = 1;
+                   roadX = x + 1;
+                   roadY = y;
             }
         }
     }
@@ -467,112 +382,76 @@ int checkNeighbors(int x, int y, Vector2 map0) {
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    kingdoms[turn].roadLeftover[x][y - 1] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roadLeftover[x][y - 1] <= 0) {
-                        kingdoms[turn].roadLeftover[x][y - 1] = 0;
-                        map[1][x][y-1] = turn;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y - 1;
-                        kingdoms[turn].roadNumber++;
-                        if(map[0][x + 1][y - 1] == -2 || map[0][x - 1][y - 1] == -2 ||
-                           map[0][x][y - 1 - 1] == -2 || map[0][x][y - 1 + 1] == -2) {
-                            int VID = (map[0][x + 1][y - 1] == -2) * map[1][x + 1][y - 1]
-                                      + (map[0][x- 1][y - 1] == -2) * map[1][x - 1][y - 1]
-                                      + (map[0][x][y - 1 - 1] == -2) * map[1][x][y - 1 - 1]
-                                      + (map[0][x][y - 1 + 1] == -2) * map[1][x][y - 1 + 1];
-                            villages[VID].kingdom = turn;
-                            kingdoms[turn].villageNumber++;
-                            kingdoms[turn].goldX += villages[VID].goldX;
-                            kingdoms[turn].foodX += villages[VID].foodX;
-                        }
-                        if (checker) { //war
-                            if (map[0][x + 1][y - 1] == -1 || map[0][x - 1][y - 1] == -1 ||
-                                map[0][x][y - 1 - 1] == -1 || map[0][x][y - 1 + 1] == -1) //all-out war
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    DeleteKingdom(opponent);
-                                    return 1;
-                                }
-                                else {
-                                    DeleteKingdom(turn);
-                                    return 1;
-                                }
-                            else {
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    kingdoms[turn].soldier -= kingdoms[opponent].soldier;
-                                    kingdoms[opponent].soldier = 0;
-                                }
-                                else {
-                                    kingdoms[opponent].soldier -= kingdoms[turn].soldier;
-                                    kingdoms[turn].soldier = 0;
-                                }
-                            }
-                        }
-                    }
-
-                mode=0;
-                turn++;
-                return 1;
+                    MakeRoad = 1;
+                    roadX = x;
+                    roadY = y - 1;
             }
         }
     }
     if(y!=(mapHeight-1) && ((map[0][x][y+1]>0 && map[1][x][y+1]==0) || (map[0][x][y+1]==-2 && villages[map[1][x][y+1]].kingdom==0))) {
-        int checker = checkForWar(x ,y+1 ,map0);
+        int checker = checkForWar(x, y + 1, map0);
         if (checker) {
-            DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
+            DrawRectangle(x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
         } else {
-            DrawRectangle(x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+            DrawRectangle(x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
         }
-        available= (Rectangle){x*TILE_SIZE + map0.x, (y+1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+        available = (Rectangle) {x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    kingdoms[turn].roadLeftover[x][y + 1] -= kingdoms[turn].worker;
-                    if (kingdoms[turn].roadLeftover[x][y + 1] <= 0) {
-                        kingdoms[turn].roadLeftover[x][y + 1] = 0;
-                        map[1][x][y+1] = turn;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].x = x;
-                        kingdoms[turn].road[kingdoms[turn].roadNumber].y = y + 1;
-                        kingdoms[turn].roadNumber++;
-                        if(map[0][x + 1][y + 1] == -2 || map[0][x - 1][y + 1] == -2 ||
-                           map[0][x][y + 1 - 1] == -2 || map[0][x][y + 1 + 1] == -2) {
-                            int VID = (map[0][x + 1][y + 1] == -2) * map[1][x + 1][y + 1]
-                                      + (map[0][x- 1][y + 1] == -2) * map[1][x - 1][y + 1]
-                                      + (map[0][x][y + 1 - 1] == -2) * map[1][x][y + 1 - 1]
-                                      + (map[0][x][y + 1 + 1] == -2) * map[1][x][y + 1 + 1];
-                            villages[VID].kingdom = turn;
-                            kingdoms[turn].villageNumber++;
-                            kingdoms[turn].goldX += villages[VID].goldX;
-                            kingdoms[turn].foodX += villages[VID].foodX;
-                        }
-                        if (checker) { //war
-                            if (map[0][x + 1][y - 1] == -1 || map[0][x - 1][y - 1] == -1 ||
-                                map[0][x][y - 1 - 1] == -1 || map[0][x][y - 1 + 1] == -1) //all-out war
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    DeleteKingdom(opponent);
-                                    return 1;
-                                }
-                                else {
-                                    DeleteKingdom(turn);
-                                    return 1;
-                                }
-                            else {
-                                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                                    kingdoms[turn].soldier -= kingdoms[opponent].soldier;
-                                    kingdoms[opponent].soldier = 0;
-                                }
-                                else {
-                                    kingdoms[opponent].soldier -= kingdoms[turn].soldier;
-                                    kingdoms[turn].soldier = 0;
-                                }
-                            }
-                        }
-                    }
-
-                mode=0;
-                turn++;
-                return 1;
+                MakeRoad = 1;
+                roadX = x;
+                roadY = y + 1;
             }
         }
+    }
+
+    if (MakeRoad) {
+        kingdoms[turn].roadLeftover[roadX][roadY] -= kingdoms[turn].worker;
+        if (kingdoms[turn].roadLeftover[roadX][roadY] <= 0) {
+            kingdoms[turn].roadLeftover[roadX][roadY] = 0;
+            map[1][roadX][roadY] = turn;
+            kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
+            kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
+            kingdoms[turn].roadNumber++;
+            if(map[0][roadX + 1][roadY] == -2 || map[0][roadX - 1][roadY] == -2 ||
+               map[0][roadX][roadY - 1] == -2 || map[0][roadX][roadY + 1] == -2) {
+                int VID = (map[0][roadX + 1][roadY] == -2) * map[1][roadX + 1][roadY]
+                          + (map[0][roadX- 1][roadY] == -2) * map[1][roadX - 1][roadY]
+                          + (map[0][roadX][roadY - 1] == -2) * map[1][roadX][roadY - 1]
+                          + (map[0][roadX][roadY + 1] == -2) * map[1][roadX][roadY + 1];
+                villages[VID].kingdom = turn;
+                kingdoms[turn].villageNumber++;
+                kingdoms[turn].goldX += villages[VID].goldX;
+                kingdoms[turn].foodX += villages[VID].foodX;
+            }
+            if (checkForWar(roadX, roadY, map0)) { //war
+                if (map[0][roadX + 1][roadY] == -1 || map[0][roadX - 1][roadY] == -1 ||
+                    map[0][roadX][roadY - 1] == -1 || map[0][roadX][roadY + 1] == -1) //all-out war
+                    if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                        DeleteKingdom(opponent);
+                        return 1;
+                    }
+                    else {
+                        DeleteKingdom(turn);
+                        return 1;
+                    }
+                else {
+                    if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                        kingdoms[turn].soldier -= kingdoms[opponent].soldier;
+                        kingdoms[opponent].soldier = 0;
+                    }
+                    else {
+                        kingdoms[opponent].soldier -= kingdoms[turn].soldier;
+                        kingdoms[turn].soldier = 0;
+                    }
+                }
+            }
+        }
+
+        mode=0;
+        turn++;
+        return 1;
     }
     return 0;
 }
@@ -612,7 +491,7 @@ int checkForWar(int x, int y, Vector2 map0) {
     return 0;
 }
 
-int DeleteKingdom(int id) {
+void DeleteKingdom(int id) {
     kingdoms[id].food = 0;
     kingdoms[id].foodX = 0;
     kingdoms[id].gold = 0;
@@ -645,5 +524,142 @@ int DeleteKingdom(int id) {
         turn++;
         mode = 0;
     }
-    return 0;
 }
+
+void mode0() {
+    if (turn > kingdomNumber) {
+        turn = 1;
+        if(kingdoms[turn].dead)
+            turn++;
+        for (int i = 1; i <= kingdomNumber; i++) {
+            if (kingdoms[i].dead)
+                continue;
+            kingdoms[i].food += kingdoms[i].foodX;
+            kingdoms[i].gold += kingdoms[i].goldX;
+        }
+    }
+    if (kingdoms[turn].dead)
+        turn++;
+    if (turn > kingdomNumber) {
+        turn = 1;
+        if (kingdoms[turn].dead)
+            turn++;
+        for (int i = 1; i <= kingdomNumber; i++) {
+            if (kingdoms[i].dead)
+                continue;
+            kingdoms[i].food += kingdoms[i].foodX;
+            kingdoms[i].gold += kingdoms[i].goldX;
+        }
+    }
+
+    int kingdomVertexNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
+    for(int i=0; i<villageNumber; i++) {
+        dijkstraPath(kingdomVertexNumber, i, mapWidth*mapHeight);
+    }
+
+    //choose the shortest path
+    for (int i = 0; i < villageNumber; ++i) {
+        int BestPath = kingdoms[turn].y * mapWidth + kingdoms[turn].x, path, distance
+        , BestDistance =dijkstraPath(kingdomVertexNumber, i, mapWidth * mapHeight);
+        for (int j = 0; j < kingdoms[turn].roadNumber; ++j) {
+            path = kingdoms[turn].road[j].y * mapWidth + kingdoms[turn].road[j].x;
+            distance = dijkstraPath(path, i , mapWidth * mapHeight);
+            if (dijkstraPath(path, i , mapWidth * mapHeight) < BestDistance) {
+                BestPath = path;
+                BestDistance = distance;
+            }
+        }
+        for (int j=0; j<villageNumber; ++j) {
+            if (villages[j].kingdom == turn) {
+                path = villages[j].y * mapWidth + villages[j].x;
+                distance = dijkstraPath(path, i , mapWidth * mapHeight);
+                if (dijkstraPath(path, i , mapWidth * mapHeight) < BestDistance) {
+                    BestPath = path;
+                    BestDistance = distance;
+                }
+            }
+        }
+
+        dijkstraPath(BestPath, i , mapWidth * mapHeight);
+    }
+
+    strcpy(buttons[0].text, "Add food");
+    strcpy(buttons[1].text, "Add worker");
+    strcpy(buttons[2].text, "Add soldier");
+    strcpy(buttons[3].text, "Make road");
+    strcpy(buttons[4].text, "Do nothing");
+    for (int i = 0; i < 5; ++i) {
+        buttons[i].rect.x = 30 + 175 * i;
+        if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 30;
+        buttons[i].rect.y = buttonsPosY;
+        buttons[i].rect.width = 150;
+        buttons[i].rect.height = 65;
+        buttons[i].color = WHITE;
+        if (CheckCollisionPointRec(mousePosition, buttons[i].rect)) {
+            buttons[i].color = (Color) {255, 255, 255, 220};
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+                mode = 1;
+                action = i + 1;
+            }
+        }
+        DrawRectangle(buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.width, buttons[i].rect.height,
+                      buttons[i].color);
+        DrawText(buttons[i].text, buttons[i].rect.x + 25, buttons[i].rect.y + 25, 20, BLACK);
+    }
+}
+
+void mode1() {
+    buttonsPosY = -100;
+    switch (action) {
+        case 1:
+            if (kingdoms[turn].gold >= 1) {
+                kingdoms[turn].gold--;
+                kingdoms[turn].food++;
+
+            } else {
+                DrawRectangle(90, 90, 710, 40, (Color) {222, 131, 124, 100});
+                DrawText("You don't have enough gold to buy food!!!", 100, 100, 30, RED);
+                EndDrawing();
+                WaitTime(2);
+                turn--;
+            }
+
+            break;
+
+        case 2:
+            if (kingdoms[turn].food >= 3) {
+                kingdoms[turn].food -= 3;
+                kingdoms[turn].worker++;
+            } else {
+                DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
+                DrawText("You don't have enough food to hire workers!!!", 100, 100, 30, RED);
+                EndDrawing();
+                WaitTime(2);
+                turn--;
+            }
+            break;
+
+        case 3:
+            if (kingdoms[turn].gold >= 3) {
+                kingdoms[turn].gold -= 3;
+                kingdoms[turn].soldier++;
+            } else {
+                DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
+                DrawText("You don't have enough gold to hire soldiers!!!", 100, 100, 30, RED);
+                EndDrawing();
+                WaitTime(2);
+                turn--;
+            }
+            break;
+
+        case 4:
+            mode=2;
+        case 5:
+            break;
+    }
+    if (mode==1) {
+        mode = 0;
+        turn++;
+    }
+}
+
