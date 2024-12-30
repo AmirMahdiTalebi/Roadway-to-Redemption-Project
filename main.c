@@ -23,6 +23,7 @@ int main() {
     Texture2D Castle = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone castle.png");
     Texture2D Stone = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone2.png");
     Texture2D House = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\house.png");
+    Texture2D roadMan = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\SteamMan_attack1.png");
 
     Font font= LoadFont("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\pixantiqua.png");
 
@@ -33,6 +34,9 @@ int main() {
     kingdoms[4].color = (Color){189, 125, 219, 255};
 
     SetTargetFPS(60);
+    int manIndex = 0;
+    float manTimer =MAN_TIME;
+    int AnimationCounter = 0;
 
     //Main game loop
     while (!WindowShouldClose()) {
@@ -99,17 +103,38 @@ int main() {
             DrawText(text, 200, 200, 40, BLACK);
         }
 
-            EndDrawing();
+        if (mode==4) { //animation
+            if(AnimationCounter < 12) {
+                manTimer -= GetFrameTime();
+                if(manTimer < 0) {
+                    AnimationCounter++;
+                    manTimer = MAN_TIME;
+                    manIndex++;
+                    if (manIndex >= MAN_COUNT) manIndex = 0;
+                }
+                Rectangle source = (Rectangle){TILE_SIZE * manIndex,0,TILE_SIZE,TILE_SIZE};
+                DrawTextureRec(roadMan, source, manPos, WHITE);
+            }
+            else {
+                RoadMaker();
+                AnimationCounter = 0;
+            }
         }
 
-        UnloadTexture(mapTileSet);
-        UnloadTexture(GroundTile);
-        UnloadTexture(Stone);
-        UnloadTexture(House);
-        UnloadTexture(Castle);
-        UnloadFont(font);
-        // De-Initialization
-        CloseWindow();
-
-        return 0;
+        EndDrawing();
     }
+
+
+
+    UnloadTexture(mapTileSet);
+    UnloadTexture(GroundTile);
+    UnloadTexture(Stone);
+    UnloadTexture(House);
+    UnloadTexture(Castle);
+    UnloadTexture(roadMan);
+    UnloadFont(font);
+    // De-Initialization
+    CloseWindow();
+
+    return 0;
+}

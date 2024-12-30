@@ -14,9 +14,11 @@ int winner;
 int turn = 1, kingdomNumber, villageNumber, neededSoldier, opponent;
 int list[MAP_SIZE*MAP_SIZE][5];
 int mode = 0;
+int MakeRoad = 0, roadX, roadY;
 
 Vector2 mousePosition;
 Vector2 coordination;
+Vector2 manPos;
 
 Color transparentWhite = (Color){255, 255, 255, 60};
 Color transparentGreen = (Color){37, 204, 81, 90};
@@ -346,7 +348,6 @@ void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Tex
 
 int checkNeighbors(int x, int y, Vector2 map0) {
     Rectangle available;
-    int MakeRoad=0, roadX, roadY;
     if(x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] == 0) ||
       (map[0][x-1][y] == -2 && villages[map[1][x-1][y]].kingdom == 0))) {
         int checker = checkForWar(x - 1, y);
@@ -421,76 +422,82 @@ int checkNeighbors(int x, int y, Vector2 map0) {
     }
 
     if (MakeRoad) {
-        kingdoms[turn].roadLeftover[roadX][roadY] -= kingdoms[turn].worker;
-        if (kingdoms[turn].roadLeftover[roadX][roadY] <= 0) {
-            kingdoms[turn].roadLeftover[roadX][roadY] = 0;
-            map[1][roadX][roadY] = turn;
-            kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
-            kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
-            kingdoms[turn].roadNumber++;
-
-            if (checkForWar(roadX, roadY) == 3) { //all-out war
-                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                    DeleteKingdom(opponent);
-                    return 1;
-                } else {
-                    DeleteKingdom(turn);
-                    return 1;
-                }
-            } else if (checkForWar(roadX, roadY)) {
-                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                    kingdoms[turn].soldier -= kingdoms[opponent].soldier;
-                    kingdoms[opponent].soldier = 0;
-                } else {
-                    kingdoms[opponent].soldier -= kingdoms[turn].soldier;
-                    kingdoms[turn].soldier = 0;
-                }
-            }
-
-            int VillageID;
-            if (map[0][roadX + 1][roadY] == -2) {
-                VillageID = map[1][roadX + 1][roadY];
-                if (villages[VillageID].kingdom == 0) {
-                    villages[VillageID].kingdom = turn;
-                    kingdoms[turn].villageNumber++;
-                    kingdoms[turn].goldX += villages[VillageID].goldX;
-                    kingdoms[turn].foodX += villages[VillageID].foodX;
-                }
-            }
-            if (map[0][roadX - 1][roadY] == -2) {
-                VillageID = map[1][roadX - 1][roadY];
-                if (villages[VillageID].kingdom == 0) {
-                    villages[VillageID].kingdom = turn;
-                    kingdoms[turn].villageNumber++;
-                    kingdoms[turn].goldX += villages[VillageID].goldX;
-                    kingdoms[turn].foodX += villages[VillageID].foodX;
-                }
-            }
-            if (map[0][roadX][roadY - 1] == -2) {
-                VillageID = map[1][roadX][roadY - 1];
-                if (villages[VillageID].kingdom == 0) {
-                    villages[VillageID].kingdom = turn;
-                    kingdoms[turn].villageNumber++;
-                    kingdoms[turn].goldX += villages[VillageID].goldX;
-                    kingdoms[turn].foodX += villages[VillageID].foodX;
-                }
-            }
-            if (map[0][roadX][roadY + 1] == -2) {
-                VillageID = map[1][roadX][roadY + 1];
-                if (villages[VillageID].kingdom == 0) {
-                    villages[VillageID].kingdom = turn;
-                    kingdoms[turn].villageNumber++;
-                    kingdoms[turn].goldX += villages[VillageID].goldX;
-                    kingdoms[turn].foodX += villages[VillageID].foodX;
-                }
-            }
-        }
-
-        mode=0;
-        turn++;
+        mode=4;
+        manPos = (Vector2) {(roadX+.2) * TILE_SIZE + map0.x, (roadY-.2) * TILE_SIZE + map0.y};
+        MakeRoad = 0;
         return 1;
     }
     return 0;
+}
+
+void RoadMaker() {
+    kingdoms[turn].roadLeftover[roadX][roadY] -= kingdoms[turn].worker;
+    if (kingdoms[turn].roadLeftover[roadX][roadY] <= 0) {
+        kingdoms[turn].roadLeftover[roadX][roadY] = 0;
+        map[1][roadX][roadY] = turn;
+        kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
+        kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
+        kingdoms[turn].roadNumber++;
+
+        if (checkForWar(roadX, roadY) == 3) { //all-out war
+            if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                DeleteKingdom(opponent);
+                return;
+            } else {
+                DeleteKingdom(turn);
+                return;
+            }
+        } else if (checkForWar(roadX, roadY)) {
+            if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                kingdoms[turn].soldier -= kingdoms[opponent].soldier;
+                kingdoms[opponent].soldier = 0;
+            } else {
+                kingdoms[opponent].soldier -= kingdoms[turn].soldier;
+                kingdoms[turn].soldier = 0;
+            }
+        }
+
+        int VillageID;
+        if (map[0][roadX + 1][roadY] == -2) {
+            VillageID = map[1][roadX + 1][roadY];
+            if (villages[VillageID].kingdom == 0) {
+                villages[VillageID].kingdom = turn;
+                kingdoms[turn].villageNumber++;
+                kingdoms[turn].goldX += villages[VillageID].goldX;
+                kingdoms[turn].foodX += villages[VillageID].foodX;
+            }
+        }
+        if (map[0][roadX - 1][roadY] == -2) {
+            VillageID = map[1][roadX - 1][roadY];
+            if (villages[VillageID].kingdom == 0) {
+                villages[VillageID].kingdom = turn;
+                kingdoms[turn].villageNumber++;
+                kingdoms[turn].goldX += villages[VillageID].goldX;
+                kingdoms[turn].foodX += villages[VillageID].foodX;
+            }
+        }
+        if (map[0][roadX][roadY - 1] == -2) {
+            VillageID = map[1][roadX][roadY - 1];
+            if (villages[VillageID].kingdom == 0) {
+                villages[VillageID].kingdom = turn;
+                kingdoms[turn].villageNumber++;
+                kingdoms[turn].goldX += villages[VillageID].goldX;
+                kingdoms[turn].foodX += villages[VillageID].foodX;
+            }
+        }
+        if (map[0][roadX][roadY + 1] == -2) {
+            VillageID = map[1][roadX][roadY + 1];
+            if (villages[VillageID].kingdom == 0) {
+                villages[VillageID].kingdom = turn;
+                kingdoms[turn].villageNumber++;
+                kingdoms[turn].goldX += villages[VillageID].goldX;
+                kingdoms[turn].foodX += villages[VillageID].foodX;
+            }
+        }
+    }
+
+    mode=0;
+    turn++;
 }
 
 int checkForWar(int x, int y) { //1:war near road 2:war near village 3:all-out war
@@ -704,7 +711,7 @@ void mode1() {
                 DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
                 DrawText("You don't have enough food to hire workers!!!", 100, 100, 30, RED);
                 EndDrawing();
-                WaitTime(2);
+                WaitTime(1.75);
                 turn--;
             }
             break;
@@ -717,7 +724,7 @@ void mode1() {
                 DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
                 DrawText("You don't have enough gold to hire soldiers!!!", 100, 100, 30, RED);
                 EndDrawing();
-                WaitTime(2);
+                WaitTime(1.75);
                 turn--;
             }
             break;
