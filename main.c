@@ -18,6 +18,7 @@ int main() {
 
     buttonsPosY = -100;
 
+    //textures, font and colors
     Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\initial map (1).png");
     Texture2D GroundTile = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\tilecrop (1).png");
     Texture2D Castle = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone castle.png");
@@ -36,7 +37,6 @@ int main() {
 
     //Main game loop
     while (!WindowShouldClose()) {
-        //Hover effect vectors
         mousePosition = GetMousePosition();
         coordination = (Vector2){(int) ((mousePosition.x - map0.x) / TILE_SIZE), (int) ((mousePosition.y - map0.y) / TILE_SIZE)};
 
