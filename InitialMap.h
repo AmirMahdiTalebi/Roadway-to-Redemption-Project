@@ -12,7 +12,7 @@ typedef struct button button;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
-extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent, winner;
+extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent, winner, dijkstraX, dijkstraY;;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
 
@@ -35,9 +35,12 @@ struct kingdom {
     int goldX;
     int worker;
     int soldier;
-    int roadLeftover[MAP_SIZE][MAP_SIZE];
+    int roadLeftover[2][MAP_SIZE][MAP_SIZE];
+    int roadList[MAP_SIZE*MAP_SIZE][5];
     Vector2 road[MAP_SIZE*MAP_SIZE];
     int roadNumber;
+    int path[289];
+    int pathNumber;
     int villageNumber;
     Color color;
     int dead;
