@@ -475,28 +475,34 @@ void RoadMaker() {
         }
 
         int VillageID;
-        if (map[0][roadX + 1][roadY] == -2) {
-            VillageID = map[1][roadX + 1][roadY];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+        if (warType ==0) {
+            if (map[0][roadX + 1][roadY] == -2) {
+                VillageID = map[1][roadX + 1][roadY];
+                if (villages[VillageID].kingdom == 0 &&
+                    (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
+                    conquerVillage(VillageID, turn);
+                }
             }
-        }
-        if (map[0][roadX - 1][roadY] == -2) {
-            VillageID = map[1][roadX - 1][roadY];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            if (map[0][roadX - 1][roadY] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX - 1][roadY];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
-        }
-        if (map[0][roadX][roadY - 1] == -2) {
-            VillageID = map[1][roadX][roadY - 1];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            if (map[0][roadX][roadY - 1] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX][roadY - 1];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
-        }
-        if (map[0][roadX][roadY + 1] == -2) {
-            VillageID = map[1][roadX][roadY + 1];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            if (map[0][roadX][roadY + 1] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX][roadY + 1];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
         }
     }
@@ -621,8 +627,8 @@ void mode1() {
             break;
 
         case 3:
-            if (kingdoms[turn].gold >= 3) {
-                kingdoms[turn].gold -= 3;
+            if (kingdoms[turn].gold >= 2) {
+                kingdoms[turn].gold -= 2;
                 kingdoms[turn].soldier++;
             } else {
                 DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});

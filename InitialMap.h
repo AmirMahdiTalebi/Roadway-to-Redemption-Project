@@ -26,7 +26,7 @@ typedef struct button button;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
-extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent, winner, dijkstraX, dijkstraY;;
+extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, opponent, winner, dijkstraX, dijkstraY;;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
 extern int MakeRoad, roadX, roadY;

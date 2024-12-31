@@ -111,7 +111,7 @@ void conquerVillage(int villageID, int conqueror) {
     for(int k = 0; k < kingdoms[conqueror].pathNumber - 1; k++) {
         int pathX = kingdoms[conqueror].path[k] % mapWidth;
         int pathY = kingdoms[conqueror].path[k] / mapWidth;
-        kingdoms[conqueror].roadLeftover[1][pathX][pathY] = 1;
+        kingdoms[conqueror].roadLeftover[1][pathX][pathY] = villageID+1;
     }
 }
 
@@ -126,11 +126,14 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
     kingdoms[warWinner].soldier -= kingdoms[warLoser].soldier;
     kingdoms[warLoser].soldier = 0;
     dijkstraForEditingRoads(loserV.y*mapWidth + loserV.x, warLoser, mapWidth * mapHeight);
+
     for(int k = 0; k < kingdoms[warLoser].pathNumber - 1; k++) {
         int pathX = kingdoms[warLoser].path[k] % mapWidth;
         int pathY = kingdoms[warLoser].path[k] / mapWidth;
         if (warType == 1) {
-            if (kingdoms[warLoser].roadLeftover[1][pathX][pathY] > 0) break;
+            if (kingdoms[warLoser].roadLeftover[1][pathX][pathY] > 0 &&
+                    kingdoms[warLoser].roadLeftover[1][pathX][pathY] !=
+                    kingdoms[warLoser].roadLeftover[1][(int)loserV.x][(int)loserV.y]) break;
             for (int roadID = 0, sw = 0; roadID < kingdoms[warLoser].roadNumber; ++roadID) {
                 if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
@@ -139,13 +142,10 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
             kingdoms[warLoser].roadNumber--;
             kingdoms[warLoser].roadLeftover[0][pathX][pathY] = map[0][pathX][pathY];
         }
-        if (warType == 2) {
-            if (k != 0 && map[0][pathX][pathY] == -2) break;
-            int villageID = map[1][(int)loserV.x][(int)loserV.y];
-            if (warLoser != turn) {
-                conquerVillage(villageID, warWinner);
-                disconquerVillage(villageID, warLoser);
-            }
+        else if (warType == 2) {
+            if ((k != 0 && map[0][pathX][pathY] == -2) ||
+            (kingdoms[warLoser].roadLeftover[1][pathX][pathY] > 0 &&
+            kingdoms[warLoser].roadLeftover[1][pathX][pathY] != map[1][(int)loserV.x][(int)loserV.y]+1)) break;
             for (int roadID = 0, sw = 0; roadID < kingdoms[warLoser].roadNumber; ++roadID) {
                 if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
@@ -154,6 +154,13 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
             kingdoms[warLoser].roadLeftover[1][pathX][pathY] = 0;
             kingdoms[warLoser].roadNumber--;
             kingdoms[warLoser].roadLeftover[0][pathX][pathY] = map[0][pathX][pathY];
+        }
+    }
+    if (warType == 2) {
+        int villageID = map[1][(int)loserV.x][(int)loserV.y];
+        if (warLoser != turn) {
+            conquerVillage(villageID, warWinner);
+            disconquerVillage(villageID, warLoser);
         }
     }
 }
