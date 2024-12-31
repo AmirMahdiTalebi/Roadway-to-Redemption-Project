@@ -1,0 +1,18 @@
+//
+// Created by ASUS on 12/31/2024.
+//
+
+#ifndef INITIALMAP_C_WARFUNCTIONS_H
+#define INITIALMAP_C_WARFUNCTIONS_H
+
+#include "InitialMap.h"
+#include "raylib.h"
+
+void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV);
+void disconquerVillage(int villageID, int loser);
+void conquerVillage(int villageID, int conqueror);
+int dijkstraForEditingRoads(int source, int id, int size);
+int checkForWar(int x, int y);
+void DeleteKingdom(int id);
+
+#endif //INITIALMAP_C_WARFUNCTIONS_H

@@ -1,6 +1,9 @@
 #ifndef INITIAL_MAP_H
 #define INITIAL_MAP_H
 
+#include "warFunctions.h"
+#include "raylib.h"
+
 #define SCREEN_HEIGHT 900
 #define SCREEN_WIDTH 1237
 #define MAP_SIZE 17
@@ -88,8 +91,6 @@ int dijkstraPath(int source, int id, int size);
 void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
 int checkNeighbors(int x, int y, Vector2 map0);
 void RoadMaker();
-int checkForWar(int x, int y);
-void DeleteKingdom(int id);
 void mode0();
 void mode1();
 
