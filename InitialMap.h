@@ -6,6 +6,10 @@
 #define MAP_SIZE 17
 #define TILE_SIZE 40
 
+#define MAN_COUNT 6
+#define MAN_TIME 0.1
+extern Vector2 manPos;
+
 typedef struct kingdom kingdom;
 typedef struct village village;
 typedef struct button button;
@@ -15,6 +19,8 @@ extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent, winner, dijkstraX, dijkstraY;;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
+
+extern int MakeRoad, roadX, roadY;
 
 extern Vector2 mousePosition;
 extern Vector2 coordination;
@@ -75,6 +81,7 @@ void makeBarrier();
 int dijkstraPath(int source, int id, int size);
 void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font,Vector2 map0);
 int checkNeighbors(int x, int y, Vector2 map0);
+void RoadMaker();
 int checkForWar(int x, int y);
 void DeleteKingdom(int id);
 void mode0();

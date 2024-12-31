@@ -15,9 +15,11 @@ int turn = 1, kingdomNumber, villageNumber, neededSoldier, opponent;
 int dijkstraX, dijkstraY;
 int list[MAP_SIZE*MAP_SIZE][5];
 int mode = 0;
+int MakeRoad = 0, roadX, roadY;
 
 Vector2 mousePosition;
 Vector2 coordination;
+Vector2 manPos;
 
 Color transparentWhite = (Color){255, 255, 255, 60};
 Color transparentGreen = (Color){37, 204, 81, 90};
@@ -510,7 +512,6 @@ void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Tex
 
 int checkNeighbors(int x, int y, Vector2 map0) {
     Rectangle available;
-    int MakeRoad=0, roadX, roadY;
     if(x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] == 0) ||
       (map[0][x-1][y] == -2 && villages[map[1][x-1][y]].kingdom == 0))) {
         int checker = checkForWar(x - 1, y);
@@ -585,6 +586,16 @@ int checkNeighbors(int x, int y, Vector2 map0) {
     }
 
     if (MakeRoad) {
+        mode=4;
+        manPos = (Vector2) {(roadX+.2) * TILE_SIZE + map0.x, (roadY-.2) * TILE_SIZE + map0.y};
+        MakeRoad = 0;
+        return 1;
+    }
+    return 0;
+}
+
+void RoadMaker() {
+
         kingdoms[turn].roadLeftover[0][roadX][roadY] -= kingdoms[turn].worker;
         if (kingdoms[turn].roadLeftover[0][roadX][roadY] <= 0) {
             kingdoms[turn].roadLeftover[0][roadX][roadY] = 0;
@@ -593,16 +604,33 @@ int checkNeighbors(int x, int y, Vector2 map0) {
             kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
             kingdoms[turn].roadNumber++;
 
+        if (checkForWar(roadX, roadY) == 3) { //all-out war
+            if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                DeleteKingdom(opponent);
+                return;
+            } else {
+                DeleteKingdom(turn);
+                return;
+            }
+        } else if (checkForWar(roadX, roadY)) {
+            if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                kingdoms[turn].soldier -= kingdoms[opponent].soldier;
+                kingdoms[opponent].soldier = 0;
+            } else {
+                kingdoms[opponent].soldier -= kingdoms[turn].soldier;
+                kingdoms[turn].soldier = 0;
+            }
+        }
             int warType = checkForWar(roadX, roadY);
             Vector2 opponentV = {dijkstraX, dijkstraY};
             Vector2 turnV = {roadX, roadY};
             if (warType == 3) { // All-out war
                 if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
                     DeleteKingdom(opponent);
-                    return 1;
+                    return;
                 } else if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
                     DeleteKingdom(turn);
-                    return 1;
+                    return;
                 } else {
                     normalWar(0, turn, 1, turnV);
                     normalWar(0, opponent, 1, turnV);
@@ -648,11 +676,8 @@ int checkNeighbors(int x, int y, Vector2 map0) {
             }
         }
 
-        mode=0;
-        turn++;
-        return 1;
-    }
-    return 0;
+    mode=0;
+    turn++;
 }
 
 int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village, 3:all-out war
@@ -890,7 +915,7 @@ void mode1() {
                 DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
                 DrawText("You don't have enough food to hire workers!!!", 100, 100, 30, RED);
                 EndDrawing();
-                WaitTime(2);
+                WaitTime(1.75);
                 turn--;
             }
             break;
@@ -903,7 +928,7 @@ void mode1() {
                 DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
                 DrawText("You don't have enough gold to hire soldiers!!!", 100, 100, 30, RED);
                 EndDrawing();
-                WaitTime(2);
+                WaitTime(1.75);
                 turn--;
             }
             break;
