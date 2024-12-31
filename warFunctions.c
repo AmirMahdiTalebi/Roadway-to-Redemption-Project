@@ -159,8 +159,8 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
     if (warType == 2) {
         int villageID = map[1][(int)loserV.x][(int)loserV.y];
         if (warLoser != turn) {
-            conquerVillage(villageID, warWinner);
             disconquerVillage(villageID, warLoser);
+            conquerVillage(villageID, warWinner);
         }
     }
 }
