@@ -24,6 +24,7 @@ int main() {
     Texture2D Stone = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone2.png");
     Texture2D House = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\house.png");
     Texture2D roadMan = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\SteamMan_attack1.png");
+    Texture2D explosion = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\explosion.png");
 
     Font font= LoadFont("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\pixantiqua.png");
 
@@ -36,6 +37,7 @@ int main() {
     SetTargetFPS(60);
     int manIndex = 0;
     float manTimer =MAN_TIME;
+    float flameTimer = FLAME_TIME;
     int AnimationCounter = 0;
 
     //Main game loop
@@ -104,20 +106,40 @@ int main() {
         }
 
         if (mode==4) { //animation
-            if(AnimationCounter < 12) {
-                manTimer -= GetFrameTime();
-                if(manTimer < 0) {
-                    AnimationCounter++;
-                    manTimer = MAN_TIME;
-                    manIndex++;
-                    if (manIndex >= MAN_COUNT) manIndex = 0;
+            if (animation == 1) {
+                if(AnimationCounter < 12) {
+                    manTimer -= GetFrameTime();
+                    if(manTimer < 0) {
+                        AnimationCounter++;
+                        manTimer = MAN_TIME;
+                        manIndex++;
+                        if (manIndex >= MAN_COUNT) manIndex = 0;
+                    }
+                    Rectangle source = (Rectangle){TILE_SIZE * manIndex,0,TILE_SIZE,TILE_SIZE};
+                    DrawTextureRec(roadMan, source, manPos, WHITE);
                 }
-                Rectangle source = (Rectangle){TILE_SIZE * manIndex,0,TILE_SIZE,TILE_SIZE};
-                DrawTextureRec(roadMan, source, manPos, WHITE);
+                else {
+                    RoadMaker();
+                    AnimationCounter = 0;
+                }
             }
-            else {
-                RoadMaker();
-                AnimationCounter = 0;
+            else if (animation == 2) {
+                if(AnimationCounter < 28) {
+                    flameTimer -= GetFrameTime();
+                    if(flameTimer < 0) {
+                        AnimationCounter++;
+                        flameTimer = FLAME_TIME;
+                        manIndex++;
+                        if (manIndex >= FLAME_COUNT) manIndex = 0;
+                    }
+                    manPos = (Vector2) {(kingdoms[toBeDeleted].x-.3)*TILE_SIZE+map0.x, (kingdoms[toBeDeleted].y-.4)*TILE_SIZE+map0.y};
+                    Rectangle source = (Rectangle){FLAME_WIDTH * manIndex,0,FLAME_WIDTH,FLAME_HEIGHT};
+                    DrawTextureRec(explosion, source, manPos, WHITE);
+                }
+                else {
+                    AnimationCounter = 0;
+                    DeleteKingdom(toBeDeleted);
+                }
             }
         }
 
@@ -132,6 +154,7 @@ int main() {
     UnloadTexture(House);
     UnloadTexture(Castle);
     UnloadTexture(roadMan);
+    UnloadTexture(explosion);
     UnloadFont(font);
     // De-Initialization
     CloseWindow();

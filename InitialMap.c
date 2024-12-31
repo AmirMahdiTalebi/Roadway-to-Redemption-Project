@@ -16,6 +16,7 @@ int dijkstraX, dijkstraY;
 int list[MAP_SIZE*MAP_SIZE][5];
 int mode = 0;
 int MakeRoad = 0, roadX, roadY;
+int animation=0, toBeDeleted = 0;
 
 Vector2 mousePosition;
 Vector2 coordination;
@@ -587,6 +588,7 @@ int checkNeighbors(int x, int y, Vector2 map0) {
 
     if (MakeRoad) {
         mode=4;
+        animation = 1;
         manPos = (Vector2) {(roadX+.2) * TILE_SIZE + map0.x, (roadY-.2) * TILE_SIZE + map0.y};
         MakeRoad = 0;
         return 1;
@@ -595,89 +597,76 @@ int checkNeighbors(int x, int y, Vector2 map0) {
 }
 
 void RoadMaker() {
+    kingdoms[turn].roadLeftover[0][roadX][roadY] -= kingdoms[turn].worker;
+    if (kingdoms[turn].roadLeftover[0][roadX][roadY] <= 0) {
+        kingdoms[turn].roadLeftover[0][roadX][roadY] = 0;
+        map[1][roadX][roadY] = turn;
+        kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
+        kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
+        kingdoms[turn].roadNumber++;
 
-        kingdoms[turn].roadLeftover[0][roadX][roadY] -= kingdoms[turn].worker;
-        if (kingdoms[turn].roadLeftover[0][roadX][roadY] <= 0) {
-            kingdoms[turn].roadLeftover[0][roadX][roadY] = 0;
-            map[1][roadX][roadY] = turn;
-            kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
-            kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
-            kingdoms[turn].roadNumber++;
-
-        if (checkForWar(roadX, roadY) == 3) { //all-out war
+        int warType = checkForWar(roadX, roadY);
+        Vector2 opponentV = {dijkstraX, dijkstraY};
+        Vector2 turnV = {roadX, roadY};
+        if (warType == 3) { // All-out war
             if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                DeleteKingdom(opponent);
+                toBeDeleted = opponent;
+                animation = 2;
+                mode = 4;
+                return;
+            } else if (kingdoms[opponent].soldier > kingdoms[turn].soldier) {
+                toBeDeleted = turn;
+                animation = 2;
+                mode = 4;
                 return;
             } else {
-                DeleteKingdom(turn);
-                return;
+                normalWar(0, turn, 1, turnV);
+                normalWar(0, opponent, 1, turnV);
             }
-        } else if (checkForWar(roadX, roadY)) {
+        }
+        else if (warType > 0) {
             if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                kingdoms[turn].soldier -= kingdoms[opponent].soldier;
-                kingdoms[opponent].soldier = 0;
-            } else {
-                kingdoms[opponent].soldier -= kingdoms[turn].soldier;
-                kingdoms[turn].soldier = 0;
+                normalWar(turn, opponent, warType, opponentV);
+            }
+            else if (kingdoms[turn].soldier < kingdoms[opponent].soldier) {
+                normalWar(opponent, turn, warType, turnV);
+            }
+            else {
+                normalWar(0, opponent, warType, opponentV);
+                normalWar(0, turn, warType, turnV);
             }
         }
-            int warType = checkForWar(roadX, roadY);
-            Vector2 opponentV = {dijkstraX, dijkstraY};
-            Vector2 turnV = {roadX, roadY};
-            if (warType == 3) { // All-out war
-                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                    DeleteKingdom(opponent);
-                    return;
-                } else if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                    DeleteKingdom(turn);
-                    return;
-                } else {
-                    normalWar(0, turn, 1, turnV);
-                    normalWar(0, opponent, 1, turnV);
-                }
-            }
-            else if (warType > 0) {
-                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                    normalWar(turn, opponent, warType, opponentV);
-                }
-                else if (kingdoms[turn].soldier < kingdoms[opponent].soldier) {
-                    normalWar(opponent, turn, warType, turnV);
-                }
-                else {
-                    normalWar(0, opponent, warType, opponentV);
-                    normalWar(0, turn, warType, turnV);
-                }
-            }
 
-            int VillageID;
-            if (map[0][roadX + 1][roadY] == -2) {
-                VillageID = map[1][roadX + 1][roadY];
-                if (villages[VillageID].kingdom == 0) {
-                    conquerVillage(VillageID, turn);
-                }
-            }
-            if (map[0][roadX - 1][roadY] == -2) {
-                VillageID = map[1][roadX - 1][roadY];
-                if (villages[VillageID].kingdom == 0) {
-                    conquerVillage(VillageID, turn);
-                }
-            }
-            if (map[0][roadX][roadY - 1] == -2) {
-                VillageID = map[1][roadX][roadY - 1];
-                if (villages[VillageID].kingdom == 0) {
-                    conquerVillage(VillageID, turn);
-                }
-            }
-            if (map[0][roadX][roadY + 1] == -2) {
-                VillageID = map[1][roadX][roadY + 1];
-                if (villages[VillageID].kingdom == 0) {
-                    conquerVillage(VillageID, turn);
-                }
+        int VillageID;
+        if (map[0][roadX + 1][roadY] == -2) {
+            VillageID = map[1][roadX + 1][roadY];
+            if (villages[VillageID].kingdom == 0) {
+                conquerVillage(VillageID, turn);
             }
         }
+        if (map[0][roadX - 1][roadY] == -2) {
+            VillageID = map[1][roadX - 1][roadY];
+            if (villages[VillageID].kingdom == 0) {
+                conquerVillage(VillageID, turn);
+            }
+        }
+        if (map[0][roadX][roadY - 1] == -2) {
+            VillageID = map[1][roadX][roadY - 1];
+            if (villages[VillageID].kingdom == 0) {
+                conquerVillage(VillageID, turn);
+            }
+        }
+        if (map[0][roadX][roadY + 1] == -2) {
+            VillageID = map[1][roadX][roadY + 1];
+            if (villages[VillageID].kingdom == 0) {
+                conquerVillage(VillageID, turn);
+            }
+        }
+    }
 
     mode=0;
     turn++;
+    return;
 }
 
 int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village, 3:all-out war

@@ -6,9 +6,16 @@
 #define MAP_SIZE 17
 #define TILE_SIZE 40
 
+extern int animation;
+extern int toBeDeleted;
 #define MAN_COUNT 6
 #define MAN_TIME 0.1
+#define FLAME_COUNT 28
+#define FLAME_TIME 0.05
+#define FLAME_WIDTH 68
+#define FLAME_HEIGHT 60
 extern Vector2 manPos;
+
 
 typedef struct kingdom kingdom;
 typedef struct village village;
@@ -19,7 +26,6 @@ extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, neededSoldier, opponent, winner, dijkstraX, dijkstraY;;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
-
 extern int MakeRoad, roadX, roadY;
 
 extern Vector2 mousePosition;
