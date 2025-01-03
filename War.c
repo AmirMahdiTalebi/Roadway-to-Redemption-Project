@@ -1,12 +1,12 @@
-#include "warFunctions.h"
-#include  "InitialMap.h"
+#include "War.h"
+#include  "Map.h"
 #include "raylib.h"
 
 int dijkstraForEditingRoads(int source, int id, int size) {
     int dest = kingdoms[id].y*mapWidth + kingdoms[id].x;
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
-            if (map[0][i][j] > 0 && kingdoms[id].roadLeftover[0][i][j] > 0) {
+            if (map[0][i][j] > 0 && kingdoms[id].roadLeftover[i][j] > 0) {
                 //anything that can't become a road
                 kingdoms[id].roadList[j * mapWidth + i][0] = 2000;
             }
@@ -94,11 +94,12 @@ int dijkstraForEditingRoads(int source, int id, int size) {
         }
     }
 
+    //save the path
     int k;
-    for (k = 0; k < pathNumber[dest]; k++) {
+    for (k = 0; k < pathNumber[dest]-1 && kingdoms[id].roadList[path[dest][k]][3]==-1; k++) {
         kingdoms[id].path[k] = path[dest][k];
     }
-    kingdoms[id].pathNumber = pathNumber[dest];
+    kingdoms[id].pathNumber = k;
     return dist[dest];
 }
 
@@ -108,11 +109,6 @@ void conquerVillage(int villageID, int conqueror) {
     kingdoms[conqueror].goldX += villages[villageID].goldX;
     kingdoms[conqueror].foodX += villages[villageID].foodX;
     dijkstraForEditingRoads(villages[villageID].y*mapWidth + villages[villageID].x, turn, mapWidth*mapHeight);
-    for(int k = 0; k < kingdoms[conqueror].pathNumber - 1; k++) {
-        int pathX = kingdoms[conqueror].path[k] % mapWidth;
-        int pathY = kingdoms[conqueror].path[k] / mapWidth;
-        kingdoms[conqueror].roadLeftover[1][pathX][pathY] = villageID+1;
-    }
 }
 
 void disconquerVillage(int villageID, int loser) {
@@ -127,38 +123,41 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
     kingdoms[warLoser].soldier = 0;
     dijkstraForEditingRoads(loserV.y*mapWidth + loserV.x, warLoser, mapWidth * mapHeight);
 
-    for(int k = 0; k < kingdoms[warLoser].pathNumber - 1; k++) {
-        int pathX = kingdoms[warLoser].path[k] % mapWidth;
-        int pathY = kingdoms[warLoser].path[k] / mapWidth;
-        if (warType == 1) {
-            if (kingdoms[warLoser].roadLeftover[1][pathX][pathY] > 0 &&
-                    kingdoms[warLoser].roadLeftover[1][pathX][pathY] !=
-                    kingdoms[warLoser].roadLeftover[1][(int)loserV.x][(int)loserV.y]) break;
+    if (warType ==1) { //war near a road
+        for(int k = 0; k < kingdoms[warLoser].pathNumber; k++) {
+            //destroy each road
+            int pathX = kingdoms[warLoser].path[k] % mapWidth;
+            int pathY = kingdoms[warLoser].path[k] / mapWidth;
+            if (k != 0 && map[0][pathX][pathY] == -2) break;
             for (int roadID = 0, sw = 0; roadID < kingdoms[warLoser].roadNumber; ++roadID) {
                 if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
             }
+
             map[1][pathX][pathY] = 0;
             kingdoms[warLoser].roadNumber--;
-            kingdoms[warLoser].roadLeftover[0][pathX][pathY] = map[0][pathX][pathY];
+            kingdoms[warLoser].roadLeftover[pathX][pathY] = map[0][pathX][pathY];
+
         }
-        else if (warType == 2) {
-            if ((k != 0 && map[0][pathX][pathY] == -2) ||
-            (kingdoms[warLoser].roadLeftover[1][pathX][pathY] > 0 &&
-            kingdoms[warLoser].roadLeftover[1][pathX][pathY] != map[1][(int)loserV.x][(int)loserV.y]+1)) break;
+    }
+    else if (warType == 2) { //war near a village
+        for(int k = 0; k < kingdoms[warLoser].pathNumber; k++) {
+            //destroy each road
+            int pathX = kingdoms[warLoser].path[k] % mapWidth;
+            int pathY = kingdoms[warLoser].path[k] / mapWidth;
+            if (k != 0 && map[0][pathX][pathY] == -2) break;
             for (int roadID = 0, sw = 0; roadID < kingdoms[warLoser].roadNumber; ++roadID) {
                 if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
             }
+
             if (map[0][pathX][pathY] > 0) map[1][pathX][pathY] = 0;
-            kingdoms[warLoser].roadLeftover[1][pathX][pathY] = 0;
             kingdoms[warLoser].roadNumber--;
-            kingdoms[warLoser].roadLeftover[0][pathX][pathY] = map[0][pathX][pathY];
+            kingdoms[warLoser].roadLeftover[pathX][pathY] = map[0][pathX][pathY];
+
         }
-    }
-    if (warType == 2) {
-        int villageID = map[1][(int)loserV.x][(int)loserV.y];
         if (warLoser != turn) {
+            int villageID = map[1][(int) loserV.x][(int) loserV.y];
             disconquerVillage(villageID, warLoser);
             conquerVillage(villageID, warWinner);
         }
@@ -167,12 +166,7 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
 
 int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village, 3:all-out war
     if (x != 0) {
-        if (map[0][x - 1][y] > 0 && map[1][x - 1][y] != 0 && map[1][x - 1][y] != turn) {
-            opponent = map[1][x - 1][y];
-            dijkstraX = x - 1;
-            dijkstraY = y;
-            return 1;
-        }
+
         if (map[0][x - 1][y] == -1 && map[1][x - 1][y] != turn && !kingdoms[map[1][x - 1][y]].dead) {
             opponent = map[1][x - 1][y];
             dijkstraX = x - 1;
@@ -186,15 +180,16 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
             dijkstraY = y;
             return 2;
         }
+        if (map[0][x - 1][y] > 0 && map[1][x - 1][y] != 0 && map[1][x - 1][y] != turn) {
+            opponent = map[1][x - 1][y];
+            dijkstraX = x - 1;
+            dijkstraY = y;
+            return 1;
+        }
     }
 
     if (y != 0) {
-        if (map[0][x][y - 1] > 0 && map[1][x][y - 1] != 0 && map[1][x][y - 1] != turn) {
-            opponent = map[1][x][y - 1];
-            dijkstraX = x;
-            dijkstraY = y - 1;
-            return 1;
-        }
+
         if (map[0][x][y - 1] == -1 && map[1][x][y - 1] != turn && !kingdoms[map[1][x][y - 1]].dead) {
             opponent = map[1][x][y - 1];
             dijkstraX = x;
@@ -208,15 +203,16 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
             dijkstraY = y - 1;
             return 2;
         }
+        if (map[0][x][y - 1] > 0 && map[1][x][y - 1] != 0 && map[1][x][y - 1] != turn) {
+            opponent = map[1][x][y - 1];
+            dijkstraX = x;
+            dijkstraY = y - 1;
+            return 1;
+        }
     }
 
     if (y != (mapHeight-1)) {
-        if (map[0][x][y + 1] > 0 && map[1][x][y + 1] != 0 && map[1][x][y + 1] != turn) {
-            opponent = map[1][x][y + 1];
-            dijkstraX = x;
-            dijkstraY = y + 1;
-            return 1;
-        }
+
         if (map[0][x][y + 1] == -1 && map[1][x][y + 1] != turn && !kingdoms[map[1][x][y + 1]].dead) {
             opponent = map[1][x][y + 1];
             dijkstraX = x;
@@ -230,15 +226,16 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
             dijkstraY = y + 1;
             return 2;
         }
+        if (map[0][x][y + 1] > 0 && map[1][x][y + 1] != 0 && map[1][x][y + 1] != turn) {
+            opponent = map[1][x][y + 1];
+            dijkstraX = x;
+            dijkstraY = y + 1;
+            return 1;
+        }
     }
 
     if (x != (mapWidth-1) ) {
-        if (map[0][x + 1][y] > 0 && map[1][x + 1][y] != 0 && map[1][x + 1][y] != turn) {
-            opponent = map[1][x + 1][y];
-            dijkstraX = x + 1;
-            dijkstraY = y;
-            return 1;
-        }
+
         if (map[0][x + 1][y] == -1 && map[1][x + 1][y] != turn && !kingdoms[map[1][x + 1][y]].dead) {
             opponent = map[1][x + 1][y];
             dijkstraX = x + 1;
@@ -251,6 +248,12 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
             dijkstraX = x + 1;
             dijkstraY = y;
             return 2;
+        }
+        if (map[0][x + 1][y] > 0 && map[1][x + 1][y] != 0 && map[1][x + 1][y] != turn) {
+            opponent = map[1][x + 1][y];
+            dijkstraX = x + 1;
+            dijkstraY = y;
+            return 1;
         }
     }
     return 0;

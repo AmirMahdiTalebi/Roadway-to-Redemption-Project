@@ -1,7 +1,7 @@
 #ifndef INITIAL_MAP_H
 #define INITIAL_MAP_H
 
-#include "warFunctions.h"
+#include "War.h"
 #include "raylib.h"
 
 #define SCREEN_HEIGHT 900
@@ -14,7 +14,7 @@ extern int toBeDeleted;
 #define MAN_COUNT 6
 #define MAN_TIME 0.1
 #define FLAME_COUNT 28
-#define FLAME_TIME 0.05
+#define FLAME_TIME 0.03
 #define FLAME_WIDTH 68
 #define FLAME_HEIGHT 60
 extern Vector2 manPos;
@@ -26,7 +26,7 @@ typedef struct button button;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
-extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, opponent, winner, dijkstraX, dijkstraY;;
+extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, opponent, winner, dijkstraX, dijkstraY;
 extern int list[MAP_SIZE*MAP_SIZE][5];
 extern int mode;
 extern int MakeRoad, roadX, roadY;
@@ -50,7 +50,7 @@ struct kingdom {
     int goldX;
     int worker;
     int soldier;
-    int roadLeftover[2][MAP_SIZE][MAP_SIZE];
+    int roadLeftover[MAP_SIZE][MAP_SIZE];
     int roadList[MAP_SIZE*MAP_SIZE][5];
     Vector2 road[MAP_SIZE*MAP_SIZE];
     int roadNumber;
@@ -79,7 +79,7 @@ struct button {
 
 extern button buttons[5];
 extern village villages[30];
-extern kingdom kingdoms[5];
+extern kingdom kingdoms[6];
 
 // Functions' Prototypes
 //int generate_number();

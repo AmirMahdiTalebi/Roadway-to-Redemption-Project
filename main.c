@@ -1,7 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include "raylib.h"
-#include "InitialMap.h"
+#include "Map.h"
 
 // Program main entry point
 int main() {

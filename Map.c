@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "raylib.h"
-#include "InitialMap.h"
+#include "Map.h"
 #include <string.h>
 
 typedef struct kingdom kingdom;
@@ -31,7 +31,7 @@ int action;
 
 button buttons[5];
 village villages[30] = {0};
-kingdom kingdoms[5] = {0};
+kingdom kingdoms[6] = {0};
 
 int generate_number() {
     float probs[4] = {.65, .25, .05, .05};
@@ -61,7 +61,7 @@ int dijkstraPath(int source,int id, int size) {
                 if (map[1][i][j]!=turn && map[1][i][j]>0)
                     list[j*mapWidth + i][0]=2000;
                 else
-                    list[j * mapWidth + i][0] = (kingdoms[turn].roadLeftover[0][i][j] + kingdoms[turn].worker - 1) / kingdoms[turn].worker;
+                    list[j * mapWidth + i][0] = (kingdoms[turn].roadLeftover[i][j] + kingdoms[turn].worker - 1) / kingdoms[turn].worker;
             }
         }
     }
@@ -207,7 +207,7 @@ void makeKingdom() {
         kingdoms[i].goldX = kingdoms[i].worker = 1;
         for (int mapX = 0; mapX < mapWidth; ++mapX) {
             for (int mapY = 0; mapY < mapHeight; ++mapY) {
-                kingdoms[i].roadLeftover[0][mapX][mapY] = map[0][mapX][mapY];
+                kingdoms[i].roadLeftover[mapX][mapY] = map[0][mapX][mapY];
             }
         }
     }
@@ -310,7 +310,7 @@ void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Tex
                     } else {
                         // Writing roadways' numbers on the tile
                         char innerNum[2];
-                        sprintf(innerNum, "%d", kingdoms[turn].roadLeftover[0][i][j]);
+                        sprintf(innerNum, "%d", kingdoms[turn].roadLeftover[i][j]);
                         DrawTextEx(font, innerNum,
                                    (Vector2) {(i + .4) * TILE_SIZE + map0.x, (j + .15) * TILE_SIZE + map0.y}, 30, 1,
                                    (Color) {150, 75, 0, 200});
@@ -434,9 +434,9 @@ int checkNeighbors(int x, int y, Vector2 map0) {
 }
 
 void RoadMaker() {
-    kingdoms[turn].roadLeftover[0][roadX][roadY] -= kingdoms[turn].worker;
-    if (kingdoms[turn].roadLeftover[0][roadX][roadY] <= 0) {
-        kingdoms[turn].roadLeftover[0][roadX][roadY] = 0;
+    kingdoms[turn].roadLeftover[roadX][roadY] -= kingdoms[turn].worker;
+    if (kingdoms[turn].roadLeftover[roadX][roadY] <= 0) {
+        kingdoms[turn].roadLeftover[roadX][roadY] = 0;
         map[1][roadX][roadY] = turn;
         kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
         kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
@@ -507,30 +507,19 @@ void RoadMaker() {
 }
 
 void mode0() {
-    if (turn > kingdomNumber) {
-        turn = 1;
-        if(kingdoms[turn].dead)
-            turn++;
-        for (int i = 1; i <= kingdomNumber; i++) {
-            if (kingdoms[i].dead)
-                continue;
-            kingdoms[i].food += kingdoms[i].foodX;
-            kingdoms[i].gold += kingdoms[i].goldX;
+
+    do {
+        if (turn > kingdomNumber) {
+            turn = 1;
+            for (int i = 1; i <= kingdomNumber; i++) {
+                if (kingdoms[i].dead)
+                    continue;
+                kingdoms[i].food += kingdoms[i].foodX;
+                kingdoms[i].gold += kingdoms[i].goldX;
+            }
         }
-    }
-    if (kingdoms[turn].dead)
-        turn++;
-    if (turn > kingdomNumber) {
-        turn = 1;
-        if (kingdoms[turn].dead)
-            turn++;
-        for (int i = 1; i <= kingdomNumber; i++) {
-            if (kingdoms[i].dead)
-                continue;
-            kingdoms[i].food += kingdoms[i].foodX;
-            kingdoms[i].gold += kingdoms[i].goldX;
-        }
-    }
+        if (kingdoms[turn].dead) turn++;
+    } while(kingdoms[turn].dead);
 
     int kingdomVertexNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
     for(int i=0; i<villageNumber; i++) {
