@@ -221,6 +221,7 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
 
             if (map[0][pathX][pathY] > 0) map[1][pathX][pathY] = 0;
             kingdoms[warLoser].roadNumber--;
+            k--;
             kingdoms[warLoser].roadLeftover[pathX][pathY] = map[0][pathX][pathY];
 
         }
