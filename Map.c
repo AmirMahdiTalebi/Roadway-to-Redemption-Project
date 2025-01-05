@@ -11,7 +11,7 @@ int map[2][MAP_SIZE][MAP_SIZE];
 int mapHeight = 0;
 int mapWidth = 0;
 int winner;
-int turn = 1, kingdomNumber, villageNumber, neededSoldier, opponent;
+int turn = 1, kingdomNumber, villageNumber, opponent;
 int dijkstraX, dijkstraY;
 int list[MAP_SIZE*MAP_SIZE][5];
 int mode = 0;
@@ -503,7 +503,6 @@ void RoadMaker() {
 
     mode=0;
     turn++;
-    return;
 }
 
 void mode0() {
@@ -560,7 +559,7 @@ void mode0() {
     strcpy(buttons[4].text, "Do nothing");
     for (int i = 0; i < 5; ++i) {
         buttons[i].rect.x = 30 + 175 * i;
-        if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 20;
+        if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 35;
         buttons[i].rect.y = buttonsPosY;
         buttons[i].rect.width = 150;
         buttons[i].rect.height = 65;

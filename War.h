@@ -9,7 +9,7 @@
 #include "raylib.h"
 
 void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV);
-void disconquerVillage(int villageID, int loser);
+void loseVillage(int villageID, int loser);
 void conquerVillage(int villageID, int conqueror);
 int dijkstraForEditingRoads(int source, int id, int size);
 int checkForWar(int x, int y);
