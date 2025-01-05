@@ -106,7 +106,6 @@ int dijkstraForEditingRoads(int source, int id, int size) {
 
 void dfs(int v, int id, int mark[]) {
     mark[v] = 1;
-    printf("help");
     for (int i = 1; kingdoms[id].roadList[v][i] != -1 && i < 5; ++i) {
         if (!mark[kingdoms[id].roadList[v][i]]) dfs(kingdoms[id].roadList[v][i], id, mark);
     }
@@ -145,29 +144,16 @@ void garbageCollector(int id) {
         }
     }
 
-    for (int mapY = 0; mapY < mapHeight; ++mapY) {
-        for (int mapX = 0; mapX < mapWidth; ++mapX) {
-            int v = mapY * mapWidth + mapX;
-            for (int i = 1; i < 5; ++i) {
-                printf("%d ", kingdoms[id].roadList[v][i]);
-            }
-            printf("\n");
-        }
-    }
-
-
 
     int kingdomVertex = kingdoms[id].y * mapWidth + kingdoms[id].x;
-//    dfs(kingdomVertex, kingdomVertex, mark);
+    dfs(kingdomVertex, id, mark);
 
     for (int i = 0; i < kingdoms[id].roadNumber; ++i) {
         int mapX = (int)kingdoms[id].road[i].x;
-        printf("%d\n", mapX);
         int mapY = (int)kingdoms[id].road[i].y;
-        printf("%d\n", mapY);
         if (!mark[mapY * mapWidth + mapX]) {
             if (map[0][mapX][mapY] > 0) {
-                for (int roadID = i; roadID < kingdoms[id].roadNumber - 1; ++roadID) {
+                for (int roadID = i; roadID < kingdoms[id].roadNumber ; ++roadID) {
                     kingdoms[id].road[roadID] = kingdoms[id].road[roadID + 1];
                 }
                 kingdoms[id].roadNumber--;
@@ -180,8 +166,6 @@ void garbageCollector(int id) {
             }
         }
     }
-
-
 
 }
 
@@ -232,6 +216,8 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
                 if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
             }
+
+            if (map[0][pathX][pathY] > 0) map[1][pathX][pathY] = 0;
             kingdoms[warLoser].roadNumber--;
             kingdoms[warLoser].roadLeftover[pathX][pathY] = map[0][pathX][pathY];
 
