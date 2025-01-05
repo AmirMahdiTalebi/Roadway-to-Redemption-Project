@@ -183,6 +183,10 @@ void makeKingdom() {
     int x, y;
     printf("Enter the number of kingdoms:");
     scanf("%d", &kingdomNumber);
+    while(kingdomNumber<1 || kingdomNumber>4) {
+        printf("Too many kingdoms\nEnter the number of kingdoms:");
+        scanf("%d", &kingdomNumber);
+    }
     kingdoms[0].dead = 1;
     for (int i = 1; i <= kingdomNumber; ++i) {
         printf("Enter x and y for the kingdom No.%d:\n", i);

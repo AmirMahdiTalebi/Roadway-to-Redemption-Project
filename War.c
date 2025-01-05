@@ -148,6 +148,11 @@ void garbageCollector(int id) {
     int kingdomVertex = kingdoms[id].y * mapWidth + kingdoms[id].x;
     dfs(kingdomVertex, id, mark);
 
+    for (int i = 0; i < villageNumber; ++i) {
+        if (villages[i].kingdom==id && !mark[villages[i].y*mapWidth+ villages[i].x])
+            loseVillage(i, id);
+    }
+
     for (int i = 0; i < kingdoms[id].roadNumber; ++i) {
         int mapX = (int)kingdoms[id].road[i].x;
         int mapY = (int)kingdoms[id].road[i].y;
@@ -157,14 +162,11 @@ void garbageCollector(int id) {
                     kingdoms[id].road[roadID] = kingdoms[id].road[roadID + 1];
                 }
                 kingdoms[id].roadNumber--;
+                i--;
                 map[1][mapX][mapY] = 0;
                 kingdoms[id].roadLeftover[mapX][mapY] = map[0][mapX][mapY];
             }
         }
-    }
-    for (int i = 0; i < villageNumber; ++i) {
-        if (villages[i].kingdom==id && !mark[villages[i].y*mapWidth+ villages[i].x])
-            loseVillage(i, id);
     }
 
 }
