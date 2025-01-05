@@ -160,11 +160,11 @@ void garbageCollector(int id) {
                 map[1][mapX][mapY] = 0;
                 kingdoms[id].roadLeftover[mapX][mapY] = map[0][mapX][mapY];
             }
-
-            if (map[0][mapX][mapY] == -2) {
-                loseVillage(map[1][mapX][mapY],id);
-            }
         }
+    }
+    for (int i = 0; i < villageNumber; ++i) {
+        if (villages[i].kingdom==id && !mark[villages[i].y*mapWidth+ villages[i].x])
+            loseVillage(i, id);
     }
 
 }
