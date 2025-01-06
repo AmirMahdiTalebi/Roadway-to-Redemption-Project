@@ -446,64 +446,67 @@ void RoadMaker() {
         kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
         kingdoms[turn].roadNumber++;
 
-        int warType = checkForWar(roadX, roadY);
-        Vector2 opponentV = {dijkstraX, dijkstraY};
-        Vector2 turnV = {roadX, roadY};
-        if (warType == 3) { // All-out war
-            if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                toBeDeleted = opponent;
-                animation = 2;
-                mode = 4;
-                return;
-            } else if (kingdoms[opponent].soldier > kingdoms[turn].soldier) {
-                toBeDeleted = turn;
-                animation = 2;
-                mode = 4;
-                return;
-            } else {
-                normalWar(0, turn, 1, turnV);
-                normalWar(0, opponent, 1, turnV);
+        for (int i = 0; i < 4; ++i) {
+            int warType = checkForWar(roadX, roadY);
+            Vector2 opponentV = {dijkstraX, dijkstraY};
+            Vector2 turnV = {roadX, roadY};
+            if (warType == 3) { // All-out war
+                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                    toBeDeleted = opponent;
+                    animation = 2;
+                    mode = 4;
+                    return;
+                } else if (kingdoms[opponent].soldier > kingdoms[turn].soldier) {
+                    toBeDeleted = turn;
+                    animation = 2;
+                    mode = 4;
+                    return;
+                } else {
+                    normalWar(0, turn, 1, turnV);
+                    normalWar(0, opponent, 1, turnV);
+                }
             }
-        }
-        else if (warType > 0) {
-            if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
-                normalWar(turn, opponent, warType, opponentV);
+            else if (warType > 0) {
+                if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
+                    normalWar(turn, opponent, warType, opponentV);
+                }
+                else if (kingdoms[turn].soldier < kingdoms[opponent].soldier) {
+                    normalWar(opponent, turn, warType, turnV);
+                }
+                else {
+                    normalWar(0, opponent, warType, opponentV);
+                    normalWar(0, turn, warType, turnV);
+                }
             }
-            else if (kingdoms[turn].soldier < kingdoms[opponent].soldier) {
-                normalWar(opponent, turn, warType, turnV);
-            }
-            else {
-                normalWar(0, opponent, warType, opponentV);
-                normalWar(0, turn, warType, turnV);
-            }
-        }
 
-        int VillageID;
-        if (map[0][roadX + 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
-            VillageID = map[1][roadX + 1][roadY];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            int VillageID;
+            if (map[0][roadX + 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX + 1][roadY];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
-        }
-        if (map[0][roadX - 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
-            VillageID = map[1][roadX - 1][roadY];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            if (map[0][roadX - 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX - 1][roadY];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
-        }
-        if (map[0][roadX][roadY - 1] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
-            VillageID = map[1][roadX][roadY - 1];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            if (map[0][roadX][roadY - 1] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX][roadY - 1];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
-        }
-        if (map[0][roadX][roadY + 1] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
-            VillageID = map[1][roadX][roadY + 1];
-            if (villages[VillageID].kingdom == 0) {
-                conquerVillage(VillageID, turn);
+            if (map[0][roadX][roadY + 1] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+                VillageID = map[1][roadX][roadY + 1];
+                if (villages[VillageID].kingdom == 0) {
+                    conquerVillage(VillageID, turn);
+                }
             }
         }
     }
+
 
     mode=0;
     turn++;
