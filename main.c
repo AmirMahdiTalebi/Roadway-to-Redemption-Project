@@ -101,7 +101,10 @@ int main() {
             DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
             char text[20];
             sprintf(text, "WINNER IS KINGDOM %d", winner);
-            DrawText(text, 200, 200, 40, BLACK);
+            int textWidth = MeasureText(text, 40);
+            Vector2 textPos = {SCREEN_WIDTH / 2 - textWidth / 2,
+                               SCREEN_HEIGHT / 2 - 22.5};
+            DrawText(text, textPos.x, textPos.y, 40, BLACK);
         }
 
         if (mode==4) { //animation
@@ -146,7 +149,7 @@ int main() {
     }
 
 
-
+    // De-Initialization
     UnloadTexture(mapTileSet);
     UnloadTexture(GroundTile);
     UnloadTexture(Stone);
@@ -155,7 +158,6 @@ int main() {
     UnloadTexture(roadMan);
     UnloadTexture(explosion);
     UnloadFont(font);
-    // De-Initialization
     CloseWindow();
 
     return 0;
