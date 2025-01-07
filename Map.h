@@ -23,6 +23,7 @@ extern Vector2 manPos;
 typedef struct kingdom kingdom;
 typedef struct village village;
 typedef struct button button;
+typedef struct gameState gameState;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
@@ -81,6 +82,18 @@ extern button buttons[5];
 extern village villages[30];
 extern kingdom kingdoms[6];
 
+struct gameState {
+    int kingdomNumber;
+    kingdom kingdom[6];
+    int villageNumber;
+    village villages[30];
+    int mapWidth, mapHeight;
+    int map[2][MAP_SIZE][MAP_SIZE];
+    int turn;
+    int winner;
+    int end;
+};
+
 // Functions' Prototypes
 //int generate_number();
 void initialMapMaker();
@@ -93,5 +106,7 @@ int checkNeighbors(int x, int y, Vector2 map0);
 void RoadMaker();
 void mode0();
 void mode1();
+void SaveGame(gameState* game);
+void LoadGame (gameState* game);
 
 #endif // INITIAL_MAP_H

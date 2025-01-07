@@ -639,3 +639,53 @@ void mode1() {
     }
 }
 
+void SaveGame(gameState* game) {
+    game->kingdomNumber = kingdomNumber;
+    for (int i = 1; i <= kingdomNumber; ++i) {
+        game->kingdom[i] = kingdoms[i];
+    }
+    game->villageNumber = villageNumber;
+    for (int i = 0; i < villageNumber; ++i) {
+        game->villages[i] = villages[i];
+    }
+    game->mapWidth = mapWidth;
+    game->mapHeight = mapHeight;
+    for (int i = 0; i < mapHeight; ++i) {
+        for (int j = 0; j < mapWidth; ++j) {
+            for (int k = 0; k < 2; ++k) {
+                game->map[k][j][i] = map[k][j][i];
+            }
+        }
+    }
+    game-> winner = winner;
+    if (mode==3)
+        game->end = 1;
+    else
+        game->end = 0;
+}
+
+void LoadGame(gameState* game) {
+    kingdomNumber = game->kingdomNumber;
+    for (int i = 1; i <= kingdomNumber; ++i) {
+        kingdoms[i] = game->kingdom[i];
+    }
+    villageNumber = game->villageNumber;
+    for (int i = 0; i < villageNumber; ++i) {
+        villages[i] = game->villages[i];
+    }
+    mapWidth = game->mapWidth;
+    mapHeight = game->mapHeight;
+    for (int i = 0; i < mapHeight; ++i) {
+        for (int j = 0; j < mapWidth; ++j) {
+            for (int k = 0; k < 2; ++k) {
+                map[k][j][i] = game->map[k][j][i];
+            }
+        }
+    }
+    winner = game-> winner;
+    if (game->end == 1)
+        mode = 3;
+    else
+        mode = 0;
+}
+
