@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "raylib.h"
 #include "Map.h"
 
@@ -186,18 +187,23 @@ int main() {
     while(!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawText("Do you want to save the game?", 50, 100, 20, GREEN);
+        char text[50] = "Do you want to save the game? (Y/N)";
+        int textWidth = MeasureText(text, 20);
+        DrawText(text, (500-textWidth)/2, 90, 20, GREEN);
         if (IsKeyPressed(KEY_Y)) {
             gameState lastGame;
             SaveGame(&lastGame);
             FILE* fileWriter;
             fileWriter = fopen("SavedGame.dat", "wb");
             if (!fileWriter) {
-                printf("Can't save the game. SORRYYYYY T-T\n");
+                strcpy(text, "Can't save the game. SORRYYYYY T-T\n");
+                DrawText(text, (500-textWidth)/2, 90, 20, GREEN);
             }
-            fwrite(&lastGame, sizeof(gameState), 1, fileWriter);
-            fclose(fileWriter);
-            break;
+            else {
+                fwrite(&lastGame, sizeof(gameState), 1, fileWriter);
+                fclose(fileWriter);
+                break;
+            }
         }
         if (IsKeyPressed(KEY_N)) {
             break;

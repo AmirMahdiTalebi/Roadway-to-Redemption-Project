@@ -662,6 +662,7 @@ void SaveGame(gameState* game) {
         game->end = 1;
     else
         game->end = 0;
+    game-> turn = turn;
 }
 
 void LoadGame(gameState* game) {
@@ -687,5 +688,6 @@ void LoadGame(gameState* game) {
         mode = 3;
     else
         mode = 0;
+    turn = game-> turn;
 }
 
