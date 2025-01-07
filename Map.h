@@ -3,6 +3,8 @@
 
 #include "War.h"
 #include "raylib.h"
+#include "monteCarlo.h"
+
 
 #define SCREEN_HEIGHT 900
 #define SCREEN_WIDTH 1237

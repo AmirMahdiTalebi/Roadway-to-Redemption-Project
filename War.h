@@ -7,6 +7,7 @@
 
 #include "Map.h"
 #include "raylib.h"
+#include "monteCarlo.h"
 
 void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV);
 void loseVillage(int villageID, int loser);
