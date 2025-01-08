@@ -280,7 +280,7 @@ void makeBarrier() {
     }
 }
 
-void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font, Vector2 map0) {
+void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font) {
     DrawTexture(mapTileSet, 0,0, WHITE);
     for(int i=0; i<mapWidth; i++) {
         for (int j = 0; j < mapHeight; j++) {
@@ -352,7 +352,7 @@ void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Tex
     }
 }
 
-int checkNeighbors(int x, int y, Vector2 map0) {
+int checkNeighbors(int x, int y) {
     Rectangle available;
     int availableNumber = kingdoms[turn].availableNumber;
     if(x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] == 0) ||
@@ -466,12 +466,22 @@ void RoadMaker() {
             if (warType == 3) { // All-out war
                 if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
                     toBeDeleted = opponent;
-                    animation = 2;
+                    if (monteCarlo) {
+                        DeleteKingdom(toBeDeleted);
+                        return;
+                    }
+                    else
+                        animation = 2;
                     mode = 4;
                     return;
                 } else if (kingdoms[opponent].soldier > kingdoms[turn].soldier) {
                     toBeDeleted = turn;
-                    animation = 2;
+                    if (monteCarlo) {
+                        DeleteKingdom(toBeDeleted);
+                        return;
+                    }
+                    else
+                        animation = 2;
                     mode = 4;
                     return;
                 } else {

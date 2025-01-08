@@ -13,7 +13,7 @@ int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
 
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
-    Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
+    map0= (Vector2){mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
 
     buttonsPosY = -100;
 
@@ -45,11 +45,13 @@ int main() {
         mousePosition = GetMousePosition();
         coordination = (Vector2){(int) ((mousePosition.x - map0.x) / TILE_SIZE), (int) ((mousePosition.y - map0.y) / TILE_SIZE)};
 
+        monteCarlo = 0;
+
         BeginDrawing();
 
         ClearBackground(BLACK);
 
-        mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font, map0);
+        mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font);
 
         for (int i = 0; i < kingdomNumber; ++i) { //show kingdoms' info
             char text[50];
@@ -83,15 +85,15 @@ int main() {
             mode1();
 
         if (mode == 2) { //making roads
-            int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
+            int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y);
 
             for (int i = 0; i <kingdoms[turn].roadNumber && check==0; ++i) {
-                check = checkNeighbors(kingdoms[turn].road[i].x, kingdoms[turn].road[i].y, map0);
+                check = checkNeighbors(kingdoms[turn].road[i].x, kingdoms[turn].road[i].y);
             }
 
             for(int i=0; i<villageNumber && check==0; i++) {
                 if(villages[i].kingdom==turn) {
-                    check = checkNeighbors(villages[i].x, villages[i].y, map0);
+                    check = checkNeighbors(villages[i].x, villages[i].y);
                 }
             }
 
@@ -108,7 +110,7 @@ int main() {
         }
 
         if (mode==4) { //animation
-            if (animation == 1) {
+            if (animation == 1) { //making roads
                 if(AnimationCounter < 12) {
                     manTimer -= GetFrameTime();
                     if(manTimer < 0) {
@@ -125,7 +127,7 @@ int main() {
                     AnimationCounter = 0;
                 }
             }
-            else if (animation == 2) {
+            else if (animation == 2) { //all-out war
                 if(AnimationCounter < 28) {
                     flameTimer -= GetFrameTime();
                     if(flameTimer < 0) {

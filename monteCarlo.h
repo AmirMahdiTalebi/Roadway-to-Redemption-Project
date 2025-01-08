@@ -20,7 +20,7 @@ void monte();
 node* selection();
 void expand(node* parent);
 int simulation(gameState* state);
-void backpropagation();
-int possibleMoves(gameState * state, Vector2 map0) ;
+void backpropagation(node* node, int result);
+int possibleMoves(gameState* state) ;
 
 #endif //MAIN_C_MONTECARLO_H
