@@ -3,6 +3,8 @@
 
 #include "War.h"
 #include "raylib.h"
+#include "monteCarlo.h"
+
 
 #define SCREEN_HEIGHT 900
 #define SCREEN_WIDTH 1237
@@ -18,11 +20,6 @@ extern int toBeDeleted;
 #define FLAME_WIDTH 68
 #define FLAME_HEIGHT 60
 extern Vector2 manPos;
-
-
-typedef struct kingdom kingdom;
-typedef struct village village;
-typedef struct button button;
 
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
@@ -41,7 +38,7 @@ extern Color transparentRed;
 extern float buttonsPosY;
 extern int action;
 
-struct kingdom {
+typedef struct kingdom {
     int x;
     int y;
     int food;
@@ -59,9 +56,11 @@ struct kingdom {
     int villageNumber;
     Color color;
     int dead;
-};
+    Vector2 available[MAP_SIZE*MAP_SIZE];
+    int availableNumber;
+} kingdom;
 
-struct village {
+typedef struct village {
     int x;
     int y;
     int goldX;
@@ -69,13 +68,25 @@ struct village {
     int path[289];
     int pathNumber;
     int kingdom;
-};
+} village;
 
-struct button {
+typedef struct gameState {
+    int kingdomNumber;
+    kingdom kingdom[6];
+    int villageNumber;
+    village villages[30];
+    int mapWidth, mapHeight;
+    int map[2][MAP_SIZE][MAP_SIZE];
+    int turn;
+    int winner;
+    int end;
+}gameState;
+
+typedef struct button {
     Rectangle rect;
     char text[30];
     Color color;
-};
+} button;
 
 extern button buttons[5];
 extern village villages[30];
@@ -93,5 +104,7 @@ int checkNeighbors(int x, int y, Vector2 map0);
 void RoadMaker();
 void mode0();
 void mode1();
+void SaveGame(gameState* game);
+void LoadGame (gameState* game);
 
 #endif // INITIAL_MAP_H

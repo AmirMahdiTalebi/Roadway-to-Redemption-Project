@@ -354,16 +354,20 @@ void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Tex
 
 int checkNeighbors(int x, int y, Vector2 map0) {
     Rectangle available;
+    int availableNumber = kingdoms[turn].availableNumber;
     if(x != 0 && ((map[0][x-1][y] > 0 && map[1][x-1][y] == 0) ||
       (map[0][x-1][y] == -2 && villages[map[1][x-1][y]].kingdom == 0))) {
-        int checker = checkForWar(x - 1, y);
-        if (checker) {
-            DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
-        } else {
-            DrawRectangle((x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int isAlreadyAdded = 0;
+        for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
+            if (kingdoms[turn].available[i].x == x-1 && kingdoms[turn].available[i].y == y) isAlreadyAdded = 1;
+        }
+        if (!isAlreadyAdded) {
+            kingdoms[turn].available[availableNumber].x = x-1;
+            kingdoms[turn].available[availableNumber].y = y;
+            kingdoms[turn].availableNumber++;
+            availableNumber++;
         }
         available = (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
-
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 MakeRoad = 1;
@@ -374,14 +378,17 @@ int checkNeighbors(int x, int y, Vector2 map0) {
     }
     if(x!=(mapWidth-1) && ((map[0][x+1][y]>0 && map[1][x+1][y]==0) ||
       (map[0][x+1][y]==-2 && villages[map[1][x+1][y]].kingdom==0))) {
-        int checker = checkForWar(x + 1, y);
-        if (checker) {
-            DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
-        } else {
-            DrawRectangle((x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int isAlreadyAdded = 0;
+        for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
+            if (kingdoms[turn].available[i].x == x+1 && kingdoms[turn].available[i].y == y) isAlreadyAdded = 1;
+        }
+        if (!isAlreadyAdded) {
+            kingdoms[turn].available[availableNumber].x = x+1;
+            kingdoms[turn].available[availableNumber].y = y;
+            kingdoms[turn].availableNumber++;
+            availableNumber++;
         }
         available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
-
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                    MakeRoad = 1;
@@ -392,14 +399,17 @@ int checkNeighbors(int x, int y, Vector2 map0) {
     }
     if(y!=0 && ((map[0][x][y-1]>0 && map[1][x][y-1]==0) ||
       (map[0][x][y-1]==-2 && villages[map[1][x][y-1]].kingdom==0))) {
-        int checker = checkForWar(x, y - 1);
-        if (checker) {
-            DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
-        } else {
-            DrawRectangle(x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int isAlreadyAdded = 0;
+        for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
+            if (kingdoms[turn].available[i].x == x && kingdoms[turn].available[i].y == y-1) isAlreadyAdded = 1;
+        }
+        if (!isAlreadyAdded) {
+            kingdoms[turn].available[availableNumber].x = x;
+            kingdoms[turn].available[availableNumber].y = y-1;
+            kingdoms[turn].availableNumber++;
+            availableNumber++;
         }
         available = (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
-
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                     MakeRoad = 1;
@@ -410,14 +420,17 @@ int checkNeighbors(int x, int y, Vector2 map0) {
     }
     if(y!=(mapHeight-1) && ((map[0][x][y+1]>0 && map[1][x][y+1]==0) ||
       (map[0][x][y+1]==-2 && villages[map[1][x][y+1]].kingdom==0))) {
-        int checker = checkForWar(x, y + 1);
-        if (checker) {
-            DrawRectangle(x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
-        } else {
-            DrawRectangle(x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+        int isAlreadyAdded = 0;
+        for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
+            if (kingdoms[turn].available[i].x == x && kingdoms[turn].available[i].y == y+1) isAlreadyAdded = 1;
+        }
+        if (!isAlreadyAdded) {
+            kingdoms[turn].available[availableNumber].x = x;
+            kingdoms[turn].available[availableNumber].y = y+1;
+            kingdoms[turn].availableNumber++;
+            availableNumber++;
         }
         available = (Rectangle) {x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
-
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 MakeRoad = 1;
@@ -648,5 +661,55 @@ void mode1() {
         mode = 0;
         turn++;
     }
+}
+
+void SaveGame(gameState* game) {
+    game->kingdomNumber = kingdomNumber;
+    for (int i = 1; i <= kingdomNumber; ++i) {
+        game->kingdom[i] = kingdoms[i];
+    }
+    game->villageNumber = villageNumber;
+    for (int i = 0; i < villageNumber; ++i) {
+        game->villages[i] = villages[i];
+    }
+    game->mapWidth = mapWidth;
+    game->mapHeight = mapHeight;
+    for (int i = 0; i < mapHeight; ++i) {
+        for (int j = 0; j < mapWidth; ++j) {
+            for (int k = 0; k < 2; ++k) {
+                game->map[k][j][i] = map[k][j][i];
+            }
+        }
+    }
+    game-> winner = winner;
+    if (mode==3)
+        game->end = 1;
+    else
+        game->end = 0;
+}
+
+void LoadGame(gameState* game) {
+    kingdomNumber = game->kingdomNumber;
+    for (int i = 1; i <= kingdomNumber; ++i) {
+        kingdoms[i] = game->kingdom[i];
+    }
+    villageNumber = game->villageNumber;
+    for (int i = 0; i < villageNumber; ++i) {
+        villages[i] = game->villages[i];
+    }
+    mapWidth = game->mapWidth;
+    mapHeight = game->mapHeight;
+    for (int i = 0; i < mapHeight; ++i) {
+        for (int j = 0; j < mapWidth; ++j) {
+            for (int k = 0; k < 2; ++k) {
+                map[k][j][i] = game->map[k][j][i];
+            }
+        }
+    }
+    winner = game-> winner;
+    if (game->end == 1)
+        mode = 3;
+    else
+        mode = 0;
 }
 
