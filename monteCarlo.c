@@ -7,7 +7,7 @@
 
 #define constant 2
 
- node* root;
+node* root;
 int totalVisits;
 
 typedef struct node node;
@@ -23,9 +23,9 @@ void monte() {
 
     for (int i = 0; i < 10; ++i) {
         expand(current);
-//        for (int u: children[current]) {
-//            simulation(child[i]);
-//        }
+        for (int j=0; j<current->childCount; j++) {
+            simulation(current->children[j]->state);
+        }
         backpropagation();
         current = selection();
     }
@@ -55,6 +55,7 @@ void expand(node* parent) {
 }
 
 int simulation(gameState* state) {
+
     while (!winner) {
 
     }
@@ -65,6 +66,24 @@ void backpropagation() {
 
 }
 
-int possibleMoves () {
+int possibleMoves (gameState* state, Vector2 map0) {
+    state->kingdom[state->turn].availableNumber = 0;
+    int check = checkNeighbors(state->kingdom[state->turn].x, state->kingdom[state->turn].y, map0);
 
+    for (int i = 0; i <state->kingdom[state->turn].roadNumber && check==0; ++i) {
+        check = checkNeighbors(state->kingdom[state->turn].road[i].x, state->kingdom[state->turn].road[i].y, map0);
+    }
+
+    for(int i=0; i<state->villageNumber && check==0; i++) {
+        if(state->villages[i].kingdom == state->turn) {
+            check = checkNeighbors(state->villages[i].x, state->villages[i].y, map0);
+        }
+    }
+    int moveCount = state->kingdom[state->turn].roadNumber;
+    if (state->kingdom[state->turn].foodX < 3 && state->kingdom[state->turn].worker < 4)
+        moveCount++;
+    if (state->kingdom[state->turn].worker <4)
+        moveCount++;
+    moveCount++;
+    return moveCount;
 }

@@ -21,6 +21,6 @@ node* selection();
 void expand(node* parent);
 int simulation(gameState* state);
 void backpropagation();
-int possibleMoves() ;
+int possibleMoves(gameState * state, Vector2 map0) ;
 
 #endif //MAIN_C_MONTECARLO_H
