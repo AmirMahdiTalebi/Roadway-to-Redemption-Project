@@ -6,6 +6,7 @@
 #include <math.h>
 
 #define constant 2
+#define iterations 10
 
 node* root;
 int totalVisits;
@@ -21,12 +22,12 @@ void monte() {
     current->visits=current->winCount=0;
     root = current;
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < iterations ; ++i) {
         expand(current);
-        for (int j=0; j<current->childCount; j++) {
-            simulation(current->children[j]->state);
+        for (int j = 0; j < current->childCount; ++j) {
+            int gameResult = simulation(current->children[j]);
+            backpropagation(current->children[j],gameResult);
         }
-        backpropagation();
         current = selection();
     }
 }
@@ -59,11 +60,15 @@ int simulation(gameState* state) {
     while (!winner) {
 
     }
-    return (winner==root->state->turn);
+    return (winner == root->state->turn);
 }
 
-void backpropagation() {
-
+void backpropagation(node* node, int result) {
+    while (node != NULL) {
+        node->visits++;
+        node->winCount += result;
+        node = node->parent;
+    }
 }
 
 int possibleMoves (gameState* state, Vector2 map0) {
