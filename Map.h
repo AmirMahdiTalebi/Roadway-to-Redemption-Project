@@ -21,12 +21,6 @@ extern int toBeDeleted;
 #define FLAME_HEIGHT 60
 extern Vector2 manPos;
 
-
-typedef struct kingdom kingdom;
-typedef struct village village;
-typedef struct button button;
-typedef struct gameState gameState;
-
 // Global Variables
 extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, opponent, winner, dijkstraX, dijkstraY;
@@ -44,7 +38,7 @@ extern Color transparentRed;
 extern float buttonsPosY;
 extern int action;
 
-struct kingdom {
+typedef struct kingdom {
     int x;
     int y;
     int food;
@@ -62,9 +56,11 @@ struct kingdom {
     int villageNumber;
     Color color;
     int dead;
-};
+    Vector2 available[MAP_SIZE*MAP_SIZE];
+    int availableNumber;
+} kingdom;
 
-struct village {
+typedef struct village {
     int x;
     int y;
     int goldX;
@@ -72,19 +68,9 @@ struct village {
     int path[289];
     int pathNumber;
     int kingdom;
-};
+} village;
 
-struct button {
-    Rectangle rect;
-    char text[30];
-    Color color;
-};
-
-extern button buttons[5];
-extern village villages[30];
-extern kingdom kingdoms[6];
-
-struct gameState {
+typedef struct gameState {
     int kingdomNumber;
     kingdom kingdom[6];
     int villageNumber;
@@ -94,7 +80,17 @@ struct gameState {
     int turn;
     int winner;
     int end;
-};
+}gameState;
+
+typedef struct button {
+    Rectangle rect;
+    char text[30];
+    Color color;
+} button;
+
+extern button buttons[5];
+extern village villages[30];
+extern kingdom kingdoms[6];
 
 // Functions' Prototypes
 //int generate_number();

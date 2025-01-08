@@ -1,7 +1,3 @@
-//
-// Created by ASUS on 12/31/2024.
-//
-
 #ifndef INITIALMAP_C_WAR_H
 #define INITIALMAP_C_WAR_H
 

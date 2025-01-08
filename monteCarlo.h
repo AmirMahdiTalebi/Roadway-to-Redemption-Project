@@ -5,11 +5,22 @@
 #include "War.h"
 #include "Map.h"
 
+typedef struct node node;
+typedef struct gameState gameState;
+typedef struct node {
+    gameState* state;
+    node* parent;
+    node** children;
+    int childCount;
+    int winCount;
+    int visits;
+} node;
 
 void monte();
-void search();
-void expand();
-void simulation();
+node* selection();
+void expand(node* parent);
+int simulation(gameState* state);
 void backpropagation();
+int possibleMoves() ;
 
 #endif //MAIN_C_MONTECARLO_H

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "Map.h"
+#include "War.h"
+#include "monteCarlo.h"
 
 // Program main entry point
 int main() {
@@ -117,6 +119,7 @@ int main() {
             mode1();
 
         if (mode == 2) { //making roads
+            kingdoms[turn].availableNumber = 0;
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
             for (int i = 0; i <kingdoms[turn].roadNumber && check==0; ++i) {
@@ -124,11 +127,19 @@ int main() {
             }
 
             for(int i=0; i<villageNumber && check==0; i++) {
-                if(villages[i].kingdom==turn) {
+                if(villages[i].kingdom == turn) {
                     check = checkNeighbors(villages[i].x, villages[i].y, map0);
                 }
             }
-
+            for (int i = 0; i < kingdoms[turn].availableNumber; ++i) {
+                int mapX = (int)kingdoms[turn].available[i].x;
+                int mapY = (int)kingdoms[turn].available[i].y;
+                if (checkForWar(mapX, mapY)) {
+                    DrawRectangle(mapX * TILE_SIZE + map0.x, mapY * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
+                } else {
+                    DrawRectangle(mapX * TILE_SIZE + map0.x, mapY * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
+                }
+            }
         }
 
         if (mode == 3) { //the end of the game
