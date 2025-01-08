@@ -31,6 +31,16 @@ void monte() {
         }
         current = selection();
     }
+
+    node* bestMove = NULL;
+    int maxSimulations = -1;
+    for (int i = 0; i < root->childCount; i++) {
+        if (root->children[i]->visits> maxSimulations) {
+            maxSimulations = root->children[i]->visits;
+            bestMove = root->children[i];
+        }
+    }
+    LoadGame(bestMove->state);
 }
 
 node* selection() {
@@ -47,13 +57,53 @@ node* selection() {
                 best = parent->children[i];
             }
         }
-         parent = best;
+        parent = best;
     }
     return best;
 }
 
 void expand(node* parent) {
+    parent->childCount = possibleMoves(parent->state);
+    parent->children = (node**)malloc(parent->childCount * sizeof(node*));
 
+    for (int i = 0; i < parent->childCount; i++) {
+        parent->children[i]->state = parent->state;
+        parent->children[i]->parent = parent;
+        parent->children[i]->children = NULL;
+        parent->children[i]->childCount = 0;
+        parent->children[i]->winCount = 0;
+        parent->children[i]->visits = 0;
+
+        gameState *myState = parent->children[i]->state;
+        int move = i;
+        if (move <= myState->kingdom[myState->turn].availableNumber) {
+            roadX = myState->kingdom[myState->turn].available[move-1].x;
+            roadY = myState->kingdom[myState->turn].available[move-1].y;
+            RoadMaker();
+        }
+        else {
+            if (move - myState->kingdom[myState->turn].availableNumber ==1) { //add food
+                if (myState->kingdom[myState->turn].foodX < 3 && myState->kingdom[myState->turn].worker < 4) {
+                    action = 2;
+                    mode1();
+                }
+                else move++;
+            }
+            if (move - myState->kingdom[myState->turn].availableNumber == 2) { //add worker
+                if (myState->kingdom[myState->turn].worker <4 && myState->kingdom[myState->turn].food >=3) {
+                    action = 2;
+                    mode1();
+                }
+                else move++;
+            }
+            else if (myState->kingdom[myState->turn].gold >=2) { //add soldier
+                action = 3;
+                mode1();
+            }
+            else //do nothing
+                myState->turn++;
+        }
+    }
 }
 
 int simulation(gameState* state) {
@@ -77,14 +127,14 @@ int simulation(gameState* state) {
         }
         else {
             if (move - changer.kingdom[changer.turn].availableNumber ==1) { //add food
-                if (state->kingdom[state->turn].foodX < 3 && state->kingdom[state->turn].worker < 4) {
+                if (changer.kingdom[changer.turn].foodX < 3 && changer.kingdom[changer.turn].worker < 4) {
                     action = 2;
                     mode1();
                 }
                 else move++;
             }
             if (move - changer.kingdom[changer.turn].availableNumber == 2) { //add worker
-                if (state->kingdom[state->turn].worker <4 && state->kingdom[state->turn].food >=3) {
+                if (changer.kingdom[changer.turn].worker <4 && changer.kingdom[changer.turn].food >=3) {
                     action = 2;
                     mode1();
                 }

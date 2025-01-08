@@ -101,7 +101,7 @@ void makeVillage();
 void makeBarrier();
 int dijkstraPath(int source, int id, int size);
 void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font);
-int checkNeighbors(int x, int y,);
+int checkNeighbors(int x, int y);
 void RoadMaker();
 void mode0();
 void mode1();
