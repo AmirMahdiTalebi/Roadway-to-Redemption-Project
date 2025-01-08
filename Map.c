@@ -583,17 +583,28 @@ void mode0() {
         buttons[i].rect.y = buttonsPosY;
         buttons[i].rect.width = 150;
         buttons[i].rect.height = 65;
-        buttons[i].color = WHITE;
+        buttons[i].color = BLACK;
         if (CheckCollisionPointRec(mousePosition, buttons[i].rect)) {
-            buttons[i].color = (Color) {255, 255, 255, 220};
+            buttons[i].color = Fade(BLACK, 0.6f);
+            buttons[i].rect.x += 2;
+            buttons[i].rect.y += 2;
             if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
                 mode = 1;
                 action = i + 1;
             }
         }
-        DrawRectangle(buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.width, buttons[i].rect.height,
-                      buttons[i].color);
-        DrawText(buttons[i].text, buttons[i].rect.x + 25, buttons[i].rect.y + 25, 20, BLACK);
+
+        // Draw shadow for 3D effect
+        DrawRectangleRounded((Rectangle){buttons[i].rect.x + 2, buttons[i].rect.y + 2, buttons[i].rect.width, buttons[i].rect.height},
+                             .3f, 16, buttons[i].color);
+
+        DrawRectangleRounded(buttons[i].rect, .3f, 16, buttons[i].color);
+
+        // Draw button label
+        int textWidth = MeasureText(buttons[i].text, 20);
+        Vector2 textPos = {buttons[i].rect.x + buttons[i].rect.width / 2 - textWidth / 2,
+                           buttons[i].rect.y + buttons[i].rect.height / 2 - 10};
+        DrawText(buttons[i].text, textPos.x, textPos.y, 20, kingdoms[turn].color);
     }
 }
 

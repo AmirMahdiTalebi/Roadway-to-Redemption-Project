@@ -1,51 +1,16 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "Map.h"
-#include "War.h"
-#include "monteCarlo.h"
 
 // Program main entry point
 int main() {
-
-    InitWindow(800, 200, "starting window");
-    while(!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(BLACK);
-        int TextSize = MeasureText("Press N to start a new game", 20);
-        DrawText("Press N to start a new game\nPress L to load the last game",
-                 800/2 - TextSize/2, 200/2 - 5, 20, GREEN);
-        ClearBackground(BLACK);
-        if (IsKeyPressed(KEY_N)) {
-            initialMapMaker();
-            makeKingdom();
-            makeVillage();
-            makeBarrier();
-            break;
-        }
-        if (IsKeyPressed(KEY_L)) {
-            FILE* fileReader;
-            fileReader = fopen("SavedGame.dat", "rb");
-            if (!fileReader) {
-                printf("Can't load the last game. pLease start a new one\n");
-                initialMapMaker();
-                makeKingdom();
-                makeVillage();
-                makeBarrier();
-            }
-            else {
-                gameState lastGame;
-                fread(&lastGame, sizeof(gameState), 1, fileReader);
-                LoadGame(&lastGame);
-            }
-            fclose(fileReader);
-            break;
-        }
-        EndDrawing();
-    }
-    CloseWindow();
     action = 0;
+    initialMapMaker();
+    makeKingdom();
+    makeVillage();
+    makeBarrier();
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "main game window");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "starting window");
 
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     Vector2 map0= {mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
@@ -73,7 +38,6 @@ int main() {
     float manTimer =MAN_TIME;
     float flameTimer = FLAME_TIME;
     int AnimationCounter = 0;
-
 
     //Main game loop
     while (!WindowShouldClose()) {
@@ -119,7 +83,6 @@ int main() {
             mode1();
 
         if (mode == 2) { //making roads
-            kingdoms[turn].availableNumber = 0;
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
 
             for (int i = 0; i <kingdoms[turn].roadNumber && check==0; ++i) {
@@ -127,26 +90,21 @@ int main() {
             }
 
             for(int i=0; i<villageNumber && check==0; i++) {
-                if(villages[i].kingdom == turn) {
+                if(villages[i].kingdom==turn) {
                     check = checkNeighbors(villages[i].x, villages[i].y, map0);
                 }
             }
-            for (int i = 0; i < kingdoms[turn].availableNumber; ++i) {
-                int mapX = (int)kingdoms[turn].available[i].x;
-                int mapY = (int)kingdoms[turn].available[i].y;
-                if (checkForWar(mapX, mapY)) {
-                    DrawRectangle(mapX * TILE_SIZE + map0.x, mapY * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentRed);
-                } else {
-                    DrawRectangle(mapX * TILE_SIZE + map0.x, mapY * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE, transparentGreen);
-                }
-            }
+
         }
 
         if (mode == 3) { //the end of the game
             DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
             char text[20];
             sprintf(text, "WINNER IS KINGDOM %d", winner);
-            DrawText(text, 200, 200, 40, BLACK);
+            int textWidth = MeasureText(text, 40);
+            Vector2 textPos = {SCREEN_WIDTH / 2 - textWidth / 2,
+                               SCREEN_HEIGHT / 2 - 22.5};
+            DrawText(text, textPos.x, textPos.y, 40, BLACK);
         }
 
         if (mode==4) { //animation
@@ -190,32 +148,8 @@ int main() {
         EndDrawing();
     }
 
-    CloseWindow();
 
-    InitWindow(500, 200, "quit screen");
-
-    while(!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(BLACK);
-        DrawText("Do you want to save the game?", 50, 100, 20, GREEN);
-        if (IsKeyPressed(KEY_Y)) {
-            gameState lastGame;
-            SaveGame(&lastGame);
-            FILE* fileWriter;
-            fileWriter = fopen("SavedGame.dat", "wb");
-            if (!fileWriter) {
-                printf("Can't save the game. SORRYYYYY T-T\n");
-            }
-            fwrite(&lastGame, sizeof(gameState), 1, fileWriter);
-            fclose(fileWriter);
-            break;
-        }
-        if (IsKeyPressed(KEY_N)) {
-            break;
-        }
-        EndDrawing();
-    }
-
+    // De-Initialization
     UnloadTexture(mapTileSet);
     UnloadTexture(GroundTile);
     UnloadTexture(Stone);
@@ -224,7 +158,6 @@ int main() {
     UnloadTexture(roadMan);
     UnloadTexture(explosion);
     UnloadFont(font);
-    // De-Initialization
     CloseWindow();
 
     return 0;
