@@ -96,7 +96,11 @@ int main() {
                     check = checkNeighbors(villages[i].x, villages[i].y);
                 }
             }
-
+            for (int i = 0; i < kingdoms[turn].availableNumber; ++i) {
+                DrawRectangle(kingdoms[turn].available[i].x * TILE_SIZE + map0.x
+                              , kingdoms[turn].available[i].y * TILE_SIZE + map0.y
+                              , TILE_SIZE, TILE_SIZE, transparentGreen);
+            }
         }
 
         if (mode == 3) { //the end of the game

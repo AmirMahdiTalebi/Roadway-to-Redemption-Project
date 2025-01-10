@@ -14,13 +14,14 @@ int winner;
 int turn = 1, kingdomNumber, villageNumber, opponent;
 int dijkstraX, dijkstraY;
 int list[MAP_SIZE*MAP_SIZE][5];
-int mode = 0;
+int mode = 0, monteCarlo;
 int MakeRoad = 0, roadX, roadY;
 int animation=0, toBeDeleted = 0;
 
 Vector2 mousePosition;
 Vector2 coordination;
 Vector2 manPos;
+Vector2 map0;
 
 Color transparentWhite = (Color){255, 255, 255, 60};
 Color transparentGreen = (Color){37, 204, 81, 90};
@@ -537,6 +538,8 @@ void RoadMaker() {
 
 void mode0() {
 
+    if (turn ==2 && kingdomNumber == 2 && !monteCarlo)
+        monte();
     do {
         if (turn > kingdomNumber) {
             turn = 1;
@@ -549,6 +552,7 @@ void mode0() {
         }
         if (kingdoms[turn].dead) turn++;
     } while(kingdoms[turn].dead);
+
 
     int kingdomVertexNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
     for(int i=0; i<villageNumber; i++) {
@@ -696,6 +700,7 @@ void SaveGame(gameState* game) {
         game->end = 1;
     else
         game->end = 0;
+    game->turn = turn;
 }
 
 void LoadGame(gameState* game) {
@@ -721,5 +726,6 @@ void LoadGame(gameState* game) {
         mode = 3;
     else
         mode = 0;
+    turn = game->turn;
 }
 

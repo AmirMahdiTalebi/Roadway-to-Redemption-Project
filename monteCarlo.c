@@ -4,9 +4,10 @@
 #include "raylib.h"
 #include "stdlib.h"
 #include <math.h>
+#include "stdio.h"
 
 #define constant 2
-#define iterations 10
+#define iterations 5
 
 node* root;
 int totalVisits;
@@ -15,8 +16,8 @@ typedef struct node node;
 
 void monte() {
     monteCarlo = 1;
-    node *current;
-    current = (node*) malloc(sizeof(node));
+    node *current = (node*) malloc(sizeof(node));
+    current->state = (gameState*) malloc(sizeof(gameState));
     current->parent = NULL;
     current->children = NULL;
     SaveGame(current->state);
@@ -32,15 +33,22 @@ void monte() {
         current = selection();
     }
 
-    node* bestMove = NULL;
+    node* bestMove;
     int maxSimulations = -1;
     for (int i = 0; i < root->childCount; i++) {
-        if (root->children[i]->visits> maxSimulations) {
+        if (root->children[i]->visits > maxSimulations) {
             maxSimulations = root->children[i]->visits;
             bestMove = root->children[i];
         }
     }
     LoadGame(bestMove->state);
+
+//    node* parent = root;
+//    while (parent->children) {
+//        for (int i = 0; i < parent->childCount; ++i) {
+//            free(parent->children[i]);
+//        }
+//    }
 }
 
 node* selection() {
@@ -67,6 +75,7 @@ void expand(node* parent) {
     parent->children = (node**)malloc(parent->childCount * sizeof(node*));
 
     for (int i = 0; i < parent->childCount; i++) {
+        parent->children[i] = (node*) malloc(sizeof (node));
         parent->children[i]->state = parent->state;
         parent->children[i]->parent = parent;
         parent->children[i]->children = NULL;
@@ -75,10 +84,12 @@ void expand(node* parent) {
         parent->children[i]->visits = 0;
 
         gameState *myState = parent->children[i]->state;
+        gameState changer=*myState;
+        LoadGame(&changer);
         int move = i;
         if (move <= myState->kingdom[myState->turn].availableNumber) {
-            roadX = myState->kingdom[myState->turn].available[move-1].x;
-            roadY = myState->kingdom[myState->turn].available[move-1].y;
+            roadX = myState->kingdom[myState->turn].available[move].x;
+            roadY = myState->kingdom[myState->turn].available[move].y;
             RoadMaker();
         }
         else {
@@ -103,12 +114,13 @@ void expand(node* parent) {
             else //do nothing
                 myState->turn++;
         }
+        free(myState);
     }
 }
 
 int simulation(gameState* state) {
-    gameState mainGame, changer=*state;
-    SaveGame(&mainGame);
+    gameState changer=*state;
+    LoadGame(&changer);
     while (!winner) {
             if (turn > kingdomNumber) {
                 turn = 1;
@@ -148,12 +160,11 @@ int simulation(gameState* state) {
                 changer.turn++;
         }
     }
-    LoadGame(&mainGame);
     return (winner == root->state->turn);
 }
 
 void backpropagation(node* node, int result) {
-    while (node != NULL) {
+    while (node) {
         node->visits++;
         node->winCount += result;
         node = node->parent;
@@ -179,5 +190,6 @@ int possibleMoves (gameState* state) {
     if (state->kingdom[state->turn].worker <4 && state->kingdom[state->turn].food >=3)
         moveCount++;
     moveCount+=2;
+    printf("%d\n", moveCount);
     return moveCount;
 }
