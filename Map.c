@@ -188,6 +188,7 @@ void makeKingdom() {
         printf("Too many kingdoms\nEnter the number of kingdoms:");
         scanf("%d", &kingdomNumber);
     }
+    if (kingdomNumber == 2) printf("First kingdom is yours and second is for computer.\n");
     kingdoms[0].dead = 1;
     for (int i = 1; i <= kingdomNumber; ++i) {
         printf("Enter x and y for the kingdom No.%d:\n", i);
@@ -534,7 +535,7 @@ void RoadMaker() {
 
 void mode0() {
 
-    if (turn ==2 && kingdomNumber == 2 && !monteCarlo)
+    if (turn == 2 && kingdomNumber == 2 && !monteCarlo)
         monte();
     do {
         if (turn > kingdomNumber) {
