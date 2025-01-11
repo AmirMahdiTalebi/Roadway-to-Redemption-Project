@@ -85,6 +85,7 @@ int main() {
             mode1();
 
         if (mode == 2) { //making roads
+            kingdoms[turn].availableNumber = 0;
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y);
 
             for (int i = 0; i <kingdoms[turn].roadNumber && check==0; ++i) {
