@@ -7,7 +7,7 @@
 #include "stdio.h"
 
 #define constant 2
-#define iterations 5
+#define iterations 1
 
 node* root;
 int totalVisits;
@@ -83,44 +83,41 @@ void expand(node* parent) {
         parent->children[i]->winCount = 0;
         parent->children[i]->visits = 0;
 
-        gameState *myState = parent->children[i]->state;
-        gameState changer=*myState;
-        LoadGame(&changer);
+        LoadGame(parent->state);
         int move = i;
-        if (move <= myState->kingdom[myState->turn].availableNumber) {
-            roadX = myState->kingdom[myState->turn].available[move].x;
-            roadY = myState->kingdom[myState->turn].available[move].y;
+        if (move < kingdoms[turn].availableNumber) {
+            roadX = kingdoms[turn].available[move].x;
+            roadY = kingdoms[turn].available[move].y;
             RoadMaker();
         }
         else {
-            if (move - myState->kingdom[myState->turn].availableNumber ==1) { //add food
-                if (myState->kingdom[myState->turn].foodX < 3 && myState->kingdom[myState->turn].worker < 4) {
+            if (move - kingdoms[turn].availableNumber ==0) { //add food
+                if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
                     action = 2;
                     mode1();
                 }
                 else move++;
             }
-            if (move - myState->kingdom[myState->turn].availableNumber == 2) { //add worker
-                if (myState->kingdom[myState->turn].worker <4 && myState->kingdom[myState->turn].food >=3) {
+            if (move - kingdoms[turn].availableNumber == 1) { //add worker
+                if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
                     action = 2;
                     mode1();
                 }
                 else move++;
             }
-            else if (myState->kingdom[myState->turn].gold >=2) { //add soldier
+            else if (kingdoms[turn].gold >=2) { //add soldier
                 action = 3;
                 mode1();
             }
             else //do nothing
-                myState->turn++;
+                turn++;
         }
-        free(myState);
+        SaveGame(parent->children[i]->state);
     }
 }
 
 int simulation(gameState* state) {
-    gameState changer=*state;
-    LoadGame(&changer);
+    LoadGame(state);
     while (!winner) {
             if (turn > kingdomNumber) {
                 turn = 1;
@@ -131,34 +128,36 @@ int simulation(gameState* state) {
                     kingdoms[i].gold += kingdoms[i].goldX;
                 }
             }
-        int move = GetRandomValue(1, possibleMoves(&changer)+4);
-        if (move <= changer.kingdom[changer.turn].availableNumber) {
-            roadX = changer.kingdom[changer.turn].available[move-1].x;
-            roadY = changer.kingdom[changer.turn].available[move-1].y;
+        int move = GetRandomValue(1, possibleMoves(state)+4);
+            printf("move = %d\n", move);
+        if (move <= kingdoms[turn].availableNumber) {
+            roadX = kingdoms[turn].available[move-1].x;
+            roadY = kingdoms[turn].available[move-1].y;
             RoadMaker();
         }
         else {
-            if (move - changer.kingdom[changer.turn].availableNumber ==1) { //add food
-                if (changer.kingdom[changer.turn].foodX < 3 && changer.kingdom[changer.turn].worker < 4) {
+            if (move - kingdoms[turn].availableNumber ==1) { //add food
+                if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
                     action = 2;
                     mode1();
                 }
                 else move++;
             }
-            if (move - changer.kingdom[changer.turn].availableNumber == 2) { //add worker
-                if (changer.kingdom[changer.turn].worker <4 && changer.kingdom[changer.turn].food >=3) {
+            if (move - kingdoms[turn].availableNumber == 2) { //add worker
+                if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
                     action = 2;
                     mode1();
                 }
                 else move++;
             }
-            else if (changer.kingdom[changer.turn].gold >=2) { //add soldier
+            else if (kingdoms[turn].gold >=2) { //add soldier
                 action = 3;
                 mode1();
             }
             else //do nothing
-                changer.turn++;
+                turn++;
         }
+        SaveGame(state);
     }
     return (winner == root->state->turn);
 }
@@ -172,24 +171,27 @@ void backpropagation(node* node, int result) {
 }
 
 int possibleMoves (gameState* state) {
-    state->kingdom[state->turn].availableNumber = 0;
-    int check = checkNeighbors(state->kingdom[state->turn].x, state->kingdom[state->turn].y);
+    LoadGame(state);
+    kingdoms[turn].availableNumber = 0;
+    checkNeighbors(kingdoms[turn].x, kingdoms[turn].y);
 
-    for (int i = 0; i <state->kingdom[state->turn].roadNumber && check==0; ++i) {
-        check = checkNeighbors(state->kingdom[state->turn].road[i].x, state->kingdom[state->turn].road[i].y);
+    for (int i = 0; i <kingdoms[turn].roadNumber; ++i) {
+        checkNeighbors(kingdoms[turn].road[i].x, kingdoms[turn].road[i].y);
     }
 
-    for(int i=0; i<state->villageNumber && check==0; i++) {
-        if(state->villages[i].kingdom == state->turn) {
-            check = checkNeighbors(state->villages[i].x, state->villages[i].y);
+    for(int i=0; i<villageNumber; i++) {
+        if(villages[i].kingdom ==turn) {
+            checkNeighbors(villages[i].x, villages[i].y);
         }
     }
-    int moveCount = state->kingdom[state->turn].roadNumber;
-    if (state->kingdom[state->turn].foodX < 3 && state->kingdom[state->turn].worker < 4)
+    int moveCount = kingdoms[turn].availableNumber;
+    if (state->kingdom[state->turn].foodX < 3 && state->kingdom[state->turn].worker < 4) {
         moveCount++;
-    if (state->kingdom[state->turn].worker <4 && state->kingdom[state->turn].food >=3)
+    }
+    if (state->kingdom[state->turn].worker <4 && state->kingdom[state->turn].food >=3) {
         moveCount++;
+    }
     moveCount+=2;
-    printf("%d\n", moveCount);
+    SaveGame(state);
     return moveCount;
 }
