@@ -8,7 +8,7 @@
 #include <limits.h>
 
 #define constant 2
-#define iterations 10
+#define iterations 100
 
 node root;
 
@@ -63,7 +63,7 @@ node selection() {
             } else {
                 ucb = INT_MAX;
             }
-            if (ucb > maxUCB) {
+            if (ucb > maxUCB && !parent->children[i]->state->end) {
                 maxUCB = ucb;
                 best = *parent->children[i];
             }
@@ -123,13 +123,13 @@ void expand(node* parent) {
         if (turn > kingdomNumber) {
             turn = 1;
             for (int k = 1; k <= kingdomNumber; k++) {
-                if (kingdoms[k].dead)
-                    continue;
                 kingdoms[k].food += kingdoms[k].foodX;
                 kingdoms[k].gold += kingdoms[k].goldX;
             }
         }
         SaveGame(parent->children[i]->state);
+        if (mode == 3)
+            parent->children[i]->state->end = 1;
     }
 }
 
