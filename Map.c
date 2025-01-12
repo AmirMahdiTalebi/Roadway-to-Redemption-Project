@@ -623,18 +623,8 @@ void mode1() {
     buttonsPosY = -100;
     switch (action) {
         case 1:
-            if (kingdoms[turn].gold >= 1) {
-                kingdoms[turn].gold--;
-                kingdoms[turn].food++;
-
-            } else {
-                DrawRectangle(90, 90, 710, 40, (Color) {222, 131, 124, 100});
-                DrawText("You don't have enough gold to buy food!!!", 100, 100, 30, RED);
-                EndDrawing();
-                WaitTime(2);
-                turn--;
-            }
-
+            kingdoms[turn].gold--;
+            kingdoms[turn].food++;
             break;
 
         case 2:
@@ -702,7 +692,7 @@ void SaveGame(gameState* game) {
 
 void LoadGame(gameState* game) {
     kingdomNumber = game->kingdomNumber;
-    for (int i = 1; i <= kingdomNumber; ++i) {
+    for (int i = 0; i <= kingdomNumber; ++i) {
         kingdoms[i] = game->kingdom[i];
     }
     villageNumber = game->villageNumber;
@@ -717,12 +707,12 @@ void LoadGame(gameState* game) {
                 map[k][j][i] = game->map[k][j][i];
             }
         }
-    }
-    winner = game-> winner;
-    if (game->end == 1)
-        mode = 3;
-    else
-        mode = 0;
-    turn = game->turn;
-}
 
+        winner = game->winner;
+        if (game->end == 1)
+            mode = 3;
+        else
+            mode = 0;
+        turn = game->turn;
+    }
+}

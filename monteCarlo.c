@@ -7,9 +7,9 @@
 #include "stdio.h"
 
 #define constant 2
-#define iterations 5
+#define iterations 10
 
-node* root;
+node root;
 
 typedef struct node node;
 
@@ -21,23 +21,28 @@ void monte() {
     current->children = NULL;
     SaveGame(current->state);
     current->visits=current->winCount=0;
-    root = current;
+    expand(current);
+    for (int j = 0; j < current->childCount; ++j) {
+        int gameResult = simulation(current->children[j]->state);
+        backpropagation(current->children[j],gameResult);
+    }
+    root = *current;
 
     for (int i = 0; i < iterations ; ++i) {
+        current = selection();
         expand(current);
         for (int j = 0; j < current->childCount; ++j) {
             int gameResult = simulation(current->children[j]->state);
             backpropagation(current->children[j],gameResult);
         }
-        current = selection();
     }
 
     node* bestMove;
     int maxSimulations = -1;
-    for (int i = 0; i < root->childCount; i++) {
-        if (root->children[i]->visits > maxSimulations) {
-            maxSimulations = root->children[i]->visits;
-            bestMove = root->children[i];
+    for (int i = 0; i < root.childCount; i++) {
+        if (root.children[i]->visits > maxSimulations) {
+            maxSimulations = root.children[i]->visits;
+            bestMove = root.children[i];
         }
     }
     LoadGame(bestMove->state);
@@ -47,13 +52,12 @@ node* selection() {
     node* best = NULL;
     double maxUCB;
     node* parent;
-    parent = root;
+    parent = &root;
     while (parent->children) {
         maxUCB = -1;
         for (int i = 0; i < parent->childCount; ++i) {
             double ucb = ((parent->children[i]->winCount/parent->children[i]->visits) +
-                       constant* sqrt(log(root->visits)/parent->children[i]->visits));
-            printf("ucb = %lf\n", ucb);
+                       constant* sqrt(log(root.visits)/parent->children[i]->visits));
             if (ucb > maxUCB) {
                 maxUCB = ucb;
                 best = parent->children[i];
@@ -70,43 +74,44 @@ void expand(node* parent) {
 
     for (int i = 0; i < parent->childCount; i++) {
         parent->children[i] = (node*) malloc(sizeof (node));
-        parent->children[i]->state = parent->state;
+        parent->children[i]->state = (gameState*) malloc(sizeof (gameState));
+        *parent->children[i]->state = *parent->state;
         parent->children[i]->parent = parent;
         parent->children[i]->children = NULL;
         parent->children[i]->childCount = 0;
         parent->children[i]->winCount = 0;
         parent->children[i]->visits = 0;
 
-        LoadGame(parent->state);
-        int move = i;
-        if (move < kingdoms[turn].availableNumber) {
+        LoadGame(parent->children[i]->state);
+        int move = i+1;
+        if (move <= kingdoms[turn].availableNumber) {
             roadX = kingdoms[turn].available[move].x;
             roadY = kingdoms[turn].available[move].y;
             RoadMaker();
         }
         else {
-            if (move - kingdoms[turn].availableNumber ==0) { //add food
+            if (move - kingdoms[turn].availableNumber ==1) { //add food
                 if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
                     action = 1;
                     mode1();
                 }
                 else move++;
             }
-            if (move - kingdoms[turn].availableNumber == 1) { //add worker
+            if (move - kingdoms[turn].availableNumber == 2) { //add worker
                 if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
                     action = 2;
                     mode1();
                 }
                 else move++;
             }
-            if (move - kingdoms[turn].availableNumber == 2) { //add soldier
+            if (move - kingdoms[turn].availableNumber == 3) { //add soldier
                 if (kingdoms[turn].gold >=2) {
                     action = 3;
                     mode1();
                 }
                 else move++;
             }
-            if (move - kingdoms[turn].availableNumber == 3) { //do nothing
+            if (move - kingdoms[turn].availableNumber == 4) { //do nothing
                 turn++;
             }
         }
@@ -124,9 +129,9 @@ void expand(node* parent) {
 }
 
 int simulation(gameState* state) {
-    gameState * save = state;
     LoadGame(state);
-    turn++;
+    gameState *save = (gameState*) malloc(sizeof(gameState));
+    *save = *state;
     while (!winner) {
         if (turn > kingdomNumber) {
             turn = 1;
@@ -140,48 +145,38 @@ int simulation(gameState* state) {
         SaveGame(state);
         int move = GetRandomValue(1, possibleMoves(state));
 
-        printf("move = %d\n", move);
-        printf("available = %d\n", kingdoms[turn].availableNumber);
-
         if (move <= kingdoms[turn].availableNumber) {
             roadX = kingdoms[turn].available[move - 1].x;
             roadY = kingdoms[turn].available[move - 1].y;
             RoadMaker();
-
-            printf("made a road!\n");
 
         } else {
             if (move - kingdoms[turn].availableNumber == 1) { //add food
                 if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
                     action = 1;
                     mode1();
-                    printf("bought food\n");
                 } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 2) { //add worker
                 if (kingdoms[turn].worker < 4 && kingdoms[turn].food >= 3) {
                     action = 2;
                     mode1();
-                    printf("hired a worker!\n");
                 } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 3) {
                 if (kingdoms[turn].gold >= 2) { //add soldier
                     action = 3;
                     mode1();
-                    printf("hired a soldier!\n");
                 } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 4) //do nothing
             {
                 turn++;
-                printf("nothing!\n");
             }
         }
     }
-    printf("winner = %d\n", winner);
-    state = save;
-    return (winner == root->state->turn);
+    *state = *save;
+    return (winner == 2);
 }
 
 void backpropagation(node* node, int result) {
@@ -214,7 +209,6 @@ int possibleMoves (gameState* state) {
         moveCount++;
     }
     moveCount+=2;
-    printf("possible kingdom %d moves are %d\n",turn,  moveCount);
     SaveGame(state);
     return moveCount;
 }
