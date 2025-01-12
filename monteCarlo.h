@@ -21,6 +21,7 @@ node* selection();
 void expand(node* parent);
 int simulation(gameState* state);
 void backpropagation(node* node, int result);
-int possibleMoves(gameState* state) ;
+int possibleMoves(gameState* state);
+void freeTree(node *root);
 
 #endif //MAIN_C_MONTECARLO_H

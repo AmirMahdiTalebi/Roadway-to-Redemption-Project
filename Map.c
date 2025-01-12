@@ -626,7 +626,6 @@ void mode1() {
             kingdoms[turn].gold--;
             kingdoms[turn].food++;
             break;
-
         case 2:
             if (kingdoms[turn].food >= 3) {
                 kingdoms[turn].food -= 3;
@@ -659,7 +658,7 @@ void mode1() {
             break;
     }
     if (mode==1) {
-        mode = 0;
+        if (!monteCarlo) mode = 0;
         turn++;
     }
 }

@@ -5,6 +5,7 @@
 #include "stdlib.h"
 #include <math.h>
 #include "stdio.h"
+#include <limits.h>
 
 #define constant 2
 #define iterations 10
@@ -29,12 +30,12 @@ void monte() {
     root = *current;
 
     for (int i = 0; i < iterations ; ++i) {
-        current = selection();
         expand(current);
         for (int j = 0; j < current->childCount; ++j) {
             int gameResult = simulation(current->children[j]->state);
             backpropagation(current->children[j],gameResult);
         }
+        current = selection();
     }
 
     node* bestMove;
@@ -46,6 +47,9 @@ void monte() {
         }
     }
     LoadGame(bestMove->state);
+    monteCarlo = 0;
+    mode = 0;
+    freeTree(&root);
 }
 
 node* selection() {
@@ -56,8 +60,13 @@ node* selection() {
     while (parent->children) {
         maxUCB = -1;
         for (int i = 0; i < parent->childCount; ++i) {
-            double ucb = ((parent->children[i]->winCount/parent->children[i]->visits) +
+            double ucb;
+            if (parent->children[i]->visits != 0) {
+                ucb = ((parent->children[i]->winCount/parent->children[i]->visits) +
                        constant* sqrt(log(root.visits)/parent->children[i]->visits));
+            } else {
+                ucb = INT_MAX;
+            }
             if (ucb > maxUCB) {
                 maxUCB = ucb;
                 best = parent->children[i];
@@ -75,7 +84,7 @@ void expand(node* parent) {
     for (int i = 0; i < parent->childCount; i++) {
         parent->children[i] = (node*) malloc(sizeof (node));
         parent->children[i]->state = (gameState*) malloc(sizeof (gameState));
-        *parent->children[i]->state = *parent->state;
+        parent->children[i]->state = parent->state;
         parent->children[i]->parent = parent;
         parent->children[i]->children = NULL;
         parent->children[i]->childCount = 0;
@@ -130,14 +139,11 @@ void expand(node* parent) {
 
 int simulation(gameState* state) {
     LoadGame(state);
-    gameState *save = (gameState*) malloc(sizeof(gameState));
-    *save = *state;
+    gameState save = *state;
     while (!winner) {
         if (turn > kingdomNumber) {
             turn = 1;
             for (int i = 1; i <= kingdomNumber; i++) {
-                if (kingdoms[i].dead)
-                    continue;
                 kingdoms[i].food += kingdoms[i].foodX;
                 kingdoms[i].gold += kingdoms[i].goldX;
             }
@@ -175,8 +181,9 @@ int simulation(gameState* state) {
             }
         }
     }
-    *state = *save;
-    return (winner == 2);
+    int result = (winner == 2);
+    *state = save;
+    return result;
 }
 
 void backpropagation(node* node, int result) {
@@ -208,7 +215,19 @@ int possibleMoves (gameState* state) {
     if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
         moveCount++;
     }
-    moveCount+=2;
+    moveCount += 2;
     SaveGame(state);
     return moveCount;
+}
+
+void freeTree(node *root) {
+    if (!root) return;
+
+    for (int i = 0; i < root->childCount; ++i) {
+        freeTree(root->children[i]);
+    }
+
+    free(root->state);
+    free(root->children);
+    free(root);
 }

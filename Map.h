@@ -94,7 +94,6 @@ extern village villages[30];
 extern kingdom kingdoms[6];
 
 // Functions' Prototypes
-//int generate_number();
 void initialMapMaker();
 void makeKingdom();
 void makeVillage();
