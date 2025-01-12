@@ -17,7 +17,7 @@ typedef struct node {
 } node;
 
 void monte();
-node* selection();
+node selection();
 void expand(node* parent);
 int simulation(gameState* state);
 void backpropagation(node* node, int result);

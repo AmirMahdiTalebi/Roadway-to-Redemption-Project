@@ -16,18 +16,13 @@ typedef struct node node;
 
 void monte() {
     monteCarlo = 1;
-    node *current = (node*) malloc(sizeof(node));
-    current->state = (gameState*) malloc(sizeof(gameState));
-    current->parent = NULL;
-    current->children = NULL;
-    SaveGame(current->state);
-    current->visits=current->winCount=0;
-    expand(current);
-    for (int j = 0; j < current->childCount; ++j) {
-        int gameResult = simulation(current->children[j]->state);
-        backpropagation(current->children[j],gameResult);
-    }
-    root = *current;
+    node *current;
+    root.state = (gameState*) malloc(sizeof(gameState));
+    root.parent = NULL;
+    root.children = NULL;
+    SaveGame(root.state);
+    root.visits=root.winCount=0;
+    current = &root;
 
     for (int i = 0; i < iterations ; ++i) {
         expand(current);
@@ -35,7 +30,8 @@ void monte() {
             int gameResult = simulation(current->children[j]->state);
             backpropagation(current->children[j],gameResult);
         }
-        current = selection();
+        node nodeCurrent = selection();
+        current = &nodeCurrent;
     }
 
     node* bestMove;
@@ -49,11 +45,11 @@ void monte() {
     LoadGame(bestMove->state);
     monteCarlo = 0;
     mode = 0;
-    freeTree(&root);
+    //freeTree(&root);
 }
 
-node* selection() {
-    node* best = NULL;
+node selection() {
+    node best;
     double maxUCB;
     node* parent;
     parent = &root;
@@ -69,10 +65,10 @@ node* selection() {
             }
             if (ucb > maxUCB) {
                 maxUCB = ucb;
-                best = parent->children[i];
+                best = *parent->children[i];
             }
         }
-        parent = best;
+        parent = &best;
     }
     return best;
 }
@@ -84,7 +80,7 @@ void expand(node* parent) {
     for (int i = 0; i < parent->childCount; i++) {
         parent->children[i] = (node*) malloc(sizeof (node));
         parent->children[i]->state = (gameState*) malloc(sizeof (gameState));
-        parent->children[i]->state = parent->state;
+        *parent->children[i]->state = *parent->state;
         parent->children[i]->parent = parent;
         parent->children[i]->children = NULL;
         parent->children[i]->childCount = 0;
@@ -139,7 +135,8 @@ void expand(node* parent) {
 
 int simulation(gameState* state) {
     LoadGame(state);
-    gameState save = *state;
+    gameState *save = (gameState*) malloc(sizeof(gameState));
+    *save = *state;
     while (!winner) {
         if (turn > kingdomNumber) {
             turn = 1;
@@ -181,9 +178,8 @@ int simulation(gameState* state) {
             }
         }
     }
-    int result = (winner == 2);
-    *state = save;
-    return result;
+    *state = *save;
+    return (winner == root.state->turn);
 }
 
 void backpropagation(node* node, int result) {
@@ -192,6 +188,8 @@ void backpropagation(node* node, int result) {
         node->winCount += result;
         node = node->parent;
     }
+    root.visits++;
+    root.winCount += result;
 }
 
 int possibleMoves (gameState* state) {
@@ -220,14 +218,20 @@ int possibleMoves (gameState* state) {
     return moveCount;
 }
 
-void freeTree(node *root) {
-    if (!root) return;
+void freeTree(node *parent) {
+    if (!parent) return;
 
-    for (int i = 0; i < root->childCount; ++i) {
-        freeTree(root->children[i]);
+    for (int i = 0; i < parent->childCount; ++i) {
+        freeTree(parent->children[i]);
+        parent->children[i] = NULL;
     }
 
-    free(root->state);
-    free(root->children);
-    free(root);
+    free(parent->state);
+    parent->state = NULL;
+    if (parent->children) {
+        free(parent->children);
+        parent->children = NULL;
+    }
+    free(parent);
+    parent = NULL;
 }
