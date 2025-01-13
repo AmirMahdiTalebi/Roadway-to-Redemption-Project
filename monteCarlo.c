@@ -7,8 +7,8 @@
 #include "stdio.h"
 #include <limits.h>
 
-#define constant 2
-#define iterations 100
+#define constant 1.5
+#define iterations 200
 
 node root;
 
@@ -30,29 +30,31 @@ void monte() {
             int gameResult = simulation(current->children[j]->state);
             backpropagation(current->children[j],gameResult);
         }
-        node nodeCurrent = selection();
-        current = &nodeCurrent;
+        current = selection();
     }
 
-    node* bestMove;
+    gameState bestMove;
     int maxSimulations = -1;
     for (int i = 0; i < root.childCount; i++) {
         if (root.children[i]->visits > maxSimulations) {
             maxSimulations = root.children[i]->visits;
-            bestMove = root.children[i];
+            bestMove = *root.children[i]->state;
         }
+        printf("%d visits\n", root.children[i]->visits);
     }
-    LoadGame(bestMove->state);
+    printf("\n");
+    LoadGame(&bestMove);
     monteCarlo = 0;
     mode = 0;
     //freeTree(&root);
 }
 
-node selection() {
-    node best;
+node* selection() {
+    node* best;
     double maxUCB;
     node* parent;
-    parent = &root;
+    parent = (node*) malloc(sizeof(node));
+    *parent = root;
     while (parent->children) {
         maxUCB = -1;
         for (int i = 0; i < parent->childCount; ++i) {
@@ -65,10 +67,10 @@ node selection() {
             }
             if (ucb > maxUCB && !parent->children[i]->state->end) {
                 maxUCB = ucb;
-                best = *parent->children[i];
+                best = parent->children[i];
             }
         }
-        parent = &best;
+        parent = best;
     }
     return best;
 }
@@ -78,8 +80,8 @@ void expand(node* parent) {
     parent->children = (node**)malloc(parent->childCount * sizeof(node*));
 
     for (int i = 0; i < parent->childCount; i++) {
-        parent->children[i] = (node*) malloc(sizeof (node));
-        parent->children[i]->state = (gameState*) malloc(sizeof (gameState));
+        parent->children[i] = (node *) malloc(sizeof(node));
+        parent->children[i]->state = (gameState *) malloc(sizeof(gameState));
         *parent->children[i]->state = *parent->state;
         parent->children[i]->parent = parent;
         parent->children[i]->children = NULL;
@@ -88,33 +90,32 @@ void expand(node* parent) {
         parent->children[i]->visits = 0;
 
         LoadGame(parent->children[i]->state);
-        int move = i+1;
+        int move = i + 1;
         if (move <= kingdoms[turn].availableNumber) {
-            roadX = kingdoms[turn].available[move].x;
-            roadY = kingdoms[turn].available[move].y;
+            roadX = kingdoms[turn].available[move - 1].x;
+            roadY = kingdoms[turn].available[move - 1].y;
             RoadMaker();
-        }
-        else {
-            if (move - kingdoms[turn].availableNumber ==1) { //add food
+        } else {
+            if (move - kingdoms[turn].availableNumber == 1) { //add food
                 if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
-                    action = 1;
-                    mode1();
-                }
-                else move++;
+                    kingdoms[turn].gold--;
+                    kingdoms[turn].food++;
+                    turn++;
+                } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 2) { //add worker
-                if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
-                    action = 2;
-                    mode1();
-                }
-                else move++;
+                if (kingdoms[turn].worker < 4 && kingdoms[turn].food >= 3) {
+                    kingdoms[turn].food -= 3;
+                    kingdoms[turn].worker++;
+                    turn++;
+                } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 3) { //add soldier
-                if (kingdoms[turn].gold >=2) {
-                    action = 3;
-                    mode1();
-                }
-                else move++;
+                if (kingdoms[turn].gold >= 2) {
+                    kingdoms[turn].gold -= 2;
+                    kingdoms[turn].soldier++;
+                    turn++;
+                } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 4) { //do nothing
                 turn++;
@@ -137,7 +138,7 @@ int simulation(gameState* state) {
     LoadGame(state);
     gameState *save = (gameState*) malloc(sizeof(gameState));
     *save = *state;
-    while (!winner) {
+    for (int k = 0; k < mapWidth*mapHeight && !winner; ++k)  {
         if (turn > kingdomNumber) {
             turn = 1;
             for (int i = 1; i <= kingdomNumber; i++) {
@@ -145,8 +146,8 @@ int simulation(gameState* state) {
                 kingdoms[i].gold += kingdoms[i].goldX;
             }
         }
-        SaveGame(state);
-        int move = GetRandomValue(1, possibleMoves(state));
+        SaveGame(save);
+        int move = GetRandomValue(1, possibleMoves(save));
 
         if (move <= kingdoms[turn].availableNumber) {
             roadX = kingdoms[turn].available[move - 1].x;
@@ -156,20 +157,23 @@ int simulation(gameState* state) {
         } else {
             if (move - kingdoms[turn].availableNumber == 1) { //add food
                 if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
-                    action = 1;
-                    mode1();
+                    kingdoms[turn].gold--;
+                    kingdoms[turn].food++;
+                    turn++;
                 } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 2) { //add worker
                 if (kingdoms[turn].worker < 4 && kingdoms[turn].food >= 3) {
-                    action = 2;
-                    mode1();
+                    kingdoms[turn].food -= 3;
+                    kingdoms[turn].worker++;
+                    turn++;
                 } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 3) {
                 if (kingdoms[turn].gold >= 2) { //add soldier
-                    action = 3;
-                    mode1();
+                    kingdoms[turn].gold -= 2;
+                    kingdoms[turn].soldier++;
+                    turn++;
                 } else move++;
             }
             if (move - kingdoms[turn].availableNumber == 4) //do nothing
@@ -178,18 +182,17 @@ int simulation(gameState* state) {
             }
         }
     }
-    *state = *save;
-    return (winner == root.state->turn);
+    if (winner)
+        save->end = 1;
+    return ((save->end && winner == root.state->turn) || (save->kingdom[1].soldier <= save->kingdom[2].soldier));
 }
 
 void backpropagation(node* node, int result) {
-    while (node) {
+    while (node != NULL) {
         node->visits++;
         node->winCount += result;
         node = node->parent;
     }
-    root.visits++;
-    root.winCount += result;
 }
 
 int possibleMoves (gameState* state) {
@@ -213,7 +216,9 @@ int possibleMoves (gameState* state) {
     if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
         moveCount++;
     }
-    moveCount += 2;
+    if (kingdoms[turn].gold>=2)
+        moveCount++;
+    moveCount ++;
     SaveGame(state);
     return moveCount;
 }
