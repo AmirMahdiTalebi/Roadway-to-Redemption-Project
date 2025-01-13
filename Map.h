@@ -25,7 +25,7 @@ extern Vector2 manPos;
 extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, opponent, winner, dijkstraX, dijkstraY;
 extern int list[MAP_SIZE*MAP_SIZE][5];
-extern int mode, monteCarlo;
+extern int mode, isPlayingWithMonte;
 extern int MakeRoad, roadX, roadY;
 
 extern Vector2 mousePosition;
@@ -99,7 +99,7 @@ void makeKingdom();
 void makeVillage();
 void makeBarrier();
 int dijkstraPath(int source, int id, int size);
-void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Font font);
+void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Texture2D quoteBox, Font font, Font myFont);
 int checkNeighbors(int x, int y);
 void RoadMaker();
 void mode0();

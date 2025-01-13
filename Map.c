@@ -14,7 +14,7 @@ int winner;
 int turn = 1, kingdomNumber, villageNumber, opponent;
 int dijkstraX, dijkstraY;
 int list[MAP_SIZE*MAP_SIZE][5];
-int mode = 0, monteCarlo;
+int mode = 0, isPlayingWithMonte = 0;
 int MakeRoad = 0, roadX, roadY;
 int animation=0, toBeDeleted = 0;
 
@@ -188,7 +188,18 @@ void makeKingdom() {
         printf("Too many kingdoms\nEnter the number of kingdoms:");
         scanf("%d", &kingdomNumber);
     }
-    if (kingdomNumber == 2) printf("First kingdom is yours and second is for computer.\n");
+    if (kingdomNumber == 2) {
+        char gameMode;
+        printf("Do you want to play with computer? (Y,N)\n");
+        scanf("%c", &gameMode);
+        while (gameMode != 'y' && gameMode != 'Y' && gameMode != 'N' && gameMode != 'n') {
+            scanf("%c", &gameMode);
+        }
+        if (gameMode == 'Y' || gameMode == 'y') {
+            isPlayingWithMonte = 1;
+            printf("First kingdom is yours and second is for computer.\n");
+        }
+    }
     kingdoms[0].dead = 1;
     for (int i = 1; i <= kingdomNumber; ++i) {
         printf("Enter x and y for the kingdom No.%d:\n", i);
@@ -282,7 +293,7 @@ void makeBarrier() {
     }
 }
 
-void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Font font) {
+void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House,Texture2D Stone, Texture2D quoteBox, Font font, Font myFont) {
     DrawTexture(mapTileSet, 0,0, WHITE);
     for(int i=0; i<mapWidth; i++) {
         for (int j = 0; j < mapHeight; j++) {
@@ -341,14 +352,12 @@ void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Tex
                                   (villages[id].path[k] / mapWidth) * TILE_SIZE + map0.y,
                                   TILE_SIZE, TILE_SIZE, transparentWhite);
                 }
-                //village info
-                DrawRectangle((i - 1.3) * TILE_SIZE + map0.x, (j - 0.2) * TILE_SIZE + map0.y, (1.7) * TILE_SIZE,
-                              (1.2) * TILE_SIZE, (Color) {56, 125, 55, 100});
+//                village info
+                DrawTexture(quoteBox, (i-1) * TILE_SIZE + map0.x, (j-1) * TILE_SIZE + map0.y, WHITE);
                 char goldFood[30];
                 sprintf(goldFood, "%d gold\n%d food", villages[id].goldX, villages[id].foodX);
-                DrawTextEx(font, goldFood, (Vector2) {(i - 1.3) * TILE_SIZE + map0.x, (j - 0.1) * TILE_SIZE + map0.y},
-                           20, 1, (Color) {35, 97, 34, 200});
-
+                DrawTextEx(myFont, goldFood, (Vector2) {(i-.85) * TILE_SIZE + map0.x, (j-.85) * TILE_SIZE + map0.y},
+                           20, 1, Fade(kingdoms[villages[id].kingdom].color, .5));
             }
         }
     }
@@ -464,7 +473,7 @@ void RoadMaker() {
             if (warType == 3) { // All-out war
                 if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
                     toBeDeleted = opponent;
-                    if (monteCarlo) {
+                    if (isPlayingWithMonte && turn == 2) {
                         DeleteKingdom(toBeDeleted);
                         return;
                     }
@@ -474,7 +483,7 @@ void RoadMaker() {
                     return;
                 } else if (kingdoms[opponent].soldier > kingdoms[turn].soldier) {
                     toBeDeleted = turn;
-                    if (monteCarlo) {
+                    if (isPlayingWithMonte && turn == 2) {
                         DeleteKingdom(toBeDeleted);
                         return;
                     }
@@ -535,7 +544,7 @@ void RoadMaker() {
 
 void mode0() {
 
-    if (turn == 2 && kingdomNumber == 2 && !monteCarlo)
+    if (turn == 2 && kingdomNumber == 2 && isPlayingWithMonte)
         monte();
     do {
         if (turn > kingdomNumber) {
@@ -596,7 +605,7 @@ void mode0() {
         buttons[i].rect.height = 65;
         buttons[i].color = BLACK;
         if (CheckCollisionPointRec(mousePosition, buttons[i].rect)) {
-            buttons[i].color = Fade(BLACK, 0.6f);
+            buttons[i].color = Fade(BLACK, 0.7f);
             buttons[i].rect.x += 2;
             buttons[i].rect.y += 2;
             if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
@@ -658,7 +667,7 @@ void mode1() {
             break;
     }
     if (mode==1) {
-        if (!monteCarlo) mode = 0;
+        mode = 0;
         turn++;
     }
 }

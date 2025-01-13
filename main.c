@@ -11,7 +11,7 @@ int main() {
         ClearBackground(BLACK);
         int TextSize = MeasureText("Press N to start a new game", 20);
         DrawText("Press N to start a new game\nPress L to load the last game",
-                 800/2 - TextSize/2, 200/2 - 5, 20, GREEN);
+                 800/2 - TextSize/2, 200/2 - 25, 20, GREEN);
         ClearBackground(BLACK);
         if (IsKeyPressed(KEY_N)) {
             initialMapMaker();
@@ -50,15 +50,17 @@ int main() {
 
     buttonsPosY = -100;
 
-    Texture2D mapTileSet = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\initial map (1).png");
-    Texture2D GroundTile = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\tilecrop (1).png");
-    Texture2D Castle = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone castle.png");
-    Texture2D Stone = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\stone2.png");
-    Texture2D House = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\house.png");
-    Texture2D roadMan = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\SteamMan_attack1.png");
-    Texture2D explosion = LoadTexture("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\explosion.png");
+    Texture2D mapTileSet = LoadTexture("..\\assets\\initial map (1).png");
+    Texture2D GroundTile = LoadTexture("..\\assets\\tilecrop (1).png");
+    Texture2D Castle = LoadTexture("..\\assets\\stone castle.png");
+    Texture2D Stone = LoadTexture("..\\assets\\stone2.png");
+    Texture2D House = LoadTexture("..\\assets\\house.png");
+    Texture2D roadMan = LoadTexture("..\\assets\\SteamMan_attack1.png");
+    Texture2D explosion = LoadTexture("..\\assets\\explosion.png");
+    Texture2D quoteBox = LoadTexture("..\\assets\\Quote-box.png");
 
-    Font font= LoadFont("D:\\roadway\\Roadway-to-Redemption-Project\\assets\\pixantiqua.png");
+    Font font= LoadFont("..\\assets\\pixantiqua.png");
+    Font myFont = LoadFontEx("..\\SpaceMono-Bold.ttf", 32, NULL, 0);
 
     kingdoms[0].color = WHITE;
     kingdoms[1].color = (Color){103, 135, 194, 255};
@@ -78,13 +80,11 @@ int main() {
         mousePosition = GetMousePosition();
         coordination = (Vector2){(int) ((mousePosition.x - map0.x) / TILE_SIZE), (int) ((mousePosition.y - map0.y) / TILE_SIZE)};
 
-        monteCarlo = 0;
-
         BeginDrawing();
 
         ClearBackground(BLACK);
 
-        mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, font);
+        mapDrawer(mapTileSet, GroundTile, Castle, House, Stone, quoteBox, font ,myFont);
 
         for (int i = 0; i < kingdomNumber; ++i) { //show kingdoms' info
             char text[50];
@@ -107,7 +107,6 @@ int main() {
             DrawText(text, SCREEN_WIDTH - 285, 125 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
             sprintf(text, "Villages = %d", kingdoms[i+1].villageNumber);
             DrawText(text, SCREEN_WIDTH - 285, 150 + (SCREEN_HEIGHT / kingdomNumber) * i, 20, textColor);
-            DrawRectangle(SCREEN_WIDTH - 300, (SCREEN_HEIGHT / kingdomNumber) * i - 4, 300, 4, GREEN);
         }
 
 

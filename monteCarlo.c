@@ -15,7 +15,6 @@ node root;
 typedef struct node node;
 
 void monte() {
-    monteCarlo = 1;
     node *current;
     root.state = (gameState*) malloc(sizeof(gameState));
     root.parent = NULL;
@@ -44,9 +43,8 @@ void monte() {
     }
     printf("\n");
     LoadGame(&bestMove);
-    monteCarlo = 0;
     mode = 0;
-    //freeTree(&root);
+//    freeTree(&root);
 }
 
 node* selection() {
@@ -148,12 +146,20 @@ int simulation(gameState* state) {
         }
         SaveGame(save);
         int move = GetRandomValue(1, possibleMoves(save));
-
         if (move <= kingdoms[turn].availableNumber) {
             roadX = kingdoms[turn].available[move - 1].x;
             roadY = kingdoms[turn].available[move - 1].y;
-            RoadMaker();
-
+            int opponentTurn;
+            if (turn == 2) opponentTurn = 1;
+            else opponentTurn = 2;
+            if (checkForWar(roadX, roadY) && kingdoms[turn].soldier < kingdoms[opponentTurn].soldier) {
+                if (kingdoms[turn].gold >= 2) { //add soldier
+                    kingdoms[turn].gold -= 2;
+                    kingdoms[turn].soldier++;
+                }
+                turn++; //Do Nothing
+            }
+            else RoadMaker();
         } else {
             if (move - kingdoms[turn].availableNumber == 1) { //add food
                 if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
@@ -228,15 +234,9 @@ void freeTree(node *parent) {
 
     for (int i = 0; i < parent->childCount; ++i) {
         freeTree(parent->children[i]);
-        parent->children[i] = NULL;
     }
 
     free(parent->state);
-    parent->state = NULL;
-    if (parent->children) {
-        free(parent->children);
-        parent->children = NULL;
-    }
+    free(parent->children);
     free(parent);
-    parent = NULL;
 }
