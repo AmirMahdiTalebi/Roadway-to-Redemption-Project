@@ -27,7 +27,7 @@ void monte() {
         expand(current);
         for (int j = 0; j < current->childCount; ++j) {
             int gameResult = simulation(current->children[j]->state);
-            backpropagation(current->children[j],gameResult);
+            backpropagation(current->children[j], gameResult);
         }
         current = selection();
     }
@@ -215,6 +215,22 @@ int possibleMoves (gameState* state) {
             checkNeighbors(villages[i].x, villages[i].y);
         }
     }
+
+    for (int i = 0; i < kingdoms[turn].availableNumber; ++i) {
+        int availableX = kingdoms[turn].available[i].x;
+        int availableY = kingdoms[turn].available[i].y;
+        int opponentTurn;
+        if (turn == 2) opponentTurn = 1;
+        else opponentTurn = 2;
+        if (checkForWar(availableX, availableY) && kingdoms[turn].soldier < kingdoms[opponentTurn].soldier) {
+            for (int j = i; j < kingdoms[turn].availableNumber; ++j) {
+                kingdoms[turn].available[j] = kingdoms[turn].available[j+1];
+            }
+            kingdoms[turn].availableNumber--;
+            i--;
+        }
+    }
+
     int moveCount = kingdoms[turn].availableNumber;
     if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
         moveCount++;
@@ -238,5 +254,5 @@ void freeTree(node *parent) {
 
     free(parent->state);
     free(parent->children);
-    free(parent);
+    if (parent != &root) free(parent);
 }

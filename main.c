@@ -139,11 +139,11 @@ int main() {
         if (mode == 3) { //the end of the game
             DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
             char text[20];
-            sprintf(text, "WINNER IS KINGDOM %d", winner);
+            sprintf(text, "Winner Is Kingdom %d", winner);
             int textWidth = MeasureText(text, 40);
             Vector2 textPos = {SCREEN_WIDTH / 2 - textWidth / 2,
-                               SCREEN_HEIGHT / 2 - 22.5};
-            DrawText(text, textPos.x, textPos.y, 40, BLACK);
+                               SCREEN_HEIGHT / 2 - 50};
+            DrawTextEx(myFont, text, textPos, 40, 10, BLACK);
         }
 
         if (mode==4) { //animation
@@ -228,6 +228,7 @@ int main() {
     UnloadTexture(roadMan);
     UnloadTexture(explosion);
     UnloadFont(font);
+    UnloadFont(myFont);
     CloseWindow();
 
     return 0;
