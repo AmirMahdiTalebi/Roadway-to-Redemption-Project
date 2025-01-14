@@ -599,7 +599,8 @@ void mode0() {
     strcpy(buttons[4].text, "Do nothing");
     for (int i = 0; i < 5; ++i) {
         buttons[i].rect.x = 30 + 175 * i;
-        if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 35;
+        if (isPlayingWithMonte) buttonsPosY = 20;
+        else if (buttonsPosY < 20) buttonsPosY += GetFrameTime() * 35;
         buttons[i].rect.y = buttonsPosY;
         buttons[i].rect.width = 150;
         buttons[i].rect.height = 65;
@@ -629,7 +630,7 @@ void mode0() {
 }
 
 void mode1() {
-    buttonsPosY = -100;
+    if (!isPlayingWithMonte) buttonsPosY = -100;
     switch (action) {
         case 1:
             kingdoms[turn].gold--;

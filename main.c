@@ -48,7 +48,7 @@ int main() {
     Vector2 mapCenter= {TILE_SIZE*12, TILE_SIZE*11};
     map0= (Vector2){mapCenter.x - (mapWidth*TILE_SIZE/2), mapCenter.y - (mapHeight*TILE_SIZE/2)};
 
-    buttonsPosY = -100;
+    if (!isPlayingWithMonte) buttonsPosY = -100;
 
     Texture2D mapTileSet = LoadTexture("..\\assets\\initial map (1).png");
     Texture2D GroundTile = LoadTexture("..\\assets\\tilecrop (1).png");

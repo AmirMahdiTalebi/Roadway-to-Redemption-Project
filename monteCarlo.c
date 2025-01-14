@@ -43,8 +43,7 @@ void monte() {
     }
     printf("\n");
     LoadGame(&bestMove);
-    mode = 0;
-//    freeTree(&root);
+    freeTree(&root);
 }
 
 node* selection() {
@@ -70,6 +69,8 @@ node* selection() {
         }
         parent = best;
     }
+    parent = NULL;
+    free(parent);
     return best;
 }
 
@@ -246,7 +247,7 @@ int possibleMoves (gameState* state) {
 }
 
 void freeTree(node *parent) {
-    if (!parent) return;
+    if (parent == NULL) return;
 
     for (int i = 0; i < parent->childCount; ++i) {
         freeTree(parent->children[i]);
