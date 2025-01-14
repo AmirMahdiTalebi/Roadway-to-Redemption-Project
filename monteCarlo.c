@@ -157,17 +157,7 @@ int simulation(gameState* state) {
         if (move <= kingdoms[turn].availableNumber) {
             roadX = kingdoms[turn].available[move - 1].x;
             roadY = kingdoms[turn].available[move - 1].y;
-            int opponentTurn;
-            if (turn == 2) opponentTurn = 1;
-            else opponentTurn = 2;
-            if (checkForWar(roadX, roadY) && kingdoms[turn].soldier < kingdoms[opponentTurn].soldier) {
-                if (kingdoms[turn].gold >= 2) { //add soldier
-                    kingdoms[turn].gold -= 2;
-                    kingdoms[turn].soldier++;
-                }
-                turn++; //Do Nothing
-            }
-            else RoadMaker();
+            RoadMaker();
         } else {
             if (move - kingdoms[turn].availableNumber == 1) { //add food
                 if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
@@ -190,10 +180,7 @@ int simulation(gameState* state) {
                     turn++;
                 } else move++;
             }
-            if (move - kingdoms[turn].availableNumber == 4) //do nothing
-            {
-                turn++;
-            }
+            if (move - kingdoms[turn].availableNumber == 4) turn++; //do nothing
         }
     }
     if (winner)
@@ -248,7 +235,7 @@ int possibleMoves (gameState* state) {
     }
     if (kingdoms[turn].gold>=2)
         moveCount++;
-    moveCount ++;
+    moveCount++;
     SaveGame(state);
     return moveCount;
 }
