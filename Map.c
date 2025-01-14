@@ -544,8 +544,30 @@ void RoadMaker() {
 
 void mode0() {
 
-    if (turn == 2 && kingdomNumber == 2 && isPlayingWithMonte)
-        monte();
+    if (turn == 2 && kingdomNumber == 2 && isPlayingWithMonte) {
+        int monteAction = monte();
+        char actionText[50] = " ";
+        switch (monteAction) {
+            case 1:
+                strcpy(actionText, "Computer bought food");
+                break;
+            case 2:
+                strcpy(actionText, "Computer hired worker");
+                break;
+            case 3:
+                strcpy(actionText, "Computer hired soldier.");
+                break;
+            case 5:
+                strcpy(actionText, "Computer did nothing");
+                break;
+            default: strcpy(actionText, "Computer built road");
+        }
+        DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
+        int textWidth = MeasureText(actionText, 30);
+        DrawText(actionText, (SCREEN_WIDTH - 300) / 2 - textWidth / 2, 100, 30, kingdoms[2].color);
+        EndDrawing();
+        WaitTime(1.5);
+    }
     do {
         if (turn > kingdomNumber) {
             turn = 1;

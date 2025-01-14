@@ -14,13 +14,13 @@ node root;
 
 typedef struct node node;
 
-void monte() {
-    node *current;
+int monte() {
     root.state = (gameState*) malloc(sizeof(gameState));
     root.parent = NULL;
     root.children = NULL;
     SaveGame(root.state);
     root.visits=root.winCount=0;
+    node *current;
     current = &root;
 
     for (int i = 0; i < iterations ; ++i) {
@@ -44,6 +44,13 @@ void monte() {
     printf("\n");
     LoadGame(&bestMove);
     freeTree(&root);
+    if (bestMove.kingdom[2].food > root.state->kingdom[2].food) return 1;
+    if (bestMove.kingdom[2].worker > root.state->kingdom[2].worker) return 2;
+    if (bestMove.kingdom[2].soldier > root.state->kingdom[2].soldier) return 3;
+    if (bestMove.kingdom[2].roadNumber == root.state->kingdom[2].roadNumber &&
+    bestMove.kingdom[1].roadNumber == root.state->kingdom[1].roadNumber &&
+    bestMove.kingdom[2].soldier == root.state->kingdom[2].soldier) return 5;
+    return 0;
 }
 
 node* selection() {

@@ -16,7 +16,7 @@ typedef struct node {
     int visits;
 } node;
 
-void monte();
+int monte();
 node* selection();
 void expand(node* parent);
 int simulation(gameState* state);
