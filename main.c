@@ -117,6 +117,9 @@ int main() {
             mode1();
 
         if (mode == 2) { //making roads
+            if (IsKeyPressed(KEY_B))
+                mode=0;
+            int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
             kingdoms[turn].availableNumber = 0;
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y);
 

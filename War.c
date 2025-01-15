@@ -202,8 +202,10 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
             }
 
-            map[1][pathX][pathY] = 0;
-            kingdoms[warLoser].roadNumber--;
+            if (map[0][pathX][pathY] > 0) {
+                map[1][pathX][pathY] = 0;
+                kingdoms[warLoser].roadNumber--;
+            }
             kingdoms[warLoser].roadLeftover[pathX][pathY] = map[0][pathX][pathY];
 
         }
@@ -219,9 +221,10 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
             }
 
-            if (map[0][pathX][pathY] > 0) map[1][pathX][pathY] = 0;
-            kingdoms[warLoser].roadNumber--;
-            k--;
+            if (map[0][pathX][pathY] > 0) {
+                map[1][pathX][pathY] = 0;
+                kingdoms[warLoser].roadNumber--;
+            }
             kingdoms[warLoser].roadLeftover[pathX][pathY] = map[0][pathX][pathY];
 
         }
@@ -239,21 +242,21 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
 
         if (map[0][x - 1][y] == -1 && map[1][x - 1][y] != turn && !kingdoms[map[1][x - 1][y]].dead) {
             opponent = map[1][x - 1][y];
-            dijkstraX = x - 1;
-            dijkstraY = y;
+            opponentX = x - 1;
+            opponentY = y;
             return 3;
         }
         if (map[0][x - 1][y] == -2 && villages[map[1][x - 1][y]].kingdom != 0 &&
             villages[map[1][x - 1][y]].kingdom != turn) {
             opponent = villages[map[1][x - 1][y]].kingdom;
-            dijkstraX = x - 1;
-            dijkstraY = y;
+            opponentX = x - 1;
+            opponentY = y;
             return 2;
         }
         if (map[0][x - 1][y] > 0 && map[1][x - 1][y] != 0 && map[1][x - 1][y] != turn) {
             opponent = map[1][x - 1][y];
-            dijkstraX = x - 1;
-            dijkstraY = y;
+            opponentX = x - 1;
+            opponentY = y;
             return 1;
         }
     }
@@ -262,21 +265,21 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
 
         if (map[0][x][y - 1] == -1 && map[1][x][y - 1] != turn && !kingdoms[map[1][x][y - 1]].dead) {
             opponent = map[1][x][y - 1];
-            dijkstraX = x;
-            dijkstraY = y - 1;
+            opponentX = x;
+            opponentY = y - 1;
             return 3;
         }
         if (map[0][x][y - 1] == -2 && villages[map[1][x][y - 1]].kingdom != 0 &&
             villages[map[1][x][y - 1]].kingdom != turn) {
             opponent = villages[map[1][x][y - 1]].kingdom;
-            dijkstraX = x;
-            dijkstraY = y - 1;
+            opponentX = x;
+            opponentY = y - 1;
             return 2;
         }
         if (map[0][x][y - 1] > 0 && map[1][x][y - 1] != 0 && map[1][x][y - 1] != turn) {
             opponent = map[1][x][y - 1];
-            dijkstraX = x;
-            dijkstraY = y - 1;
+            opponentX = x;
+            opponentY = y - 1;
             return 1;
         }
     }
@@ -285,21 +288,21 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
 
         if (map[0][x][y + 1] == -1 && map[1][x][y + 1] != turn && !kingdoms[map[1][x][y + 1]].dead) {
             opponent = map[1][x][y + 1];
-            dijkstraX = x;
-            dijkstraY = y + 1;
+            opponentX = x;
+            opponentY = y + 1;
             return 3;
         }
         if (map[0][x][y + 1] == -2 && villages[map[1][x][y + 1]].kingdom != 0 &&
             villages[map[1][x][y + 1]].kingdom != turn) {
             opponent = villages[map[1][x][y + 1]].kingdom;
-            dijkstraX = x;
-            dijkstraY = y + 1;
+            opponentX = x;
+            opponentY = y + 1;
             return 2;
         }
         if (map[0][x][y + 1] > 0 && map[1][x][y + 1] != 0 && map[1][x][y + 1] != turn) {
             opponent = map[1][x][y + 1];
-            dijkstraX = x;
-            dijkstraY = y + 1;
+            opponentX = x;
+            opponentY = y + 1;
             return 1;
         }
     }
@@ -308,21 +311,21 @@ int checkForWar(int x, int y) { //War types: 1:war near road, 2:war near village
 
         if (map[0][x + 1][y] == -1 && map[1][x + 1][y] != turn && !kingdoms[map[1][x + 1][y]].dead) {
             opponent = map[1][x + 1][y];
-            dijkstraX = x + 1;
-            dijkstraY = y;
+            opponentX = x + 1;
+            opponentY = y;
             return 3;
         }
         if (map[0][x + 1][y] == -2 && villages[map[1][x + 1][y]].kingdom != 0 &&
             villages[map[1][x + 1][y]].kingdom != turn) {
             opponent = villages[map[1][x + 1][y]].kingdom;
-            dijkstraX = x + 1;
-            dijkstraY = y;
+            opponentX = x + 1;
+            opponentY = y;
             return 2;
         }
         if (map[0][x + 1][y] > 0 && map[1][x + 1][y] != 0 && map[1][x + 1][y] != turn) {
             opponent = map[1][x + 1][y];
-            dijkstraX = x + 1;
-            dijkstraY = y;
+            opponentX = x + 1;
+            opponentY = y;
             return 1;
         }
     }

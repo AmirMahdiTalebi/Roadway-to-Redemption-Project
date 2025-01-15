@@ -12,7 +12,7 @@ int mapHeight = 0;
 int mapWidth = 0;
 int winner;
 int turn = 1, kingdomNumber, villageNumber, opponent;
-int dijkstraX, dijkstraY;
+int opponentX, opponentY;
 int list[MAP_SIZE*MAP_SIZE][5];
 int mode = 0, isPlayingWithMonte = 0, iterations = 0;
 int MakeRoad = 0, roadX, roadY;
@@ -386,6 +386,7 @@ int checkNeighbors(int x, int y) {
             availableNumber++;
         }
         available = (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 MakeRoad = 1;
@@ -406,6 +407,7 @@ int checkNeighbors(int x, int y) {
             availableNumber++;
         }
         available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 MakeRoad = 1;
@@ -446,6 +448,7 @@ int checkNeighbors(int x, int y) {
             availableNumber++;
         }
         available = (Rectangle) {x * TILE_SIZE + map0.x, (y + 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 MakeRoad = 1;
@@ -473,10 +476,10 @@ void RoadMaker() {
         kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
         kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
         kingdoms[turn].roadNumber++;
-
-        for (int i = 0; i < 4; ++i) {
-            int warType = checkForWar(roadX, roadY);
-            Vector2 opponentV = {dijkstraX, dijkstraY};
+        int warType=0, i=0;
+        while (checkForWar(roadX, roadY) && i++<4) {
+            warType = checkForWar(roadX, roadY);
+            Vector2 opponentV = {opponentX, opponentY};
             Vector2 turnV = {roadX, roadY};
             if (warType == 3) { // All-out war
                 if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
@@ -503,20 +506,18 @@ void RoadMaker() {
                     normalWar(0, turn, 1, turnV);
                     normalWar(0, opponent, 1, turnV);
                 }
-            }
-            else if (warType > 0) {
+            } else if (warType > 0) {
                 if (kingdoms[turn].soldier > kingdoms[opponent].soldier) {
                     normalWar(turn, opponent, warType, opponentV);
-                }
-                else if (kingdoms[turn].soldier < kingdoms[opponent].soldier) {
+                } else if (kingdoms[turn].soldier < kingdoms[opponent].soldier) {
                     normalWar(opponent, turn, warType, turnV);
-                }
-                else {
+                } else {
                     normalWar(0, opponent, warType, opponentV);
                     normalWar(0, turn, warType, turnV);
                 }
             }
-
+        }
+        for (i = 0; i < 4; ++i) {
             int VillageID;
             if (map[0][roadX + 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
                 VillageID = map[1][roadX + 1][roadY];
@@ -666,6 +667,7 @@ void mode1() {
             kingdoms[turn].gold--;
             kingdoms[turn].food++;
             break;
+
         case 2:
             if (kingdoms[turn].food >= 3) {
                 kingdoms[turn].food -= 3;
@@ -755,3 +757,4 @@ void LoadGame(gameState* game) {
         turn = game->turn;
     }
 }
+
