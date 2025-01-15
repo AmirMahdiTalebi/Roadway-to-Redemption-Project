@@ -215,7 +215,7 @@ void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV) {
             int pathY = kingdoms[warLoser].path[k] / mapWidth;
             if (k != 0 && map[0][pathX][pathY] == -2) break;
             for (int roadID = 0, sw = 0; roadID < kingdoms[warLoser].roadNumber; ++roadID) {
-                if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;
+                if (kingdoms[warLoser].road[roadID].x == pathX && kingdoms[warLoser].road[roadID].y == pathY) sw = 1;//*****
                 if (sw) kingdoms[warLoser].road[roadID] = kingdoms[warLoser].road[roadID + 1];
             }
 

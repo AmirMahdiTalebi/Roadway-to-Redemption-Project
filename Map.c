@@ -549,18 +549,18 @@ void mode0() {
         char actionText[50] = " ";
         switch (monteAction) {
             case 1:
-                strcpy(actionText, "Computer bought food");
+                strcpy(actionText, "The computer bought food");
                 break;
             case 2:
-                strcpy(actionText, "Computer hired worker");
+                strcpy(actionText, "The computer hired a worker");
                 break;
             case 3:
-                strcpy(actionText, "Computer hired soldier.");
+                strcpy(actionText, "The computer hired a soldier.");
                 break;
             case 5:
-                strcpy(actionText, "Computer did nothing");
+                strcpy(actionText, "The computer did nothing");
                 break;
-            default: strcpy(actionText, "Computer built road");
+            default: strcpy(actionText, "The computer built a road");
         }
         DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
         int textWidth = MeasureText(actionText, 30);
@@ -697,7 +697,7 @@ void mode1() {
 
 void SaveGame(gameState* game) {
     game->kingdomNumber = kingdomNumber;
-    for (int i = 1; i <= kingdomNumber; ++i) {
+    for (int i = 0; i <= kingdomNumber; ++i) {
         game->kingdom[i] = kingdoms[i];
     }
     game->villageNumber = villageNumber;

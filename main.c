@@ -65,7 +65,7 @@ int main() {
     kingdoms[0].color = WHITE;
     kingdoms[1].color = (Color){103, 135, 194, 255};
     kingdoms[2].color = (Color){230, 37, 82, 255};
-    kingdoms[3].color = (Color){131, 235, 148, 255};
+    kingdoms[3].color = (Color){255, 114, 43, 255};
     kingdoms[4].color = (Color){189, 125, 219, 255};
 
     SetTargetFPS(60);
@@ -138,8 +138,8 @@ int main() {
 
         if (mode == 3) { //the end of the game
             DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
-            char text[20];
-            sprintf(text, "Winner Is Kingdom %d", winner);
+            char text[24];
+            sprintf(text, "The winner Is Kingdom %d", winner);
             int textWidth = MeasureText(text, 40);
             Vector2 textPos = {SCREEN_WIDTH / 2 - textWidth / 2,
                                SCREEN_HEIGHT / 2 - 50};
