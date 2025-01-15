@@ -14,7 +14,7 @@ int winner;
 int turn = 1, kingdomNumber, villageNumber, opponent;
 int dijkstraX, dijkstraY;
 int list[MAP_SIZE*MAP_SIZE][5];
-int mode = 0, isPlayingWithMonte = 0;
+int mode = 0, isPlayingWithMonte = 0, iterations = 0;
 int MakeRoad = 0, roadX, roadY;
 int animation=0, toBeDeleted = 0;
 
@@ -197,6 +197,14 @@ void makeKingdom() {
         }
         if (gameMode == 'Y' || gameMode == 'y') {
             isPlayingWithMonte = 1;
+            int level;
+            printf("Choose the level of your opponent (1-10)\n");
+            scanf("%d", &level);
+            while(level < 1 || level > 10) {
+                printf("Wrong Input!\nChoose the level of your opponent (1-10)\n ");
+                scanf("%d", &level);
+            }
+            iterations = level * 200;
             printf("First kingdom is yours and second is for computer.\n");
         }
     }
@@ -400,9 +408,9 @@ int checkNeighbors(int x, int y) {
         available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                   MakeRoad = 1;
-                   roadX = x + 1;
-                   roadY = y;
+                MakeRoad = 1;
+                roadX = x + 1;
+                roadY = y;
             }
         }
     }
@@ -420,9 +428,9 @@ int checkNeighbors(int x, int y) {
         available = (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    MakeRoad = 1;
-                    roadX = x;
-                    roadY = y - 1;
+                MakeRoad = 1;
+                roadX = x;
+                roadY = y - 1;
             }
         }
     }
@@ -544,7 +552,7 @@ void RoadMaker() {
 
 void mode0() {
 
-    if (turn == 2 && kingdomNumber == 2 && isPlayingWithMonte) {
+    if (turn == 2 && isPlayingWithMonte) {
         int monteAction = monte();
         char actionText[50] = " ";
         switch (monteAction) {

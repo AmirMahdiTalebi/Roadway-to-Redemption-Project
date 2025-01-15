@@ -25,7 +25,7 @@ extern Vector2 manPos;
 extern int map[2][MAP_SIZE][MAP_SIZE];
 extern int mapHeight, mapWidth, turn, kingdomNumber, villageNumber, opponent, winner, dijkstraX, dijkstraY;
 extern int list[MAP_SIZE*MAP_SIZE][5];
-extern int mode, isPlayingWithMonte;
+extern int mode, isPlayingWithMonte, iterations;
 extern int MakeRoad, roadX, roadY;
 
 extern Vector2 mousePosition;

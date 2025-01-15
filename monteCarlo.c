@@ -7,9 +7,6 @@
 #include "stdio.h"
 #include <limits.h>
 
-#define constant 1.5
-#define iterations 200
-
 node root;
 
 typedef struct node node;
@@ -44,28 +41,40 @@ int monte() {
     printf("\n");
     LoadGame(&bestMove);
     freeTree(&root);
-    if (bestMove.kingdom[2].food > root.state->kingdom[2].food) return 1;
+    mode = 0;
+    turn = 1;
+
+    int didTryToMakeRoad = 0;
+    for (int i = 0; i < mapWidth && !didTryToMakeRoad; ++i) {
+        for (int j = 0; j < mapHeight && !didTryToMakeRoad; ++j) {
+            if (bestMove.kingdom[2].roadLeftover[i][j] != root.state->kingdom[2].roadLeftover[i][j])
+                didTryToMakeRoad = 1;
+        }
+    }
+
+    if (bestMove.kingdom[2].food-bestMove.kingdom[2].foodX > root.state->kingdom[2].food) return 1;
     if (bestMove.kingdom[2].worker > root.state->kingdom[2].worker) return 2;
     if (bestMove.kingdom[2].soldier > root.state->kingdom[2].soldier) return 3;
     if (bestMove.kingdom[2].roadNumber == root.state->kingdom[2].roadNumber &&
-    bestMove.kingdom[1].roadNumber == root.state->kingdom[1].roadNumber &&
-    bestMove.kingdom[2].soldier == root.state->kingdom[2].soldier) return 5;
+        bestMove.kingdom[1].roadNumber == root.state->kingdom[1].roadNumber &&
+        bestMove.kingdom[2].soldier == root.state->kingdom[2].soldier &&
+        !didTryToMakeRoad) return 5;
     return 0;
 }
 
 node* selection() {
     node* best;
     double maxUCB;
-    node* parent;
-    parent = (node*) malloc(sizeof(node));
-    *parent = root;
+    node* parent = &root;
+//    parent = (node*) malloc(sizeof(node));
+//    *parent = root;
     while (parent->children) {
         maxUCB = -1;
         for (int i = 0; i < parent->childCount; ++i) {
             double ucb;
             if (parent->children[i]->visits != 0) {
                 ucb = ((parent->children[i]->winCount/parent->children[i]->visits) +
-                       constant* sqrt(log(root.visits)/parent->children[i]->visits));
+                       CONSTANT* sqrt(log(root.visits)/parent->children[i]->visits));
             } else {
                 ucb = INT_MAX;
             }
@@ -76,8 +85,6 @@ node* selection() {
         }
         parent = best;
     }
-    parent = NULL;
-    free(parent);
     return best;
 }
 
@@ -183,8 +190,12 @@ int simulation(gameState* state) {
             if (move - kingdoms[turn].availableNumber == 4) turn++; //do nothing
         }
     }
-    if (winner)
-        save->end = 1;
+    if (winner) save->end = 1;
+//    int saveEnd = save->end;
+//    int soldiers1 = save->kingdom[1].soldier;
+//    int soldiers2 = save->kingdom[2].soldier;
+//    free(save);
+//    return ((saveEnd && winner == root.state->turn) || (soldiers1 <= soldiers2));
     return ((save->end && winner == root.state->turn) || (save->kingdom[1].soldier <= save->kingdom[2].soldier));
 }
 

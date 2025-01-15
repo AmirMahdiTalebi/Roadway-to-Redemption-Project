@@ -60,7 +60,7 @@ int main() {
     Texture2D quoteBox = LoadTexture("..\\assets\\Quote-box.png");
 
     Font font= LoadFont("..\\assets\\pixantiqua.png");
-    Font myFont = LoadFontEx("..\\SpaceMono-Bold.ttf", 32, NULL, 0);
+    Font myFont = LoadFont("..\\\\SpaceMono-Bold.ttf");
 
     kingdoms[0].color = WHITE;
     kingdoms[1].color = (Color){103, 135, 194, 255};
@@ -130,9 +130,15 @@ int main() {
                 }
             }
             for (int i = 0; i < kingdoms[turn].availableNumber; ++i) {
-                DrawRectangle(kingdoms[turn].available[i].x * TILE_SIZE + map0.x
-                              , kingdoms[turn].available[i].y * TILE_SIZE + map0.y
-                              , TILE_SIZE, TILE_SIZE, transparentGreen);
+                if (checkForWar(kingdoms[turn].available[i].x, kingdoms[turn].available[i].y )) {
+                    DrawRectangle(kingdoms[turn].available[i].x * TILE_SIZE + map0.x,
+                                  kingdoms[turn].available[i].y *  TILE_SIZE + map0.y,
+                                  TILE_SIZE, TILE_SIZE, transparentRed);
+                } else {
+                    DrawRectangle(kingdoms[turn].available[i].x * TILE_SIZE + map0.x,
+                                  kingdoms[turn].available[i].y * TILE_SIZE + map0.y,
+                                  TILE_SIZE, TILE_SIZE,transparentGreen);
+                }
             }
         }
 
@@ -141,9 +147,7 @@ int main() {
             char text[24];
             sprintf(text, "The winner Is Kingdom %d", winner);
             int textWidth = MeasureText(text, 40);
-            Vector2 textPos = {SCREEN_WIDTH / 2 - textWidth / 2,
-                               SCREEN_HEIGHT / 2 - 50};
-            DrawTextEx(myFont, text, textPos, 40, 10, BLACK);
+            DrawText(text, (SCREEN_WIDTH-300) / 2 - textWidth / 2,100, 40, kingdoms[winner].color);
         }
 
         if (mode==4) { //animation

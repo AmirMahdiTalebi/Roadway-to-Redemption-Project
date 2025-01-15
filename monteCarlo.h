@@ -5,6 +5,8 @@
 #include "War.h"
 #include "Map.h"
 
+#define CONSTANT 1.5
+
 typedef struct node node;
 typedef struct gameState gameState;
 typedef struct node {
