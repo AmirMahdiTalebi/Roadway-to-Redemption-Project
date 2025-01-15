@@ -4,6 +4,7 @@
 #include "War.h"
 #include "raylib.h"
 #include "monteCarlo.h"
+#include "GameUpdate.h"
 
 
 #define SCREEN_HEIGHT 900
@@ -98,12 +99,7 @@ void initialMapMaker();
 void makeKingdom();
 void makeVillage();
 void makeBarrier();
-int dijkstraPath(int source, int id, int size);
 void mapDrawer(Texture2D mapTileSet, Texture2D GroundTile, Texture2D Castle, Texture2D House, Texture2D Stone, Texture2D quoteBox, Font font, Font myFont);
-int checkNeighbors(int x, int y);
-void RoadMaker();
-void mode0();
-void mode1();
 void SaveGame(gameState* game);
 void LoadGame (gameState* game);
 

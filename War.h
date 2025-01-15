@@ -1,9 +1,10 @@
 #ifndef INITIALMAP_C_WAR_H
 #define INITIALMAP_C_WAR_H
 
-#include "Map.h"
+#include "InitialGame.h"
 #include "raylib.h"
 #include "monteCarlo.h"
+#include "GameUpdate.h"
 
 void normalWar(int warWinner, int warLoser, int warType, Vector2 loserV);
 void loseVillage(int villageID, int loser);

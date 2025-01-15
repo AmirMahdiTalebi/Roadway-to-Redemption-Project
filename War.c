@@ -1,5 +1,5 @@
 #include "War.h"
-#include "Map.h"
+#include "InitialGame.h"
 #include "raylib.h"
 #include <stdio.h>
 

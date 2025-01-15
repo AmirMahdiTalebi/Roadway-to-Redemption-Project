@@ -6,8 +6,8 @@ set(CMAKE_C_STANDARD 11)
 include_directories(.)
 
 add_executable(Roadway_to_Redemption_project
-        main.c Map.c Map.h War.c War.h
-        monteCarlo.c monteCarlo.h)
+        main.c InitialGame.c InitialGame.h War.c War.h
+        monteCarlo.c monteCarlo.h GameUpdate.c GameUpdate.h)
 
 # Dependencies
 set(RAYLIB_VERSION 5.5)

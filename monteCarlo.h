@@ -3,7 +3,8 @@
 
 #include "raylib.h"
 #include "War.h"
-#include "Map.h"
+#include "InitialGame.h"
+#include "GameUpdate.h"
 
 #define CONSTANT 1.5
 

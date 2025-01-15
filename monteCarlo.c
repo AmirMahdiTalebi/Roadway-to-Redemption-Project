@@ -1,5 +1,5 @@
 #include "monteCarlo.h"
-#include "Map.h"
+#include "InitialGame.h"
 #include "War.h"
 #include "raylib.h"
 #include "stdlib.h"

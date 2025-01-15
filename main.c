@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "raylib.h"
-#include "Map.h"
+#include "InitialGame.h"
+#include "GameUpdate.h"
 
 // Program main entry point
 int main() {
@@ -63,10 +64,14 @@ int main() {
     Font myFont = LoadFont("..\\\\SpaceMono-Bold.ttf");
 
     kingdoms[0].color = WHITE;
-    kingdoms[1].color = (Color){103, 135, 194, 255};
-    kingdoms[2].color = (Color){230, 37, 82, 255};
-    kingdoms[3].color = (Color){255, 114, 43, 255};
-    kingdoms[4].color = (Color){189, 125, 219, 255};
+    if (!kingdoms[1].dead)
+        kingdoms[1].color = (Color){103, 135, 194, 255};
+    if (!kingdoms[2].dead)
+        kingdoms[2].color = (Color){230, 37, 82, 255};
+    if (!kingdoms[3].dead)
+        kingdoms[3].color = (Color){255, 114, 43, 255};
+    if (!kingdoms[4].dead)
+        kingdoms[4].color = (Color){189, 125, 219, 255};
 
     SetTargetFPS(60);
     int manIndex = 0;
@@ -119,7 +124,6 @@ int main() {
         if (mode == 2) { //making roads
             if (IsKeyPressed(KEY_B))
                 mode=0;
-            int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y, map0);
             kingdoms[turn].availableNumber = 0;
             int check = checkNeighbors(kingdoms[turn].x, kingdoms[turn].y);
 
