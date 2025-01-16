@@ -66,8 +66,6 @@ node* selection() {
     node* best;
     double maxUCB;
     node* parent = &root;
-//    parent = (node*) malloc(sizeof(node));
-//    *parent = root;
     while (parent->children) {
         maxUCB = -1;
         for (int i = 0; i < parent->childCount; ++i) {
@@ -191,12 +189,7 @@ int simulation(gameState* state) {
         }
     }
     if (winner) save->end = 1;
-//    int saveEnd = save->end;
-//    int soldiers1 = save->kingdom[1].soldier;
-//    int soldiers2 = save->kingdom[2].soldier;
-//    free(save);
-//    return ((saveEnd && winner == root.state->turn) || (soldiers1 <= soldiers2));
-    return ((save->end && winner == root.state->turn) || (save->kingdom[1].soldier <= save->kingdom[2].soldier));
+    return ((save->end && winner == 2) || (save->kingdom[1].soldier <= save->kingdom[2].soldier));
 }
 
 void backpropagation(node* node, int result) {

@@ -82,6 +82,7 @@ typedef struct gameState {
     int turn;
     int winner;
     int end;
+    int isPlayingWithMonte;
 }gameState;
 
 typedef struct button {

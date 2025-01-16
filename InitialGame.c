@@ -92,10 +92,10 @@ void makeKingdom() {
         if (gameMode == 'Y' || gameMode == 'y') {
             isPlayingWithMonte = 1;
             int level;
-            printf("Choose the level of your opponent (1-10)\n");
+            printf("Choose the level of your opponent (1-5)\n");
             scanf("%d", &level);
-            while(level < 1 || level > 10) {
-                printf("Wrong Input!\nChoose the level of your opponent (1-10)\n ");
+            while(level < 1 || level > 5) {
+                printf("Wrong Input!\nChoose the level of your opponent (1-5)\n ");
                 scanf("%d", &level);
             }
             iterations = level * 200;
@@ -289,6 +289,7 @@ void SaveGame(gameState* game) {
     else
         game->end = 0;
     game->turn = turn;
+    game->isPlayingWithMonte = isPlayingWithMonte;
 }
 
 void LoadGame(gameState* game) {
@@ -316,5 +317,6 @@ void LoadGame(gameState* game) {
             mode = 0;
         turn = game->turn;
     }
+    isPlayingWithMonte = game->isPlayingWithMonte;
 }
 
