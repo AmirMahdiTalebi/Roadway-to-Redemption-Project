@@ -78,7 +78,7 @@ node* selection() {
             } else {
                 ucb = INT_MAX;
             }
-            if (ucb > maxUCB && !parent->children[i]->state->end) {
+            if (ucb > maxUCB) {
                 maxUCB = ucb;
                 best = parent->children[i];
             }

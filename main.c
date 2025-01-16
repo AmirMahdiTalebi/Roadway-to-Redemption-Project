@@ -11,7 +11,7 @@ int main() {
         BeginDrawing();
         ClearBackground(BLACK);
         int TextSize = MeasureText("Press N to start a new game", 20);
-        DrawText("Press N to start a new game\nPress L to load the last game",
+        DrawText("Press N to start a new game\nPress L to load the last game\nPress D for default map",
                  800/2 - TextSize/2, 200/2 - 25, 20, GREEN);
         ClearBackground(BLACK);
         if (IsKeyPressed(KEY_N)) {
@@ -35,6 +35,24 @@ int main() {
                 gameState lastGame;
                 fread(&lastGame, sizeof(gameState), 1, fileReader);
                 LoadGame(&lastGame);
+            }
+            fclose(fileReader);
+            break;
+        }
+        if (IsKeyPressed(KEY_D)) {
+            FILE* fileReader;
+            fileReader = fopen("..\\Default.dat", "rb");
+            if (!fileReader) {
+                printf("Can't load the default map. pLease start a new one\n");
+                initialMapMaker();
+                makeKingdom();
+                makeVillage();
+                makeBarrier();
+            }
+            else {
+                gameState DefaultGame;
+                fread(&DefaultGame, sizeof(gameState), 1, fileReader);
+                LoadGame(&DefaultGame);
             }
             fclose(fileReader);
             break;
@@ -149,13 +167,8 @@ int main() {
             }
         }
 
-        if (mode == 3) { //the end of the game
-            DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
-            char text[24];
-            sprintf(text, "The winner Is Kingdom %d", winner);
-            int textWidth = MeasureText(text, 40);
-            DrawText(text, (SCREEN_WIDTH-300) / 2 - textWidth / 2,100, 40, kingdoms[winner].color);
-        }
+        if (mode == 3) //the end of the game
+            mode3();
 
         if (mode==4) { //animation
             if (animation == 1) { //making roads

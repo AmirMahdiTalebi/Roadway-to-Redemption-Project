@@ -1,8 +1,9 @@
-#include <strings.h>
+#include <string.h>
 #include "GameUpdate.h"
 #include "InitialGame.h"
 #include "War.h"
 #include "monteCarlo.h"
+#include <stdio.h>
 
 int dijkstraVillage(int source, int id, int size) {
     int dest = villages[id].y*mapWidth + villages[id].x;
@@ -290,7 +291,11 @@ void RoadMaker() {
 }
 
 void mode0() {
-
+    if (kingdoms[1].dead) {
+        buttonsPosY = -100;
+        mode3();
+        isPlayingWithMonte = 0;
+    }
     if (turn == 2 && isPlayingWithMonte) {
         int monteAction = monte();
         char actionText[50] = " ";
@@ -441,5 +446,13 @@ void mode1() {
         mode = 0;
         turn++;
     }
+}
+
+void mode3() {
+    DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
+    char text[24];
+    sprintf(text, "The winner Is Kingdom %d", winner);
+    int textWidth = MeasureText(text, 40);
+    DrawText(text, (SCREEN_WIDTH-300) / 2 - textWidth / 2,100, 40, kingdoms[winner].color);
 }
 

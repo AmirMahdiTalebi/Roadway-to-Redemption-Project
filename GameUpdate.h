@@ -10,5 +10,6 @@ int checkNeighbors(int x, int y);
 void RoadMaker();
 void mode0();
 void mode1();
+void mode3();
 
 #endif //MAIN_C_GAMEUPDATE_H
