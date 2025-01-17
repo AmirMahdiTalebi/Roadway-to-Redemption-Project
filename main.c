@@ -35,6 +35,8 @@ int main() {
                 gameState lastGame;
                 fread(&lastGame, sizeof(gameState), 1, fileReader);
                 LoadGame(&lastGame);
+                fread(&isPlayingWithMonte, sizeof(int), 1, fileReader);
+                fread(&iterations, sizeof(int), 1, fileReader);
             }
             fclose(fileReader);
             break;
@@ -232,6 +234,8 @@ int main() {
             }
             else {
                 fwrite(&lastGame, sizeof(gameState), 1, fileWriter);
+                fwrite(&isPlayingWithMonte, sizeof (int), 1, fileWriter);
+                fwrite(&iterations, sizeof (int), 1, fileWriter);
                 fclose(fileWriter);
                 break;
             }

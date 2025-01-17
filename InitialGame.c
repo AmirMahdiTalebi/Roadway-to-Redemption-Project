@@ -99,7 +99,7 @@ void makeKingdom() {
                 scanf("%d", &level);
             }
             iterations = level * 200;
-            printf("First kingdom is yours and second is for computer.\n");
+            printf("First kingdom is yours and second is for the computer.\n");
         }
     }
     kingdoms[0].dead = 1;
