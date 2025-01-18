@@ -6,7 +6,7 @@
 #include "InitialGame.h"
 #include "GameUpdate.h"
 
-#define CONSTANT 1.5
+#define CONSTANT 2.4
 
 typedef struct node node;
 typedef struct gameState gameState;

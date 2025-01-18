@@ -55,6 +55,7 @@ int main() {
                 gameState DefaultGame;
                 fread(&DefaultGame, sizeof(gameState), 1, fileReader);
                 LoadGame(&DefaultGame);
+                isPlayingWithMonte = 0;
             }
             fclose(fileReader);
             break;
