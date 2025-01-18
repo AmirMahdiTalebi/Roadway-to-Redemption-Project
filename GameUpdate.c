@@ -324,7 +324,7 @@ void mode0() {
         if (turn > kingdomNumber) {
             turn = 1;
             for (int i = 1; i <= kingdomNumber; i++) {
-                if (!kingdoms[i].dead)
+                if (kingdoms[i].dead)
                     continue;
                 kingdoms[i].food += kingdoms[i].foodX;
                 kingdoms[i].gold += kingdoms[i].goldX;
