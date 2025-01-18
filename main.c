@@ -75,7 +75,7 @@ int main() {
     Texture2D GroundTile = LoadTexture("..\\assets\\tilecrop (1).png");
     Texture2D Castle = LoadTexture("..\\assets\\stone castle.png");
     Texture2D Stone = LoadTexture("..\\assets\\stone2.png");
-    Texture2D House = LoadTexture("..\\assets\\house.png");
+    Texture2D House = LoadTexture("..\\assets\\house 2.png");
     Texture2D roadMan = LoadTexture("..\\assets\\SteamMan_attack1.png");
     Texture2D explosion = LoadTexture("..\\assets\\explosion.png");
     Texture2D quoteBox = LoadTexture("..\\assets\\Quote-box.png");
