@@ -6,54 +6,51 @@
 #include <stdio.h>
 
 int dijkstraVillage(int source, int id, int size) {
-    int dest = villages[id].y*mapWidth + villages[id].x;
+    int dest = villages[id].y * mapWidth + villages[id].x;
     for (int i = 0; i < mapWidth; ++i) {
         for (int j = 0; j < mapHeight; ++j) {
             if (map[0][i][j] < 0) {
                 //anything that can't become a road
-                list[j*mapWidth+i][0] = 2000;
-            }
-            else {
-                if (map[1][i][j]!=turn && map[1][i][j]>0)
-                    list[j*mapWidth + i][0]=2000;
+                list[j * mapWidth + i][0] = 2000;
+            } else {
+                if (map[1][i][j] != turn && map[1][i][j] > 0)
+                    list[j * mapWidth + i][0] = 2000;
                 else
-                    list[j * mapWidth + i][0] = (kingdoms[turn].roadLeftover[i][j] + kingdoms[turn].worker - 1) / kingdoms[turn].worker;
+                    list[j * mapWidth + i][0] =
+                            (kingdoms[turn].roadLeftover[i][j] + kingdoms[turn].worker - 1) / kingdoms[turn].worker;
             }
         }
     }
     list[source][0] = list[dest][0] = 0;
 
     //Adding neighbors to the list
-    for (int i = 0; i < mapWidth*mapHeight; ++i) {
+    for (int i = 0; i < mapWidth * mapHeight; ++i) {
         int k = 0;
         int e = 0;
         int vertexIndex = i + 1;
         if ((vertexIndex - mapWidth) <= 0) {
-            list[i][4-e] = -1;
+            list[i][4 - e] = -1;
             e++;
-        }
-        else {
-            list[i][1+k] = i - mapWidth;
+        } else {
+            list[i][1 + k] = i - mapWidth;
             k++;
         }
         if ((vertexIndex + mapWidth) > (mapWidth * mapHeight)) {
-            list[i][4-e] = -1;
+            list[i][4 - e] = -1;
             e++;
-        }
-        else {
-            list[i][1+k] = i + mapWidth;
+        } else {
+            list[i][1 + k] = i + mapWidth;
             k++;
         }
         if (vertexIndex % mapWidth == 1) {
-            list[i][4-e] = -1;
+            list[i][4 - e] = -1;
             e++;
-        }
-        else {
-            list[i][1+k] = i - 1;
+        } else {
+            list[i][1 + k] = i - 1;
             k++;
         }
-        if ((vertexIndex) % mapWidth == 0) list[i][4-e] = -1;
-        else list[i][1+k] = i + 1;
+        if ((vertexIndex) % mapWidth == 0) list[i][4 - e] = -1;
+        else list[i][1 + k] = i + 1;
     }
 
     //vars
@@ -65,27 +62,27 @@ int dijkstraVillage(int source, int id, int size) {
     for (int i = 0; i < size; ++i) {
         path[i][0] = source;
     }
-    int pathNumber[289]= {0};
-    int visited[289]= {0};
-    dist[source]=0;
-    pathNumber[source]=1;
-    int current=source, neighbor, minDistance;
+    int pathNumber[289] = {0};
+    int visited[289] = {0};
+    dist[source] = 0;
+    pathNumber[source] = 1;
+    int current = source, neighbor, minDistance;
 
     //main algorithm loop
-    while(!visited[dest]) {
+    while (!visited[dest]) {
 
         //update all neighbors
-        for(int i=1; list[current][i]>=0 && i<5; i++) {
-            neighbor=list[current][i];
-            if(!visited[neighbor] && (dist[current] + list[neighbor][0]) < dist[neighbor] && list[neighbor][0] != -1) {
+        for (int i = 1; list[current][i] >= 0 && i < 5; i++) {
+            neighbor = list[current][i];
+            if (!visited[neighbor] && (dist[current] + list[neighbor][0]) < dist[neighbor] && list[neighbor][0] != -1) {
                 //update distance
                 dist[neighbor] = dist[current] + list[neighbor][0];
                 //update path
-                pathNumber[neighbor]= pathNumber[current]+1;
-                for(int j=0; j<pathNumber[current]; j++) {
-                    path[neighbor][j]=path[current][j];
+                pathNumber[neighbor] = pathNumber[current] + 1;
+                for (int j = 0; j < pathNumber[current]; j++) {
+                    path[neighbor][j] = path[current][j];
                 }
-                path[neighbor][pathNumber[neighbor]-1]=neighbor;
+                path[neighbor][pathNumber[neighbor] - 1] = neighbor;
             }
         }
 
@@ -93,11 +90,11 @@ int dijkstraVillage(int source, int id, int size) {
         visited[current] = 1;
 
         //update current
-        minDistance=4000;
-        for(int i=0; i<size; i++) {
-            if(!visited[i] && dist[i]<minDistance && list[i][0] != -1) {
-                current=i;
-                minDistance=dist[i];
+        minDistance = 4000;
+        for (int i = 0; i < size; i++) {
+            if (!visited[i] && dist[i] < minDistance && list[i][0] != -1) {
+                current = i;
+                minDistance = dist[i];
             }
         }
     }
@@ -113,18 +110,18 @@ int dijkstraVillage(int source, int id, int size) {
 int checkNeighbors(int x, int y) {
     Rectangle available;
     int availableNumber = kingdoms[turn].availableNumber;
-    if(x != 0 && (map[0][x-1][y] > 0 && map[1][x-1][y] == 0)) {
+    if (x != 0 && (map[0][x - 1][y] > 0 && map[1][x - 1][y] == 0)) {
         int isAlreadyAdded = 0;
         for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
-            if (kingdoms[turn].available[i].x == x-1 && kingdoms[turn].available[i].y == y) isAlreadyAdded = 1;
+            if (kingdoms[turn].available[i].x == x - 1 && kingdoms[turn].available[i].y == y) isAlreadyAdded = 1;
         }
         if (!isAlreadyAdded) {
-            kingdoms[turn].available[availableNumber].x = x-1;
+            kingdoms[turn].available[availableNumber].x = x - 1;
             kingdoms[turn].available[availableNumber].y = y;
             kingdoms[turn].availableNumber++;
             availableNumber++;
         }
-        available = (Rectangle){(x-1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+        available = (Rectangle) {(x - 1) * TILE_SIZE + map0.x, y * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -134,18 +131,18 @@ int checkNeighbors(int x, int y) {
             }
         }
     }
-    if(x!=(mapWidth-1) && (map[0][x+1][y]>0 && map[1][x+1][y]==0)) {
+    if (x != (mapWidth - 1) && (map[0][x + 1][y] > 0 && map[1][x + 1][y] == 0)) {
         int isAlreadyAdded = 0;
         for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
-            if (kingdoms[turn].available[i].x == x+1 && kingdoms[turn].available[i].y == y) isAlreadyAdded = 1;
+            if (kingdoms[turn].available[i].x == x + 1 && kingdoms[turn].available[i].y == y) isAlreadyAdded = 1;
         }
         if (!isAlreadyAdded) {
-            kingdoms[turn].available[availableNumber].x = x+1;
+            kingdoms[turn].available[availableNumber].x = x + 1;
             kingdoms[turn].available[availableNumber].y = y;
             kingdoms[turn].availableNumber++;
             availableNumber++;
         }
-        available= (Rectangle){(x+1)*TILE_SIZE + map0.x, y*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+        available = (Rectangle) {(x + 1) * TILE_SIZE + map0.x, y * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
 
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -155,18 +152,18 @@ int checkNeighbors(int x, int y) {
             }
         }
     }
-    if(y!=0 && (map[0][x][y-1]>0 && map[1][x][y-1]==0)) {
+    if (y != 0 && (map[0][x][y - 1] > 0 && map[1][x][y - 1] == 0)) {
         int isAlreadyAdded = 0;
         for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
-            if (kingdoms[turn].available[i].x == x && kingdoms[turn].available[i].y == y-1) isAlreadyAdded = 1;
+            if (kingdoms[turn].available[i].x == x && kingdoms[turn].available[i].y == y - 1) isAlreadyAdded = 1;
         }
         if (!isAlreadyAdded) {
             kingdoms[turn].available[availableNumber].x = x;
-            kingdoms[turn].available[availableNumber].y = y-1;
+            kingdoms[turn].available[availableNumber].y = y - 1;
             kingdoms[turn].availableNumber++;
             availableNumber++;
         }
-        available = (Rectangle){x*TILE_SIZE + map0.x, (y-1)*TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
+        available = (Rectangle) {x * TILE_SIZE + map0.x, (y - 1) * TILE_SIZE + map0.y, TILE_SIZE, TILE_SIZE};
         if (CheckCollisionPointRec(mousePosition, available)) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 MakeRoad = 1;
@@ -175,14 +172,14 @@ int checkNeighbors(int x, int y) {
             }
         }
     }
-    if(y!=(mapHeight-1) && (map[0][x][y+1]>0 && map[1][x][y+1]==0)) {
+    if (y != (mapHeight - 1) && (map[0][x][y + 1] > 0 && map[1][x][y + 1] == 0)) {
         int isAlreadyAdded = 0;
         for (int i = 0; i < availableNumber && !isAlreadyAdded; ++i) {
-            if (kingdoms[turn].available[i].x == x && kingdoms[turn].available[i].y == y+1) isAlreadyAdded = 1;
+            if (kingdoms[turn].available[i].x == x && kingdoms[turn].available[i].y == y + 1) isAlreadyAdded = 1;
         }
         if (!isAlreadyAdded) {
             kingdoms[turn].available[availableNumber].x = x;
-            kingdoms[turn].available[availableNumber].y = y+1;
+            kingdoms[turn].available[availableNumber].y = y + 1;
             kingdoms[turn].availableNumber++;
             availableNumber++;
         }
@@ -198,9 +195,9 @@ int checkNeighbors(int x, int y) {
     }
 
     if (MakeRoad) {
-        mode=4;
+        mode = 4;
         animation = 1;
-        manPos = (Vector2) {(roadX+.2) * TILE_SIZE + map0.x, (roadY-.2) * TILE_SIZE + map0.y};
+        manPos = (Vector2) {(roadX + .2) * TILE_SIZE + map0.x, (roadY - .2) * TILE_SIZE + map0.y};
         MakeRoad = 0;
         return 1;
     }
@@ -215,8 +212,8 @@ void RoadMaker() {
         kingdoms[turn].road[kingdoms[turn].roadNumber].x = roadX;
         kingdoms[turn].road[kingdoms[turn].roadNumber].y = roadY;
         kingdoms[turn].roadNumber++;
-        int warType=0, i=0;
-        while (checkForWar(roadX, roadY) && i++<4) {
+        int warType = 0, i = 0;
+        while (checkForWar(roadX, roadY) && i++ < 4) {
             warType = checkForWar(roadX, roadY);
             Vector2 opponentV = {opponentX, opponentY};
             Vector2 turnV = {roadX, roadY};
@@ -226,8 +223,7 @@ void RoadMaker() {
                     if (isPlayingWithMonte && turn == 2) {
                         DeleteKingdom(toBeDeleted);
                         return;
-                    }
-                    else
+                    } else
                         animation = 2;
                     mode = 4;
                     return;
@@ -236,8 +232,7 @@ void RoadMaker() {
                     if (isPlayingWithMonte && turn == 2) {
                         DeleteKingdom(toBeDeleted);
                         return;
-                    }
-                    else
+                    } else
                         animation = 2;
                     mode = 4;
                     return;
@@ -258,25 +253,29 @@ void RoadMaker() {
         }
         for (i = 0; i < 4; ++i) {
             int VillageID;
-            if (map[0][roadX + 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+            if (map[0][roadX + 1][roadY] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
                 VillageID = map[1][roadX + 1][roadY];
                 if (villages[VillageID].kingdom == 0) {
                     conquerVillage(VillageID, turn);
                 }
             }
-            if (map[0][roadX - 1][roadY] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+            if (map[0][roadX - 1][roadY] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
                 VillageID = map[1][roadX - 1][roadY];
                 if (villages[VillageID].kingdom == 0) {
                     conquerVillage(VillageID, turn);
                 }
             }
-            if (map[0][roadX][roadY - 1] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+            if (map[0][roadX][roadY - 1] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
                 VillageID = map[1][roadX][roadY - 1];
                 if (villages[VillageID].kingdom == 0) {
                     conquerVillage(VillageID, turn);
                 }
             }
-            if (map[0][roadX][roadY + 1] == -2 && (warType==0 || (warType>0 && kingdoms[turn].soldier>kingdoms[opponent].soldier))) {
+            if (map[0][roadX][roadY + 1] == -2 &&
+                (warType == 0 || (warType > 0 && kingdoms[turn].soldier > kingdoms[opponent].soldier))) {
                 VillageID = map[1][roadX][roadY + 1];
                 if (villages[VillageID].kingdom == 0) {
                     conquerVillage(VillageID, turn);
@@ -286,7 +285,7 @@ void RoadMaker() {
     }
 
 
-    mode=0;
+    mode = 0;
     turn++;
 }
 
@@ -312,7 +311,8 @@ void mode0() {
             case 5:
                 strcpy(actionText, "The computer did nothing");
                 break;
-            default: strcpy(actionText, "The computer built a road");
+            default:
+                strcpy(actionText, "The computer built a road");
         }
         DrawRectangle(90, 90, 720, 40, (Color) {222, 131, 124, 100});
         int textWidth = MeasureText(actionText, 30);
@@ -331,11 +331,11 @@ void mode0() {
             }
         }
         if (kingdoms[turn].dead) turn++;
-    } while(kingdoms[turn].dead || turn> kingdomNumber);
+    } while (kingdoms[turn].dead || turn > kingdomNumber);
 
 
-    int kingdomVertexNumber = kingdoms[turn].y*mapWidth + kingdoms[turn].x;
-    for(int i=0; i<villageNumber; i++) {
+    int kingdomVertexNumber = kingdoms[turn].y * mapWidth + kingdoms[turn].x;
+    for (int i = 0; i < villageNumber; i++) {
         dijkstraVillage(kingdomVertexNumber, i, mapWidth * mapHeight);
     }
 
@@ -352,7 +352,7 @@ void mode0() {
                 BestDistance = distance;
             }
         }
-        for (int j=0; j<villageNumber; ++j) {
+        for (int j = 0; j < villageNumber; ++j) {
             if (villages[j].kingdom == turn) {
                 path = villages[j].y * mapWidth + villages[j].x;
                 distance = dijkstraVillage(path, i, mapWidth * mapHeight);
@@ -390,7 +390,8 @@ void mode0() {
         }
 
         // Draw shadow for 3D effect
-        DrawRectangleRounded((Rectangle){buttons[i].rect.x + 2, buttons[i].rect.y + 2, buttons[i].rect.width, buttons[i].rect.height},
+        DrawRectangleRounded((Rectangle) {buttons[i].rect.x + 2, buttons[i].rect.y + 2, buttons[i].rect.width,
+                                          buttons[i].rect.height},
                              .3f, 16, buttons[i].color);
 
         DrawRectangleRounded(buttons[i].rect, .3f, 16, buttons[i].color);
@@ -438,21 +439,21 @@ void mode1() {
             break;
 
         case 4:
-            mode=2;
+            mode = 2;
         case 5:
             break;
     }
-    if (mode==1) {
+    if (mode == 1) {
         mode = 0;
         turn++;
     }
 }
 
 void mode3() {
-    DrawRectangle(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){128, 128, 128, 150});
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color) {128, 128, 128, 150});
     char text[24];
     sprintf(text, "The winner Is Kingdom %d", winner);
     int textWidth = MeasureText(text, 40);
-    DrawText(text, (SCREEN_WIDTH-300) / 2 - textWidth / 2,100, 40, kingdoms[winner].color);
+    DrawText(text, (SCREEN_WIDTH - 300) / 2 - textWidth / 2, 100, 40, kingdoms[winner].color);
 }
 

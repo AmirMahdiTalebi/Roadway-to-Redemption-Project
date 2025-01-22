@@ -4,7 +4,6 @@
 #include "raylib.h"
 #include "stdlib.h"
 #include <math.h>
-#include "stdio.h"
 #include <limits.h>
 
 node root;
@@ -12,15 +11,15 @@ node root;
 typedef struct node node;
 
 int monte() {
-    root.state = (gameState*) malloc(sizeof(gameState));
+    root.state = (gameState *) malloc(sizeof(gameState));
     root.parent = NULL;
     root.children = NULL;
     SaveGame(root.state);
-    root.visits=root.winCount=0;
+    root.visits = root.winCount = 0;
     node *current;
     current = &root;
 
-    for (int i = 0; i < iterations ; ++i) {
+    for (int i = 0; i < iterations; ++i) {
         expand(current);
         for (int j = 0; j < current->childCount; ++j) {
             int gameResult = simulation(current->children[j]->state);
@@ -36,9 +35,7 @@ int monte() {
             maxSimulations = root.children[i]->visits;
             bestMove = *root.children[i]->state;
         }
-        printf("%d visits\n", root.children[i]->visits);
     }
-    printf("\n");
     LoadGame(&bestMove);
     freeTree(&root);
     mode = 0;
@@ -52,27 +49,28 @@ int monte() {
         }
     }
 
-    if (bestMove.kingdom[2].food-bestMove.kingdom[2].foodX > root.state->kingdom[2].food) return 1;
+    if (bestMove.kingdom[2].food - bestMove.kingdom[2].foodX > root.state->kingdom[2].food) return 1;
     if (bestMove.kingdom[2].worker > root.state->kingdom[2].worker) return 2;
     if (bestMove.kingdom[2].soldier > root.state->kingdom[2].soldier) return 3;
     if (bestMove.kingdom[2].roadNumber == root.state->kingdom[2].roadNumber &&
         bestMove.kingdom[1].roadNumber == root.state->kingdom[1].roadNumber &&
         bestMove.kingdom[2].soldier == root.state->kingdom[2].soldier &&
-        !didTryToMakeRoad) return 5;
+        !didTryToMakeRoad)
+        return 5;
     return 0;
 }
 
 node* selection() {
-    node* best;
+    node *best;
     double maxUCB;
-    node* parent = &root;
+    node *parent = &root;
     while (parent->children) {
         maxUCB = -1;
         for (int i = 0; i < parent->childCount; ++i) {
             double ucb;
             if (parent->children[i]->visits != 0) {
-                ucb = ((parent->children[i]->winCount/parent->children[i]->visits) +
-                       CONSTANT* sqrt(log(root.visits)/parent->children[i]->visits));
+                ucb = ((parent->children[i]->winCount / parent->children[i]->visits) +
+                       CONSTANT * sqrt(log(root.visits) / parent->children[i]->visits));
             } else {
                 ucb = INT_MAX;
             }
@@ -88,7 +86,7 @@ node* selection() {
 
 void expand(node* parent) {
     parent->childCount = possibleMoves(parent->state);
-    parent->children = (node**)malloc(parent->childCount * sizeof(node*));
+    parent->children = (node **) malloc(parent->childCount * sizeof(node *));
 
     for (int i = 0; i < parent->childCount; i++) {
         parent->children[i] = (node *) malloc(sizeof(node));
@@ -147,9 +145,9 @@ void expand(node* parent) {
 
 int simulation(gameState* state) {
     LoadGame(state);
-    gameState *save = (gameState*) malloc(sizeof(gameState));
+    gameState *save = (gameState *) malloc(sizeof(gameState));
     *save = *state;
-    for (int k = 0; k < mapWidth*mapHeight && !winner; ++k)  {
+    for (int k = 0; k < mapWidth * mapHeight && !winner; ++k) {
         if (turn > kingdomNumber) {
             turn = 1;
             for (int i = 1; i <= kingdomNumber; i++) {
@@ -205,12 +203,12 @@ int possibleMoves (gameState* state) {
     kingdoms[turn].availableNumber = 0;
     checkNeighbors(kingdoms[turn].x, kingdoms[turn].y);
 
-    for (int i = 0; i <kingdoms[turn].roadNumber; ++i) {
+    for (int i = 0; i < kingdoms[turn].roadNumber; ++i) {
         checkNeighbors(kingdoms[turn].road[i].x, kingdoms[turn].road[i].y);
     }
 
-    for(int i=0; i<villageNumber; i++) {
-        if(villages[i].kingdom ==turn) {
+    for (int i = 0; i < villageNumber; i++) {
+        if (villages[i].kingdom == turn) {
             checkNeighbors(villages[i].x, villages[i].y);
         }
     }
@@ -223,7 +221,7 @@ int possibleMoves (gameState* state) {
         else opponentTurn = 2;
         if (checkForWar(availableX, availableY) && kingdoms[turn].soldier < kingdoms[opponentTurn].soldier) {
             for (int j = i; j < kingdoms[turn].availableNumber; ++j) {
-                kingdoms[turn].available[j] = kingdoms[turn].available[j+1];
+                kingdoms[turn].available[j] = kingdoms[turn].available[j + 1];
             }
             kingdoms[turn].availableNumber--;
             i--;
@@ -234,10 +232,10 @@ int possibleMoves (gameState* state) {
     if (kingdoms[turn].foodX < 3 && kingdoms[turn].worker < 4) {
         moveCount++;
     }
-    if (kingdoms[turn].worker <4 && kingdoms[turn].food >=3) {
+    if (kingdoms[turn].worker < 4 && kingdoms[turn].food >= 3) {
         moveCount++;
     }
-    if (kingdoms[turn].gold>=2)
+    if (kingdoms[turn].gold >= 2)
         moveCount++;
     moveCount++;
     SaveGame(state);
