@@ -292,8 +292,8 @@ void RoadMaker() {
 void mode0() {
     if (kingdoms[1].dead && isPlayingWithMonte) {
         buttonsPosY = -100;
-        mode3();
-        isPlayingWithMonte = 0;
+        mode = 3;
+        return;
     }
     if (turn == 2 && isPlayingWithMonte) {
         int monteAction = monte();

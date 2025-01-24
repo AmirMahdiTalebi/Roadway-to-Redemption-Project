@@ -174,6 +174,7 @@ int main() {
             mode3();
 
         if (mode == 4) { //animation
+
             if (animation == 1) { //making roads
                 if (AnimationCounter < 12) {
                     manTimer -= GetFrameTime();
@@ -189,7 +190,9 @@ int main() {
                     RoadMaker();
                     AnimationCounter = 0;
                 }
-            } else if (animation == 2) { //all-out war
+            }
+
+            else if (animation == 2) { //all-out war
                 if (AnimationCounter < 28) {
                     flameTimer -= GetFrameTime();
                     if (flameTimer < 0) {
@@ -202,7 +205,8 @@ int main() {
                                         (kingdoms[toBeDeleted].y - .4) * TILE_SIZE + map0.y};
                     Rectangle source = (Rectangle) {FLAME_WIDTH * manIndex, 0, FLAME_WIDTH, FLAME_HEIGHT};
                     DrawTextureRec(explosion, source, manPos, WHITE);
-                } else {
+                }
+                else {
                     AnimationCounter = 0;
                     DeleteKingdom(toBeDeleted);
                 }
@@ -217,11 +221,14 @@ int main() {
     InitWindow(500, 200, "quit screen");
 
     while (!WindowShouldClose()) {
+
         BeginDrawing();
+
         ClearBackground(BLACK);
         char text[50] = "Do you want to save the game? (Y/N)";
         int textWidth = MeasureText(text, 20);
         DrawText(text, (500 - textWidth) / 2, 90, 20, GREEN);
+
         if (IsKeyPressed(KEY_Y)) {
             gameState lastGame;
             SaveGame(&lastGame);
@@ -238,9 +245,11 @@ int main() {
                 break;
             }
         }
+
         if (IsKeyPressed(KEY_N)) {
             break;
         }
+
         EndDrawing();
     }
 

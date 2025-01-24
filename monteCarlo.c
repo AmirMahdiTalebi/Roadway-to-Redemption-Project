@@ -35,6 +35,10 @@ int monte() {
             maxSimulations = root.children[i]->visits;
             bestMove = *root.children[i]->state;
         }
+        if (root.children[i]->state->winner == 2) {
+            bestMove = *root.children[i]->state;
+            break;
+        }
     }
     LoadGame(&bestMove);
     freeTree(&root);
@@ -187,7 +191,7 @@ int simulation(gameState* state) {
         }
     }
     if (winner) save->end = 1;
-    return ((save->end && winner == 2) || (save->kingdom[1].soldier <= save->kingdom[2].soldier));
+    return ((save->end && winner == 2) || (!save->end && save->kingdom[1].soldier <= save->kingdom[2].soldier));
 }
 
 void backpropagation(node* node, int result) {
